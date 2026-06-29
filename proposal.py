@@ -320,7 +320,9 @@ def _priced_note_row(body, label, amount, deduct=False):
     U.no_space(lp, before=2, after=2)
     if label:
         _run(lp, label, bold=True, underline=True, size=10)
-    rp = t.cell(0, 1).paragraphs[0]
+    rc = t.cell(0, 1)
+    rc.vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM   # align price to the note's last line
+    rp = rc.paragraphs[0]
     U.no_space(rp, before=2, after=2)
     if amount not in (None, ""):
         amt = str(amount).strip()
