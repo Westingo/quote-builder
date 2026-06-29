@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated proposals (job inputs are tracked; built .docx are not)
+jobs/*/*.docx
+jobs/*/~$*.docx
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Word/OneDrive lock files
+~$*

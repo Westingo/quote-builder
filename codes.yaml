@@ -1,0 +1,3309 @@
+Brivo:
+- code: ACS6100R-E
+  description: Brivo ACS6100R-E On-Air cloud hosted access controller, standard enclosure
+  model: ACS6100R-E
+  cost: 1148
+  labor: 6
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS6100L-E
+  description: Brivo ACS6100L-E On-Air cloud hosted access controller, large enclosure
+  model: ACS6100L-E
+  cost: 1300
+  labor: 6
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS6100-DB
+  description: Brivo ACS6100-DB 2-door expansion board
+  model: ACS6100-DB
+  cost: 321
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS6100-IO
+  description: Brivo ACS6100-I/O input/output board
+  model: ACS6100-IO
+  cost: 357
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS6100R-EXP
+  description: Brivo ACS6100R-EXP standard expansion enclosure
+  model: ACS6100R-EXP
+  cost: 306
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS6100L-EXP
+  description: Brivo ACS6100L-EXP large expansion enclosure
+  model: ACS6100L-EXP
+  cost: 409
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: B5
+  description: Cellular Data Unit – Allows internet access via remote access for programming and tracking use. (Monthly fees apply)
+  model: B-OA-CNM1-Z1
+  cost: 175 plus verizon charge of $30 per month
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: ACS300-E
+  description: Brivo ACS-300-E On-Air 2-door cloud hosted access controller
+  model: ACS-300-E-B
+  cost: 604
+  labor: 4
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: B5B
+  description: Outdoor weatherproof enclosure to house controls
+  cost: 390
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: B6A
+  description: Monthly On-Air cloud hosted access control fee. Includes 5 smartphone-as-a-credential passes
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: B6C
+  description: Monthly fee for cellular data and on-air hosted cloud software
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: PASSOPS
+  description: "Optional Monthly Fees:\n Add 100 smartphone mobile passes.\n Add 500 smartphone mobile passes."
+  cost: '18
+
+    54'
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: AL175
+  description: Altronix AL175ULX power supply with (2) 7AH batteries for battery backup
+  model: AL175ULX
+  cost: 172
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: AL400
+  description: Altronix AL400ULACMCB power supply with (2) 7AH batteries for battery backup – Includes ACM module
+  model: AL400ULACMCB
+  cost: 255
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: AL400-E
+  description: 'Altronix AL400ULACMCB power supply with (2) 7AH batteries for battery backup. Includes ACM module.
+
+    Provide line voltage electrician to connect 120V power to power supply.'
+  cost: 735
+  labor: 4
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: REX
+  description: Bosch DS160 “REX” motion egress sensor
+  model: DS160
+  cost: 60
+  labor: 2
+  category: BRIVO
+  notes: ds161 BLACK
+  section: scope
+  sheet: Brivo
+- code: BEA
+  description: BEA pneumatic egress button for emergency egress – Model BEA10ACPBDA10
+  model: BEA10ACPBDA10
+  cost: 188
+  labor: 3
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: What we charge
+  description: "Monthly pricing info on 6000 and 300 panels: \n   base cost per site $10 Readers 1 - 2      =   $ 18.00 each.\n    Readers 3 - 12    =   $ 14.50 each.\n    Readers 13+       =   $   6.00each.\
+    \ \n\nBrivo passes:\n    100      =    $  18.00\n    500+    =    $  54.00\n    1000+  =    $  88.00\nCellular (Verizon): $30\nAPI $45\nBrivo Visitor Kiosk: $39"
+  category: BRIVO
+  notes: "Brivo Visitor Kisok Equipment List: \n\n1) Bosstab Elite Evo tablet stand with lockable faceplate and barrel key and internal cable management in white finish - screwed down to top of reception\
+    \ desk.\n1) Apple iPad 10th Generation 64GB 10.9\" - mounted inside of tablet stand.\n1) 6' right angled USB-C charging cable and charging block for iPad.\n1) Brother QL-820NWBC label printer - plugged\
+    \ in at reception desk.\n\nSupply:\n100' of 2.4\" label paper for temporary visitor badges. | 812 | 5"
+  section: scope
+  sheet: Brivo
+- code: DSX1048
+  description: DSX 1048NV Intelligent Controller, 8-door package with non-volatile memory on master controller, enclosure, 3 expansion 1042 boards, and power distribution module
+  model: DSX-1048PKGNVMC
+  cost: 3780
+  labor: 12
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: DSX1042
+  description: DSX 1042 Intelligent Controller with enclosure for control of 2 doors with non-volatile memory, enclosure, and power distribution module
+  model: DSX-1042PKGNV
+  cost: 1365
+  labor: 6
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: DSX1043
+  description: DSX relay control board - No Enclosure
+  model: DSX-1043
+  cost: 600
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: DSX1022
+  description: DSX 1022NV Two Door Controller with non-volatile memory and enclosure.
+  model: DSX-1022NV
+  cost: 1026
+  labor: 6
+  category: BRIVO
+  notes: Qty. 100 NFC passes is an annual fee of $750.00. That's about $7.50 per NFC pass.
+  section: scope
+  sheet: Brivo
+- code: DSXLAN
+  description: DSX communicator for WAN or LAN connections
+  model: DSX-LAN-D
+  cost: 240
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: WINDSX
+  description: DSX WinStart Software Microsoft Access Version. Requires Windows 10 Pro
+  model: WinStart
+  cost: 240
+  labor: 2
+  category: BRIVO
+  notes: Qty. 20 NFC passes is an annual fee of $180.00.
+  section: scope
+  sheet: Brivo
+- code: WinStartSQL
+  description: DSX SQL Software. Requires Windows 10 Pro and SQL server 2012 or higher
+  model: WinStartSQL
+  cost: 1500
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: CYPRESS
+  description: Cypress Wiegand isolator part number OPTW-100 to allow two readers to tie to one port
+  model: OPTW-100
+  cost: 111
+  category: BRIVO
+  section: scope
+  sheet: Brivo
+- code: S5
+  description: 'Netgear 5-port PoE switch (Part #GS30DP V2)'
+  cost: 69
+  labor: 2
+  category: PoE SWITCH
+  section: scope
+  sheet: Brivo
+- code: S10
+  description: 'FS 10-port PoE switch (Part #S3410-10TF-P)'
+  cost: 299
+  labor: 2
+  category: PoE SWITCH
+  section: scope
+  sheet: Brivo
+- code: S24
+  description: 'FS 24-port PoE switch (Part #S1400-24T4F)'
+  cost: 370
+  labor: 2
+  category: PoE SWITCH
+  section: scope
+  sheet: Brivo
+Access:
+- code: 1800-080
+  description: Doorking 1800-080 cellular dialer with voice/data in outdoor rated enclosure (Monthly fees apply)
+  cost: 867
+  labor: 3
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1800-081
+  description: Doorking 1800-081 cellular dialer with voice/data for use with access plus models in outdoor rated enclosure (Monthly fees apply)
+  cost: 744
+  labor: 3
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1802-090
+  description: Doorking 1802-090 (EPD) callbox with LCD screen and keypad for visitors, A-Z buttons to choose call recipient and backlight
+  cost: 763
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1812-095
+  description: Doorking 1812-095 Plus residential telephone entry system, keypad with 5-digit entry codes, digital voice circuit for enhanced fidelity, with curved top
+  cost: 1240
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1812-096
+  description: Doorking 1812-096 Access Plus telephone entry system, keypad with 5-digit entry codes, inputs for access control devices with curved top
+  cost: 1233
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1815-037
+  description: Doorking 1815-037 USB to RS232 adapter to convert DKS RS232 port to USB connector for direct PC connection (typically used with laptops).
+  cost: 86
+  labor: 1
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1815-051
+  description: Doorking 1815-051 surface mount digital keypad. 26-bit with Wiegand signal broadcasting
+  cost: 252
+  labor: 3
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1815-578
+  description: Doorking 1815-578 VoIP adapter uses customer-supplied internet connection, does not provide programming capability. (Monthly fees apply)
+  cost: 70
+  labor: 3
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1830-185
+  description: Doorking 1830-185 manual set up TCP/IP adapter – Allows programming of 30 series systems, resides on customer’s LAN (Static IP required)
+  cost: 119
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1830-186
+  description: Doorking 1830-186 “Plug and Play” TCP/ IP adapter – Allows programming of 30 series systems using customer-supplied internet connection (Monthly fees apply)
+  cost: 109
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1834-080
+  description: Doorking 1834-080 small screen surface mount PC programmable telephone entry system (without access control), keypad with 4-digit entry codes, 3000 names/numbers (requires dedicated phone
+    line to site)
+  cost: 1486
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1835-080
+  description: Doorking 1835-080 small screen surface mount PC programmable telephone entry system (access control capability), keypad with 4-digit entry codes, 3000 names/numbers (requires dedicated phone
+    line to site)
+  cost: 2181
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1835-090
+  description: Doorking 1835-090 small screen surface mount PC programmable telephone entry system (access control capability), keypad with 4-digit entry codes, 3000 names/numbers (requires dedicated phone
+    line to site)
+  cost: 2181
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1837-080
+  description: Doorking 1837-080 large screen surface mount PC programmable telephone entry system (access control capability), keypad with 4-digit entry codes, 3000 names/ numbers (Requires dedicated phone
+    line to site)
+  cost: 3017
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 1838-081
+  description: Doorking 1838-081 2-door access controller (expandable up to 16 doors) PC programmable with 3000 codes and up to 3 relays for door/gate/elevator control. Includes memory and (2) 16VAC power
+    transformers
+  cost: 1098
+  labor: 6
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2112-080
+  description: Doorking 2112-080 eVolve video app based basic residential telephone entry system, keypad with 5-digit entry codes, with curved top – Mounted to existing gooseneck. (No video storage or cloud
+    service included).
+  cost: 789
+  labor: 6
+  category: DOORKING
+  notes: '2112-087 Flush Mount Version:
+
+    $988'
+  section: scope
+  sheet: Access
+- code: 2112-150
+  description: Doorking 2112-150 Internal cellular kit for T-Mobile
+  cost: 94
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2112-151
+  description: Doorking 2112-151 Internal cellular kit for AT&T
+  cost: 94
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2112-152
+  description: Doorking 2112-152 External Cellular Kit for T-Mobile
+  cost: 156
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: '2334'
+  description: Doorking 2334-080 VoIP + “plug and play” TCP/ IP adapter, uses customer supplied internet connection in outdoor rated enclosure (Monthly fees apply)
+  cost: 331
+  labor: 4
+  category: DOORKING
+  notes: '* Only works with a version Z or higher board'
+  section: scope
+  sheet: Access
+- code: 2348-040
+  description: Doorking 2348-040 elevator control board
+  cost: 1047
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2348-080
+  description: Doorking 2348-080 elevator control – Small housing, includes one control board
+  cost: 1356
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2348-081
+  description: Doorking 2348-081 elevator control – Large housing, includes one control board
+  cost: 1481
+  labor: 8
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2351-080
+  description: Doorking 2351-080 small tracker board enclosure – Includes one 2358-010 tracker board
+  cost: 340
+  labor: 3
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2351-082
+  description: Doorking 2351-082 large enclosure with ability to house 4 tracker boards with pre-wired configuration. Includes one 2358-010 tracker board
+  cost: 728
+  labor: 4
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: 2358-010
+  description: Doorking 2358-010 one-door expansion board
+  cost: 282
+  labor: 2
+  category: DOORKING
+  section: scope
+  sheet: Access
+- code: DK1
+  description: 'DKS 2112 Cellular Monthly Fee: For cloud programming, video calling, and VoIP (via T-Mobile)'
+  cost: Charge $56
+  category: DOORKING
+  notes: Cost $39.90
+  section: scope
+  sheet: Access
+- code: DK2
+  description: 'DKS 2112 Cellular Monthly Fee: For cloud programming, video calling, and VoIP (via AT&T)'
+  cost: Charge $56
+  category: DOORKING
+  notes: Cost $39.90
+  section: scope
+  sheet: Access
+- code: DK3
+  description: 'DKS 2112 Cloud Monthly Fee: For programming, video calling, and VoIP (If hardwired internet connection is provided)'
+  cost: Charge $28
+  category: DOORKING
+  notes: Cost $19.95
+  section: scope
+  sheet: Access
+- code: DKV100
+  description: Doorking Cellular Voice – Up to 100 minutes per month
+  model: Voice Only
+  cost: Charge $60
+  category: DOORKING
+  notes: Cost $42.95 | One time activation fee of $45 for each cellular box.
+  section: scope
+  sheet: Access
+- code: DKV450
+  description: Doorking Cellular Voice – Up to 450 minutes per month
+  cost: Charge $74
+  category: DOORKING
+  notes: Cost $52.95
+  section: scope
+  sheet: Access
+- code: DKV1200
+  description: Doorking Cellular Voice – Up to 1200 minutes per month
+  cost: Charge $87
+  category: DOORKING
+  notes: Cost $61.95
+  section: scope
+  sheet: Access
+- code: DKV2500
+  description: Doorking Cellular Voice – Up to 2500 minutes per month
+  cost: Charge $105
+  category: DOORKING
+  notes: Cost $74.95
+  section: scope
+  sheet: Access
+- code: DKVD100
+  description: DKS Cellular Voice and Data Monthly Fee – Includes DKS server. Up to 100 minutes and 6 data transfers per month
+  model: Voice & Data
+  cost: Charge $67
+  category: DOORKING
+  notes: Cost $47.95
+  section: scope
+  sheet: Access
+- code: DKVD450
+  description: DKS Cellular Voice and Data Monthly Fee – Includes DKS server. Up to 450 minutes and 60 data transfers per month
+  cost: Charge $85
+  category: DOORKING
+  notes: Cost $60.95
+  section: scope
+  sheet: Access
+- code: DKVD1200
+  description: DKS Cellular Voice and Data Monthly Fee – Includes DKS server. Up to 1200 minutes and 90 data transfers per month
+  cost: Charge $104
+  category: DOORKING
+  notes: Cost $73.95
+  section: scope
+  sheet: Access
+- code: DKVD2500
+  description: DKS Cellular Voice and Data Monthly Fee – Includes DKS server. Up to 2500 minutes and 120 data transfers per month
+  cost: Charge $122
+  category: DOORKING
+  notes: Cost $86.95
+  section: scope
+  sheet: Access
+- code: DKVPD
+  description: Doorking VoIP/Data subscription (Use with 2334-080). Provides voice and programming of 30 series systems via customer supplied broadband internet connection, per month
+  model: Voice & Data
+  cost: Charge $50
+  category: DOORKING
+  notes: Cost $35.70
+  section: scope
+  sheet: Access
+- code: DKVP
+  description: Doorking VoIP subscription (Use With 1815-578). Provides voice communication only, per month
+  cost: Charge $44
+  category: DOORKING
+  notes: Cost $31.12
+  section: scope
+  sheet: Access
+- code: DKD
+  description: Doorking Data subscription (Use With 1830-186) Provides 30 Series system programming only, per month
+  cost: Charge $19
+  category: DOORKING
+  notes: Cost $13.70
+  section: scope
+  sheet: Access
+- code: DKIM100
+  description: Doorking IM server modem – Negates the need for an analog modem and phone line at the programming PC when using POTS line at entry system (Legacy Connection). Up to 100 residents in system
+    directory, per month
+  cost: Charge $22
+  category: DOORKING
+  notes: Cost $15.54 | 251-500 Residents Cost $23.79 | Charge $34
+  section: scope
+  sheet: Access
+- code: DKIM250
+  description: Doorking IM server Modem – Negates the need for an analog modem and phone line at the programming PC when using POTS line at entry system (Legacy Connection). Up to 250 residents in system
+    directory, per month
+  cost: Charge $28
+  category: DOORKING
+  notes: Cost $20.12 | 501+ Residents Cost $29.29 | Charge $41
+  section: scope
+  sheet: Access
+- code: 'CAPXLV
+
+    (Use with CAPXLV2)'
+  description: CAPXLV2 surface mount VoIP/cloud based telephone entry system with 10” HD color touch screen, integrated 1080P camera (picture in picture capability), easy browser-based programming via web
+    port login, real time alerting, and access control device capability
+  cost: 2729
+  labor: 10
+  category: LIFTMASTER
+  notes: 2487 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPXLV2
+  description: Uses customer-supplied high speed internet connection (Requires Wi-Fi/hardwire network connection with at least 5MB/S upload/download speed) with option for live streaming video to resident
+    smartphone (Monthly fees apply)
+  cost: 2729
+  labor: 10
+  category: LIFTMASTER
+  notes: '2026-02-26 00:00:00'
+  section: scope
+  sheet: Access
+- code: CAPXLTK
+  description: Stainless steel recess box with trim ring for flush installation, Model CAPXLV2TK
+  model: CAPXLV2TK
+  cost: 230
+  labor: 2
+  category: LIFTMASTER
+  notes: '2026-02-26 00:00:00'
+  section: scope
+  sheet: Access
+- code: CAP2D
+  description: Connected access portal for cloud control for up to two entries, Model CAP2D (Monthly fees apply)
+  cost: 756
+  labor: 4
+  category: LIFTMASTER
+  notes: 599 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPXM
+  description: CAPXM smart video intercom with a 135° view 1080P camera, 7” touch screen, live streaming video to resident smart phone and includes a built-in keypad. (Requires Wi-Fi/hardwire network connection
+    with at least 5MB/S upload/download speed)
+  cost: 1489
+  labor: 10
+  category: LIFTMASTER
+  notes: 1357 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPXMTK
+  description: Stainless recess trim kit for flush mount of CAPXM
+  cost: 380
+  labor: 2
+  category: LIFTMASTER
+  notes: 380 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPXS
+  description: CAPXS Smart Video Intercom with a 135° view, 1080P camera, 5" touch screen, and live streaming video to resident's smartphone. Includes a built-in keypad. (Requires internet connection with
+    at least 5MB/S upload/download speed). Monthly fees apply
+  cost: 645
+  labor: 10
+  category: LIFTMASTER
+  notes: 588 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPXAP
+  description: Liftmaster CAPXAP Smart Controller. - Supports up to 12 smart readers
+  model: CAPXAP
+  cost: 1276
+  labor: 6
+  category: LIFTMASTER
+  notes: 1162 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAP4
+  description: 'LiftMaster myQ Smart Door Expansion Board:
+
+    - Model CAP4EXPND.
+
+    - Adds control of 2 additional access points to Smart Door Controllers.'
+  model: CAP4EXPND
+  cost: 425
+  labor: 2
+  category: LIFTMASTER
+  notes: 387 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAP4AP
+  description: 'LiftMaster myQ Smart Door Controller:
+
+    - Model CAP4AP.
+
+    - Supports up to 2 readers (can handle 2 Wiegand readers and 4 OSDP readers).
+
+    - Outdoor rated enclosure.'
+  model: CAP4AP
+  cost: 473
+  labor: 4
+  category: LIFTMASTER
+  notes: 431 | 2026-02-26 00:00:00
+  section: scope
+  sheet: Access
+- code: CAPFEE1
+  description: 'Monthly Fee - Access Only: Includes 1 day video storage and live video streaming from intercom(s), all access points, audio calling to phones, web override, and physical credentials'
+  model: Access only
+  cost: cost $81
+  labor: Charge $124
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: CAPFEE2
+  description: 'Monthly Fee - Access Plus Cloud Software: Includes 1 day video storage and live video streaming from intercom(s), all access points, audio calling to phones, web override, mobile phone credentials,
+    physical credentials, app for remote unlock, and unlimited users'
+  model: Access Plus
+  cost: cost $153
+  labor: Charge $229
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: CAPFEE3
+  description: 'Monthly Fee - Basic: Includes 1 day video storage and live video streaming from intercom(s), all access points, audio calling to phones, web override, mobile phone credentials, physical
+    credentials, app for remote unlock, Siri voice control, mobile guest passes, and unlimited users'
+  model: Basic
+  cost: Cost $1.60 per unit
+  labor: Charge $3 per unit
+  category: LIFTMASTER
+  notes: same price if end user goes direct
+  section: scope
+  sheet: Access
+- code: CAPFEE4
+  description: 'Monthly Fee - Advanced: Includes 30 days of video storage and live video streaming from intercom(s), all access points, audio calling to phones and video calling to app users, web override,
+    mobile phone credentials, physical credentials, app for remote unlock, Siri voice control, mobile guest passes, Liftmaster home garage door control, property announcements, and unlimited users'
+  model: Advanced
+  cost: Cost $2.8 per unit
+  labor: Charge $4 per unit and $240 per year minimum
+  category: LIFTMASTER
+  notes: same price if end user goes direct. Alex and i have been charging $240 per year on residential.
+  section: scope
+  sheet: Access
+- code: CAPFEECELL
+  description: Monthly fee for cellular data for MyQ Commercial Gateway with Cellular Connectivity
+  cost: 'Cost
+
+    4 Units $30/month,
+
+    50 Units $80/month
+
+    200 Units $125/month'
+  category: LIFTMASTER
+  notes: new verizon modem is free. See Westin.
+  section: scope
+  sheet: Access
+- code: CAPFEECOM1
+  description: Access Only Commercial - with cloud software and access via physical credentials
+  cost: 95 end user
+  category: LIFTMASTER
+  notes: us 80
+  section: scope
+  sheet: Access
+- code: CAPFEECOM2
+  description: Access Plus Commercial - with cloud software, physical credentials, mobile credentials, admin override, and in-app unlock
+  cost: 190 end user
+  category: LIFTMASTER
+  notes: us 153
+  section: scope
+  sheet: Access
+- code: CAPFEECOM3
+  description: Access Premium Commercial - with cloud software, physical credentials, mobile credentials, admin override, in-app unlock, plus Siri voice control, and mobile guest passes (video calling and
+    30-day video storage if call box is used)
+  cost: $300 end user
+  category: LIFTMASTER
+  notes: us 225
+  section: scope
+  sheet: Access
+- code: AL1
+  description: 'Altronix power supply/battery back-up: TM400 Enclosure, eFlow4NTB, ACM4, NetWay5P, LMBK2 (for mounting up to two (2) CAP2D) all mounting hardware'
+  model: TLM400K1
+  cost: 527
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: AL2
+  description: 'Altronix power supply/battery back-up: TM400 Enclosure, eFlow4NTB, ACM4CB, NetWay5P, LMBK2 (for mounting up to two (2) CAP2D) all mounting hardware'
+  model: TLM400K1D
+  cost: 527
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: AL3
+  description: 'Altronix power supply/battery back-up: Trove2 Enclosure TM2 backplane, eFlow104NTB, ACMS8, VR6, PDS8, NetWay5P, 2-LMBK2 (for mounting up to four (4) CAP2D) all mounting hardware'
+  model: T2LMK7F8N
+  cost: 1060
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: AL4
+  description: 'Altronix power supply/battery back-up: Trove2 Enclosure TM2 backplane, eFlow104NTB, ACMS8CB, VR6, PDS8CB, NetWay5P, 2-LMBK2 (for mounting up to four (4) CAP2D) all mounting hardware'
+  model: T2LMK7F8ND
+  cost: 1060
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: AL5
+  description: 'Altronix power supply/battery back-up: Trove3 Enclosure TM3 backplane, 2 - eFlow104NTB, 2 - ACMS8, 2 - VR6, 2 -  PDS8, 2 - NetWay5P, 4 - LMBK2 (for mounting up to four (4) CAP2D) all mounting
+    hardware'
+  model: T3LMK77F16N
+  cost: 1935
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: AL6
+  description: 'Altronix power supply/battery back-up: Trove3 Enclosure TM3 backplane, 2 - eFlow104NTB, 2 - ACMS8CB, 2 - VR6, 2 -  PDS8CB, 2 - NetWay5P, 4 - LMBK2 (for mounting up to four (4) CAP2D) all
+    mounting hardware'
+  model: T3LMK77F16ND
+  cost: 1935
+  category: LIFTMASTER
+  section: scope
+  sheet: Access
+- code: EXC1
+  description: 'Exacq Update: SSA-PRO-C - Current server version one year.'
+  category: Exacq
+  section: scope
+  sheet: Access
+- code: EXC2
+  description: 'Exacq Update: SSA-PRO-C - License per camera, one year.'
+  category: Exacq
+  section: scope
+  sheet: Access
+- code: MOFI
+  description: Mofi 4500 4G/LTE router with two cell antennas.
+  cost: 320 plus 42/month
+  labor: 2
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: MYQCOMM
+  description: Liftmaster MYQCOMM Commercial Gateway with Cellular Connectivity
+  model: MYQCOMM
+  cost: 297
+  labor: 2
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: ADA
+  description: Camden CX-12Plus door sequencer to stop the outer ADA button from working until a credential is presented first
+  cost: 55
+  labor: 2
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: CYPRESS
+  description: Cypress wiegand splitter module.
+  model: OPTW-100
+  cost: 111
+  labor: 2
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: UNIFI-GATE
+  description: '1) UniFi G3 Video Intercom with 7" touch screen, 118° view,  8 MP camera, Bluetooth and NFC connecitivity, Apple touch pass and live streaming video to resident smartphone. Includes a built-in
+    phyiscal keypad.  (Requires hardwired network connection with at least 5MB/S upload/download speed) - mounted to gooseneck.
+
+    1) UniFi Gate Hub.
+
+    - Tie in gate hub to gate operator and intercom.
+
+    1) UniFi PoE++ Adapter.
+
+    1) UniFi CloudKey+ with 1 TB SSD - To manage UniFi Access platform and save video video recording from gate.'
+  cost: 1048
+  labor: 8
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: UNIFI-BOX
+  description: UniFi Junction Utility - mounted at gate location, to house Ubiquiti controls.
+  cost: 119
+  labor: 2
+  category: OTHER
+  section: scope
+  sheet: Access
+- code: SDC
+  description: Starlink data communication. — Provide all junction boxes, wiring and power connections
+  category: OTHER
+  section: scope
+  sheet: Access
+Gate Accessories:
+- code: '6'
+  description: Sawcut vehicle presence loop – Keeps gate from closing if vehicle is present
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 6A
+  description: Preformed vehicle presence loop to be set at time of asphalt pour
+  cost: 165
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 6B
+  description: Preformed vehicle presence loop to be dug into dirt/gravel
+  cost: 165
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 6S
+  description: Sawcut “shadow” vehicle presence loop (under gate swing path)
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 6SB
+  description: Preformed "shadow" vehicle presence loop to be dug into dirt/gravel  (under gate swing path)
+  cost: 165
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: '7'
+  description: Sawcut free exit loop – Allows all vehicles to exit
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7A
+  description: Preformed free exit loop to be set at time of asphalt pour
+  cost: 185
+  category: LOOPS AND DETECTORS
+  notes: Please note that it is $22 per 10' stick of schedule 80 for the lead-in
+  section: scope
+  sheet: Gate Accessories
+- code: 7B
+  description: Preformed free exit loop to be dug into dirt/gravel
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7C
+  description: Sawcut down loop sawcut into roadway – Closes barrier after vehicle clears opening
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7D
+  description: Sawcut auto close loop – Closes barrier after vehicle clears opening
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7E
+  description: Loop detector module, Model LOOPDETLM
+  cost: 102
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7F
+  description: Hy-Security loop detector, Model MX4621
+  cost: 158
+  category: LOOPS AND DETECTORS
+  section: scope
+  sheet: Gate Accessories
+- code: 7G
+  description: BEA EvoLoop Sensor - acts as an open sensor and safety sensor and includes a protective cover
+  model: 10EVOLOOP
+  cost: 733
+  category: LOOPS AND DETECTORS
+  notes: Consider adding a 3 x 3 post for mounting
+  section: scope
+  sheet: Gate Accessories
+- code: '9'
+  description: District fire switch – Fire access box only, that allows emergency vehicle access
+  model: No device included in price.
+  cost: 47
+  category: FIRE DEVICES
+  notes: do not use this as one of the ohter choices below will be correct
+  section: scope
+  sheet: Gate Accessories
+- code: 9A
+  description: Portland Fire Bureau permit
+  cost: 35
+  category: FIRE DEVICES
+  section: scope
+  sheet: Gate Accessories
+- code: 9B
+  description: Knox 3502 key switch for fire department access recessed into gooseneck and secured with security screws
+  cost: 192
+  labor: 3
+  category: FIRE DEVICES
+  section: scope
+  sheet: Gate Accessories
+- code: 9C
+  description: Tomar strobe sensor for strobe equipped emergency vehicle access
+  cost: 505
+  labor: 4
+  category: FIRE DEVICES
+  notes: updated 6/19/26 buy direct from tomar
+  section: scope
+  sheet: Gate Accessories
+- code: 9D
+  description: 'Clackamas County fire access: FLB-100-Mini with Clackamas Fire padlock'
+  cost: 232.64
+  labor: 3
+  category: FIRE DEVICES
+  section: scope
+  sheet: Gate Accessories
+- code: 9E
+  description: 'Tualatin Valley fire access: FLB-100-Mini with Knox padlock. Includes fire permit process'
+  cost: 232.64
+  labor: 3
+  category: FIRE DEVICES
+  section: scope
+  sheet: Gate Accessories
+- code: 9S
+  description: Knox 3261 surface mount vault with inspection – For fire department key storage
+  cost: 519
+  labor: 3
+  category: FIRE DEVICES
+  section: scope
+  sheet: Gate Accessories
+- code: '10'
+  description: Gooseneck pedestal fabricated from 3" × 3" tube powder-coated finish – Metro to provide concrete footing
+  cost: 145 + Concrete
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10A
+  description: 42" & 72” Dual-height gooseneck mounting pedestal fabricated from 3" × 3" tube powder-coated finish –Metro to provide concrete footing
+  cost: 282+ Concrete
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10B
+  description: ‘Hercules’ heavy duty double legged pedestal stand fabricated from 5" × 5" tube – With yellow powder-coated finish.
+  cost: 1169
+  labor: 8
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10C
+  description: Custom hooded assembly with UHMW back plate
+  model: 12x16 with uhmw other sizes are more $
+  cost: 220
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10D
+  description: Gooseneck pedestal fabricated from 3" × 3" tube powder-coated finish – Set in concrete (Drop In)
+  cost: 110 + Concrete
+  labor: 2
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10E
+  description: Custom pedestal stand for CAPXLV entry system with LED down lighting
+  cost: 2990
+  labor: 8
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10F
+  description: Gooseneck pedestal fabricated from 3" × 3" tube powder-coated finish
+  cost: 145
+  labor: 1
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10G
+  description: Gooseneck pedestal fabricated from 3" × 3" tube powder-coated finish - For CAPXM – Metro to provide concrete footing.
+  cost: '145 +
+
+    Concrete'
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10H
+  description: Gooseneck pedestal fabricated from 3" × 3" tube powder-coated finish w/ integrated rain hood - For CAPXS – Set on concrete pad
+  cost: "250 + \nConcrete"
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10I
+  description: Custom fabricated rain hood in powder-coated finish - For CAPXS – Mounted to existing gooseneck
+  cost: 170
+  labor: 1
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: 10J
+  description: Custom fabricated rain hood in powder-coated finish - with custom backing plate for UniFi Intercom
+  cost: 200
+  labor: 3
+  category: GOOSENECKS & KEYPADS
+  section: scope
+  sheet: Gate Accessories
+- code: AK11
+  description: Linear Model AK-11 access keypad with nightlight and multiple user codes
+  cost: 205
+  labor: 2
+  category: GOOSENECKS & KEYPADS
+  notes: Includes $16.47 tariff
+  section: scope
+  sheet: Gate Accessories
+- code: '18'
+  description: Gate edge contact sensors with wireless remotes – Required by UL 325 code
+  model: 3 units at 4'
+  cost: 494
+  labor: 4
+  category: EDGES
+  section: scope
+  sheet: Gate Accessories
+- code: 18A
+  description: Gate edge contact sensor – Required by UL 325 code
+  category: EDGES
+  section: scope
+  sheet: Gate Accessories
+- code: 18B
+  description: Gate edge contact sensor (along bottom of gate) – Required by UL 325 code
+  model: 20’ Double Swing, both sides
+  cost: 729
+  labor: 6
+  category: EDGES
+  section: scope
+  sheet: Gate Accessories
+- code: 18C
+  description: If gate edges are not needed to meet UL 325 code (TBD after gates are installed), DEDUCT
+  category: EDGES
+  section: scope
+  sheet: Gate Accessories
+- code: LMWEK1TU
+  description: LiftMaster LMWEKITU monitored wireless edge kit
+  model: For rec and trans
+  cost: 129
+  category: EDGES
+  notes: lmwetxu edge transmitter $57
+  section: scope
+  sheet: Gate Accessories
+- code: E960
+  description: E-960-D90Q Infrared photo cell non-contact sensor with heater
+  model: E-960-D90Q
+  cost: 81
+  labor: 3
+  category: EYES
+  notes: '19'
+  section: scope
+  sheet: Gate Accessories
+- code: LMTBUL
+  description: Set of LiftMaster LMTBUL monitored infrared eyes with heater
+  model: LMTBUL
+  cost: 206
+  labor: 3
+  category: EYES
+  notes: 19A
+  section: scope
+  sheet: Gate Accessories
+- code: E3K
+  description: Retro-reflective photo cell non-contact sensor
+  model: E3K from Omron
+  cost: 124
+  labor: 3
+  category: EYES
+  notes: 19B
+  section: scope
+  sheet: Gate Accessories
+- code: LMRRUL
+  description: LiftMaster LMRRUL monitored reflective eye with heater
+  model: LMRRUL
+  cost: 167
+  labor: 3
+  category: EYES
+  notes: 19C
+  section: scope
+  sheet: Gate Accessories
+- code: '4'
+  description: Internal receiver with coaxial antennae
+  cost: 0
+  labor: 0
+  category: RECEIVERS
+  section: scope
+  sheet: Gate Accessories
+- code: AP5
+  description: Linear AP-5 programmable receiver with ability to add and delete individual remotes at gate motor
+  cost: 80
+  labor: 1
+  category: RECEIVERS
+  notes: 4B
+  section: scope
+  sheet: Gate Accessories
+- code: WOR
+  description: Linear Wiegand output receiver, Model AM-WOR, with ability to tie into access control software to add/delete/track remotes
+  model: AM-WOR
+  cost: 149
+  labor: 3
+  category: RECEIVERS
+  section: scope
+  sheet: Gate Accessories
+- code: DKSWOR
+  description: DKS MicroPlus Wiegand radio receiver - Model 8040-080
+  model: 8040-080
+  cost: 125
+  labor: 3
+  category: RECEIVERS
+  section: scope
+  sheet: Gate Accessories
+- code: STAR1000
+  description: LiftMaster STAR1000 programmable receiver with ability to add and delete individual remotes at gate motor and tie into access control software to add/delete/track remotes.
+  model: STAR1000
+  cost: 109
+  labor: 3
+  category: RECEIVERS
+  section: scope
+  sheet: Gate Accessories
+- code: '21'
+  description: Heavy duty vinyl cantilever rollers with covers and brackets for 4” post
+  model: 4" - Qty 4
+  cost: 609
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+  variants:
+  - model: 6" - Qty 4
+    cost: 615
+- code: PLEASANT
+  description: Pleasant sounding horn & strobe to warn of gate movement
+  model: Anixter
+  cost: 876
+  labor: 3
+  category: MISC.
+  notes: Federal signal 1- VALS-024A $229, UTM $187, WB $64, 50GC $399
+  section: scope
+  sheet: Gate Accessories
+- code: METAL
+  description: Custom Steel Powdercoated Opener Enclosure With Black Powdercoated Finish (does not include top release locking cover)
+  model: Swan island invoice number 25932
+  cost: 750
+  labor: 1
+  category: MISC.
+  notes: Versa tech locking top cover 4/06/26 $240 each our cost which includes a padlock
+  section: scope
+  sheet: Gate Accessories
+- code: BOX
+  description: 14” × 12” × 7” Outdoor enclosure with solid state fan/heat controller and outlets for devices
+  model: NB141207-1HFS-UL
+  cost: 780
+  labor: 4
+  category: MISC.
+  notes: UL Listed
+  section: scope
+  sheet: Gate Accessories
+- code: BOX2
+  description: 14” × 12” × 7” Outdoor enclosure with outlets for devices.
+  model: NB141207-100-UL
+  cost: 595
+  labor: 4
+  category: MISC.
+  notes: UL Listed
+  section: scope
+  sheet: Gate Accessories
+- code: BOX3
+  description: 18" x 16" x 8" Outdoor enclosure with solid state fan/heat controller and outlets for device
+  model: NB181608-1HFS-UL
+  cost: 1120
+  labor: 4
+  category: MISC.
+  notes: UL Listed
+  section: scope
+  sheet: Gate Accessories
+- code: BOX4
+  description: 18" x 16" x 8" Outdoor enclosure with outlets for devices.
+  model: NB181608-100-UL
+  cost: 820
+  labor: 4
+  category: MISC.
+  notes: UL Listed
+  section: scope
+  sheet: Gate Accessories
+- code: '24'
+  description: 7-day timer – Digital and programmable to hold gate open during set times
+  model: EMX-5407-2
+  cost: 74
+  labor: 2
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: SECO
+  description: SECO-LARM 365-day timer – Digital and programmable to hold gate open during set times
+  model: SECO SA-027HQ
+  cost: 81
+  labor: 3
+  category: MISC.
+  notes: or altronix PT724A 365 day timer for $76
+  section: scope
+  sheet: Gate Accessories
+- code: MAG
+  description: MAG13 Magnetic lock (1,300 lbs.)
+  model: Viking MAG13
+  cost: 200
+  labor: 4
+  category: MISC.
+  notes: Elite MG1300 $242
+  section: scope
+  sheet: Gate Accessories
+- code: MAG2
+  description: MAG13 Magnetic locks (1,300 lbs.) installed high and low on gate vertical at latch point
+  category: MISC.
+  notes: Always quantity of [2]
+  section: scope
+  sheet: Gate Accessories
+- code: '25'
+  description: Warning Signs – Required by UL 325 Code (on next PM visit)
+  cost: 4.36
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: ASTMSW
+  description: Swing gate ASTM fall protection with connection from gate post to gate leaf
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: ASTMSL
+  description: Slide gate ASTM fall protection post
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: ASTMSL2
+  description: Slide gate ASTM physical stops to prevent gate over-travel
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: BBU
+  description: 'Doorking 1000-083 Battery Back-Up - with additional 35 AH battery (PN: 1801-005 and cable set 1000-044)'
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+- code: GATEBEA
+  description: 'At Gated Entry
+
+    − Disconnect existing outside eyes and leave in place.
+
+    Install: 1) BEA outdoor presence sensor for enhanced security against vandalism.
+
+    − Model I30 10LZRI30 with 35.1242 power cable, 10LBA bracket, 10PSMDR2024 power supply, and 10Remote remote control.
+
+    − Mounted at the top corner of the gates.
+
+    Other: - Run all conduit and wiring back to control box.
+
+    Supply: 1) Electrical permit.
+
+    - One year labor warranty.'
+  cost: 1023
+  labor: 8
+  category: MISC.
+  notes: Charge 2693
+  section: scope
+  sheet: Gate Accessories
+- code: SWAY
+  description: Galvanized gate sway brace- 2" X 4" 14 ga
+  model: 24' merchants pn 95760250
+  cost: 228
+  category: MISC.
+  section: scope
+  sheet: Gate Accessories
+Operators:
+- code: HDSW
+  description: LiftMaster HD series high cycle swing gate opener, Model HDSW-24UL, for gates up to 22’ wide with 1.5HP 24VDC drive motor and battery backup during power failure
+  model: HDSW24UL
+  cost: 2740
+  labor: 10
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: CSW
+  description: LiftMaster Elite high cycle swing gate opener, Model CSW-24UL, ½ HP, 115 volt with dual gearbox drive, manual release, and E.R.D. sensor. Includes built-in battery backup for operation during
+    power failure
+  model: CSW24UL
+  cost: 2040
+  labor: 10
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: LA500
+  description: LiftMaster LA-500-UL swing gate opener with key release and battery backup. Includes upgraded large control box
+  model: SGL
+  cost: 1752
+  labor: 8
+  category: OPERATORS
+  notes: includes tariff
+  section: scope
+  sheet: Operators
+  variants:
+  - model: DBL
+    cost: 2596
+    labor: 12
+- code: 1C
+  description: Add for use of double swing gate with second motor and concrete pad
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: BYAN
+  description: Byan __ hydraulic heavy duty ram with 20" × 16" × 6" enclosure and G3M control board
+  model: 500A
+  cost: 1329
+  category: OPERATORS
+  notes: Byan prices include surcharges effective 8/25.
+  section: scope
+  sheet: Operators
+  variants:
+  - model: 600A
+    cost: 1528
+  - model: 800B
+    cost: 1722
+  - model: 900A
+    cost: 1687
+  - model: 800 LONG
+    cost: 1890
+  - model: 900 LONG
+    cost: 1855
+  - model: G3M board in enclosure
+    cost: 1241
+- code: HDSL
+  description: 'LiftMaster HD series high cycle slide gate opener, Model HDSL-24UL, for gates up to 75’ and 3,000 lbs. at 12” per second, 1.5HP 24VDC drive motor with battery backup during power failure.
+    Includes #40 drive chain'
+  model: HDSL24UL
+  cost: 2412
+  labor: 10
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: CSL
+  description: LiftMaster Elite high cycle slide gate opener, Model CSL-24UL, ½ HP, 115 volt with gearbox drive, crank release, and E.R.D. sensor for UL 325 compliance. Includes built-in battery backup
+    for operation during power failure
+  model: CSL24UL
+  cost: 2005
+  labor: 10
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: MAGNET
+  description: Magnetic Microdrive barrier gate with aluminum ___ arm assembly, dark grey model ______
+  model: Parking 12' break
+  cost: 3106
+  labor: 8
+  category: OPERATORS
+  notes: PARKING PRO-RC01210 PARKING PRO 1.3s 24V, RH, UL WIRING 115V $2,811.00 $2,811.00 RECEPTACLE, STANDARD FLANGE, 12 ft VARIOBOOM, DARK GREY, MGC PRO CONTROLLER
+  section: scope
+  sheet: Operators
+  variants:
+  - model: Access 20' with PS01
+    cost: 3598
+    labor: 8
+  - model: XXL up to 33'
+    cost: 9081
+    labor: 8
+  - model: Articulating
+    cost: 419
+    labor: 4
+- code: MAGBAT
+  description: 'Magnetic Barrier Gate Battery Backup to open gate during power failure - Part number: BAT010c-e/BAT-ak010'
+  model: BAT010c-e/BAT-ak010
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: LED
+  description: Magnetic LED light arm assembly with green in "up" position, red in "down", and flashing while moving
+  model: LEDS11C-12V  for 12' and LEDS12C-20M for 20'
+  cost: $654 12' $830 20'
+  labor: 4
+  category: OPERATORS
+  notes: LEDS11C-12V  for 12' and LEDS12C-20M for 20'
+  section: scope
+  sheet: Operators
+- code: HY
+  description: HySecurity SlideDriverII Hydraulic slide gate opener 1HP 1,500 lbs capacity and 12" per second speed
+  cost: CALL
+  labor: 12
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: HY2
+  description: HySecurity SlideDriver SD40 Hydraulic Slide Gate Opener 1HP 4,000 lb Capacity and 12" per second
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: HY3
+  description: HySecurity SlideDriver 50VF High Speed Hydraulic Gate Opener 2HP 5,000 Capacity and 2.2 feet per second
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: 2K
+  description: Full length aluminum drive rail
+  model: Grooved, Non-flanged 14'
+  cost: 318
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+  variants:
+  - model: Smooth, Flanged 14'
+    cost: 339
+- code: MA116
+  description: LiftMaster MA-116 RDOT 15' × 3" aluminum gate arm with yellow/black stripes
+  cost: 313
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+  variants:
+  - model: Counterweight MA117
+    cost: 212
+- code: 3PHCONV
+  description: LiftMaster 3PHCONV kit for 3 phase power conversion
+  cost: 368
+  labor: 3
+  category: OPERATORS
+  notes: includes tariff
+  section: scope
+  sheet: Operators
+- code: RHINO
+  description: 'Maximum Controls Industrial Slide Gate Opener Model RHINO 4000 FS Continuous duty with 4000 lb weight capacity for gates up to 60'' long. Includes #50 chain and battery back-up'
+  cost: 3019
+  labor: 10
+  category: OPERATORS
+  notes: $245 shipping
+  section: scope
+  sheet: Operators
+- code: MEGA
+  description: Maximum Controls Industrial Swing Gate Opener Model "Megatron Tank" Continuous Duty High Traffic Series. For gates up to 4500 lbs or 30' width. Includes battery back-up
+  cost: 4725
+  labor: 10
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: '3'
+  description: Concrete mounting pad for opener
+  cost: 400 each
+  labor: 4
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+- code: 3A
+  description: Steel mounting stand for opener
+  cost: 390 each
+  category: OPERATORS
+  notes: Rhino stand cost $197
+  section: scope
+  sheet: Operators
+- code: CX12
+  description: Camden CX-12 Plus door interface relay for ADA opener sequencing
+  cost: 55
+  category: OPERATORS
+  section: scope
+  sheet: Operators
+  variants:
+  - cost: 72
+    description: Photo Eye Mounting posts-set
+  - cost: 54
+    description: Strike Bump-out for HES9600 mountiung
+  - cost: 19
+    description: CSW arm brackets
+Ironwork:
+- code: '15'
+  description: Ornamental steel swing gate _ × _ with a 2” × _” frame, ¾” pickets at 6” on center, semi-gloss black powder coat finish – Current fab time is 6 - 8 weeks for any custom gates. Due to unpredictable
+    steel costs and tariffs this quote is good for 15 days
+  section: scope
+  sheet: Ironwork
+- code: 15A
+  description: Ornamental steel double swing gate _ × _ with a 2” × _” frame, ¾” pickets at 6” on center, semi-gloss black powdercoat finish Current fab time is 6 - 8 weeks for any custom gates. Due to
+    unpredictable steel costs and tariffs this quote is good for 15 days
+  section: scope
+  sheet: Ironwork
+- code: 15B
+  description: 5” × 5” × ¼” wall steel post
+  cost: 310
+  section: scope
+  sheet: Ironwork
+- code: 15C
+  description: 5” × 5” × ¼” wall steel masonry offset post (No masonry work included in this)
+  cost: 515
+  section: scope
+  sheet: Ironwork
+- code: 15D
+  description: Heavy duty Elite powerhinges with 3,000 lb. load capacity
+  cost: 93
+  section: scope
+  sheet: Ironwork
+- code: 3100P
+  description: LiftMaster 3100P hinges with 1,000 lb. load capacity (Adjustable, flat mount – both sides)
+  cost: 121
+  section: scope
+  sheet: Ironwork
+- code: 3110P
+  description: LiftMaster 3110P hinges with 1,000 lb. load capacity (Adjustable, round mount – both sides)
+  cost: 132
+  section: scope
+  sheet: Ironwork
+- code: 2000P
+  description: LiftMaster 2000P hinges with 3,000 lb. load capacity (Flat mount – both sides)
+  cost: 140
+  notes: includes tariff
+  section: scope
+  sheet: Ironwork
+- code: 2100P
+  description: LiftMaster 2100P hinges with 1,000 lb. load capacity (Flat mount – both sides)
+  cost: 93
+  section: scope
+  sheet: Ironwork
+- code: 2110P
+  description: LiftMaster 2110P hinges with 1,000 lb. load capacity
+  cost: 133
+  notes: includes tariff
+  section: scope
+  sheet: Ironwork
+- code: 2010P
+  description: LiftMaster 2010P hinges with 3,000 lb. load capacity (Round mount – both sides)
+  cost: 151
+  section: scope
+  sheet: Ironwork
+- code: SURECLOSE
+  description: '1) SureClose ReadyFit 74108323T Aluminum Closer/Hinge
+
+    1) SureClose ReadyFit 74001313T Aluminum Hinge
+
+    1) SureClose ReadyFit 7403 Gate Stop'
+  cost: 490
+  section: scope
+  sheet: Ironwork
+- code: '16'
+  description: Ornamental steel cantilever slide gate _ × _ with a 2” × 3” frame, ¾” pickets at 6” on center, 2" × 2" mesh cover and semi-gloss powdercoat finish set on 4" × 4" posts – Fab time is 6 - 8
+    weeks for any custom gates. Quote is good for 15 days
+  section: scope
+  sheet: Ironwork
+- code: '17'
+  description: Chain link full cantilever slide gate _ × _ with 2 ³/₈” frame, 2" × 4" sway brace, and 9-gauge mesh set on 4” posts with high cycle vinyl rollers
+  section: scope
+  sheet: Ironwork
+- code: 16A
+  description: with high cycle vinyl rollers
+  category: ROLLERS
+  section: scope
+  sheet: Ironwork
+- code: 16B
+  description: with bottom track, carriages and guide rollers
+  category: ROLLERS
+  section: scope
+  sheet: Ironwork
+CCTV:
+- code: LNO
+  description: Wisenet LNO-6072R  2 megapixel outdoor rated day/night bullet camera with varifocal 3.2-10mm lens
+  model: LNO-6072R
+  cost: 194
+  category: BULLET
+  section: scope
+  sheet: CCTV
+- code: XNO
+  description: Wisenet XNO-8082R 6 megapixel outdoor rated day/night bullet camera with varifocal 2.8-8.4 lens and IR night illumination up to 131’
+  model: XNO-8082R
+  cost: 837
+  category: BULLET
+  section: scope
+  sheet: CCTV
+- code: PNO
+  description: Wisenet PNO-A9081R 8 megapixel 4K resolution outdoor rated day/night bullet camera with varifocal 4.5-10mm lens and IR night illumination up to 98’
+  model: PNO-A9081R
+  cost: 1107
+  category: BULLET
+  section: scope
+  sheet: CCTV
+- code: PNOLP
+  description: Wisenet PNO-A9081RLP License plate recognition bullet camera 8 megapixel 4K resolution outdoor rated day/night with varifocal 4.5-10mm lens and IR night illumination up to 98’
+  model: PNO-A9081RLP
+  cost: 1593
+  category: BULLET
+  section: scope
+  sheet: CCTV
+- code: ANV
+  description: Wisenet ANV-L6082R 2 megapixel outdoor rated day/night dome camera with varifocal 3.2-10mm lens
+  model: ANV-L6082R
+  cost: 152
+  category: DOME
+  notes: '3'
+  section: scope
+  sheet: CCTV
+- code: QNV5
+  description: Wisenet QNV-8080R 5 megapixel outdoor rated day/night camera with 3.2-10mm varifocal lens, WDR, and IR night illumination up to 98’
+  model: QNV-8080R
+  cost: 368
+  category: DOME
+  notes: '2'
+  section: scope
+  sheet: CCTV
+- code: XNV
+  description: Wisenet XNV-C8083R 6 megapixel outdoor rated day/night camera with 4.4-9.3mm varifocal lens, WDR and IR night illumination up to 131’. Includes AI engine for video analytics
+  model: XNV-C8083R
+  cost: 837
+  category: DOME
+  notes: '2'
+  section: scope
+  sheet: CCTV
+- code: XNF
+  description: Wisenet XNF-9010RV 12 megapixel fisheye hemispheric/360 degree view outdoor rated camera with digital PTZ and 1.08 mm fixed lens, de-warping, and IR night illumination up to 32.8’
+  model: XNF-9010RV
+  cost: 648
+  category: DOME
+  notes: '3'
+  section: scope
+  sheet: CCTV
+- code: PNM
+  description: Wisenet PNM-7082RVD 4 megapixel, 2 sensor (2 megapixel X 2 sensors) outdoor rated day/night cameras with 3-6mm(2x) motorized varifocal lens and IR night illumination up to 82'
+  model: PNM-7082RVD
+  cost: 756
+  category: MULTI-IMAGER
+  section: scope
+  sheet: CCTV
+- code: P3737
+  description: Axis P3737-PLE 20 megapixel multi-imager network camera with four individually configurable sensors, and IR illuminators.
+  model: P3737-PLE
+  cost: 1650
+  labor: 4
+  category: MULTI-IMAGER
+  notes: Mounts are roughly 300 for this camera.
+  section: scope
+  sheet: CCTV
+- code: DW1
+  description: Digital Watchdog Camera - Model DWC-MV75WI28TW
+  model: DWC-MV75WI28TW
+  cost: 400
+  category: Watchdog
+  section: scope
+  sheet: CCTV
+- code: DW2
+  description: Digital Watchdog Camera License
+  category: Watchdog
+  section: scope
+  sheet: CCTV
+- code: SBP-215
+  description: Wisenet SBP-215HMW cap adapter.
+  model: SBP-215HMW
+  cost: 22
+  category: MOUNTS
+  section: scope
+  sheet: CCTV
+- code: CMVR224
+  description: Eagle Eye compact wall or shelf mount CMVR video recorder model 224+ with cloud connection. Supports up to 6 IP cameras up to 4mp. 2TB local storage
+  model: EN-BR224p-0
+  cost: 487
+  labor: 6
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR225
+  description: Eagle Eye compact wall or shelf mount CMVR video recorder model 225 with cloud connection. Supports up to 6 IP cameras up to 4mp. 2TB local storage. Includes 4 POE ports.
+  model: EN-BR225-0
+  cost: 675
+  labor: 6
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR324+
+  description: Eagle Eye compact wall or shelf mount CMVR video recorder model 324+ with cloud connection. Supports up to 12 IP cameras up to 4mp. 4TB local storage
+  model: EN-BR324p-0
+  cost: 600
+  labor: 6
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR524+
+  description: Eagle Eye compact wall or shelf mount CMVR video recorder model 524+ with cloud connection. Supports up to 25 IP cameras up to 4mp. 16TB local storage
+  model: EN-BR524p-0
+  cost: 2250
+  labor: 6
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR320
+  description: Eagle Eye rack mount CMVR video recorder model 320 with cloud connection. Supports up to 20 IP cameras up to 4mp. 4TB local storage
+  model: EN-BR320-0
+  cost: 599
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR323
+  description: Eagle Eye rack mount CMVR video recorder model 323 with cloud connection. Supports up to 20 IP cameras up to 4mp. 4TB local storage. 8 on-board POE ports.
+  model: EN-BR323-0
+  cost: 825
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR330
+  description: Eagle Eye rack mount CMVR video recorder model 330 with cloud connection. Supports up to 8 analog or 20 IP cameras up to 4mp. 4TB local storage.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR420
+  description: Eagle Eye rack mount CMVR video recorder model 420 with cloud connection. Supports up to 35 IP cameras up to 4mp. 10TB local storage.
+  model: EN-BR420-0
+  cost: 1275
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR430
+  description: Eagle Eye rack mount CMVR video recorder model 430 with cloud connection. Supports up to 16 analog or 35 IP cameras up to 4mp. 10TB local storage.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: CMVR520
+  description: Eagle Eye rack mount CMVR video recorder model 520 with cloud connection. Supports up to 50 IP cameras up to 4mp. 40TB local storage. Supports up to 4 LPR cameras.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DD07
+  description: Eagle Eye DD07 4 megapixel indoor/outdoor day/night dome camera with a fixed 2.8mm fixed lens, wide dynamic range, IR with 30meter range and ultra low light color
+  model: EN-CDUD-007a
+  cost: 136
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DD08
+  description: Eagle Eye DD08 4 megapixel indoor/outdoor day/night dome camera with a 2.7-13.5mm motorized lens, wide dynamic range, and night vision smart IR with 30 meter range
+  cost: 180
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DD09
+  description: Eagle Eye DD09 4 megapixel indoor/outdoor day/night dome camera with a 2.7-13.5mm motorized lens, wide dynamic range, and night vision smart IR with 30 meter range
+  model: EN-CDUD-009a
+  cost: 210
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DD11
+  description: Eagle Eye DD11 8 megapixel indoor/outdoor day/night dome camera with a 3.3-12mm motorized lens, wide dynamic range, ultra low light color and IR with 30 meter range
+  model: EN-CDUD-011a
+  cost: 240
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DP01
+  description: Eagle Eye DP01 2 megapixel indoor pinhole camera with a fixed 23.7 mm fixed lens
+  model: EN-CDUP-001a
+  cost: 150
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DZ03
+  description: Eagle Eye DZ03 12 megapixel indoor/outdoor day/night mini PTZ camera with wide dynamic range, motorized lens 43.7-56.4 mm zoom and focus, night vision smart, IR up to 80’ range
+  model: EN-CDUZ-003a
+  cost: 600
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DF04
+  description: Eagle Eye DF04 12 megapixel indoor/outdoor day/night hemispheric 360 degree view camera with wide dynamic range, and night vision smart IR with 15 meter range
+  model: EN-CDUF-004a
+  cost: 562
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: DM08
+  description: Eagle Eye DM08 4 megapixel indoor/outdoor day/night mini dome camera with a fixed 2.8mm or 3.6 fixed lens, wide dynamic range, IR with 15 meter range
+  model: "EN-CDUM-008a: 3.6mm lens\n EN-CDUM-008b: 2.8 mm lens"
+  cost: "3.6mm lens: $135\n 2.8 mm lens: $135"
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE304
+  description: Eagle Eye compact wall or shelf mount CMVR for cloud video access. Model number 304+. Supports up to 20 IP cameras at 4MP and buffers 2 days of video on premise
+  model: EN-SU304P-0
+  cost: 404
+  category: EAGLE EYE
+  notes: EN-SU304P-0
+  section: scope
+  sheet: CCTV
+- code: EE305
+  description: Eagle Eye compact wall or shelf mount bridge for cloud video access. Model number 305 Supports up to 12 IP cameras at 4MP and buffers 2 days of video on premise. 4 POE ports.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE310
+  description: Eagle Eye rack mount bridge for cloud video access. Supports up to 8 analog cameras or up to 20 IP cameras at 4MP and buffers 2 days of video on premise.
+  cost: 310
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE401
+  description: Eagle Eye rack mount bridge for cloud video access. Supports up to 35 IP cameras at 4MP and buffers 2 days of video on premise.
+  model: EN-SU401-0
+  cost: 675
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE406+
+  description: Eagle Eye compact wall or shelf mount bridge for cloud video access. Model number 406+. Supports up to 35 IP cameras at 4MP and buffers 2 days of video on premise. Allows up to 2 LPR cameras.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE410
+  description: Eagle Eye rack mount bridge for cloud video access. Supports up to 16 analog cameras or up to 35 IP cameras at 4MP and buffers 2 days of video on premise.
+  cost: 410
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE501
+  description: Eagle Eye rack mount bridge for cloud video access. Supports up to 50 IP cameras at 4MP and buffers 2 days of video on premise. Supports up to 4 LPR cameras.
+  cost: 510
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE504+
+  description: Eagle Eye compact wall or shelf mount bridge for cloud video access. Model number 504+. Supports up to 50 IP cameras at 4MP and buffers 2 days of video on premise.
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E1
+  description: Monthly fee for 14 days cloud recording at 720P full HD recording resolution. Video accessible via the web and mobile apps. Also integrates with access control cloud platform, if applicable
+  cost: Charge $13
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E1A
+  description: Monthly fee for 30 days cloud recording at 720P full HD recording resolution. Video accessible via the web and mobile apps. Also integrates with access control cloud platform, if applicable
+  cost: Charge $15
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E2
+  description: Monthly fee for 14 days cloud recording at 1080P full HD recording resolution. Video accessible via the web and mobile apps, also integrates with access control cloud platform, if applicable
+  cost: Charge $18
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E2A
+  description: Monthly fee for 30 days cloud recording at 1080P, full HD recording resolution. Video accessible via the web and mobile apps. Also integrates with access control cloud platform, if applicable
+  cost: Charge $23
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E3
+  description: Monthly fee for 14 days cloud recording at 5MP, full HD recording resolution. Video accessible via the web and mobile apps. Also integrates with access control cloud platform, if applicable
+  cost: Charge $32
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: E3A
+  description: Monthly fee for 30 days cloud recording at 5MP, full HD recording resolution. Video accessible via the web and mobile apps. Also integrates with access control cloud platform, if applicable
+  cost: Charge $41
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE1
+  description: Eagle Eye Camera Junction Box BX005 (DM08,DD05 to DD11 ,DE02))
+  model: EN-CABX-005
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE2
+  description: Eagle Eye Camera Wall Arm For Camera Mounting WA006 (DD07-DD11, DM08, DF03, DT01, DZ03)
+  model: EN-CAWA-006
+  cost: 49
+  category: EAGLE EYE
+  notes: Eagle Eye Camera Wall Arm WA006 (DD07-DD11, DM08, DF03, DT01, DZ03)
+  section: scope
+  sheet: CCTV
+- code: EE3
+  description: Eagle Eye Camera Wall Arm WA001 (DM08, DD07, DD10)
+  model: EN-CAWA-001
+  cost: 49
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE4
+  description: Eagle Eye Camera Junction Box BX004 (WA03,PE02,DF03)
+  model: EN-CABX-004
+  cost: 30
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE5
+  description: Eagle Eye Camera Pendant PE002 (DZ03)
+  model: EN-CAPE-002
+  cost: 30
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE6
+  description: Eagle Eye Camera Wall Arm WA003 (DZ03)
+  model: EN-CAWA-003
+  cost: 30
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE7
+  description: Eagle Eye Camera Pole Mount PM001 (BX002, BX003, BX004)
+  model: EN-CAPM-001
+  cost: 30
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE8
+  description: Eagle Eye 8-port managed PoE switch – Allows remote power cycle of individual PoE ports, or all ports
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EE16
+  description: Eagle Eye 16-port managed PoE switch – Allows remote power cycle of individual PoE ports, or all ports
+  category: EAGLE EYE
+  section: scope
+  sheet: CCTV
+- code: EQ1H
+  description: Honeywell Analog DVR, Model HRHQ1164, with 16 channels and 4TB storage
+  model: HRHQ1164
+  cost: 471
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+- code: WRN
+  description: Wisenet video server 16 channel NVR model WRN-816s-4TB with 4TB storage and 4 professional licenses included. Has PoE ports.
+  model: WRN-1632-4TB
+  cost: 2042
+  labor: 6
+  category: VIDEO SERVERS
+  notes: 16 channel POE isWRN-1632S-4TB at $2166
+  section: scope
+  sheet: CCTV
+- code: WRN1
+  description: "Custom built video server with:\n     —     Wisenet Wave software.\n     —      12 TB storage."
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+- code: WRN2
+  description: Wisenet 64 channel NVR with 16 hot swappable drives and 48TB storage
+  model: XRN-6410B2-48TB
+  cost: 5464
+  labor: 6
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+- code: WRN3
+  description: "Axis video encoder:\n     —      16 channel.\n     —      Allows connection of up to 16 analog cameras to an IP video server."
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+- code: WRN5
+  description: Additional professional licenses
+  model: Wave-pro-01
+  cost: 109
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+- code: WR
+  description: Configure system for remote viewing via PC, tablet, laptop, or smartphone
+  category: VIDEO SERVERS
+  section: scope
+  sheet: CCTV
+Remotes:
+- code: '23'
+  description: Additional remotes, EACH
+  category: REMOTES
+  notes: Metro Remote-Fob Guide LINK
+  section: scope
+  sheet: Remotes
+- code: 23A
+  description: Additional ____, in lots of 10 or more, EACH
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: L993M
+  description: LiftMaster L993MAX  3-button visor remotes
+  cost: 31.76
+  category: REMOTES
+  notes: replaces 893max
+  section: scope
+  sheet: Remotes
+- code: 811LM
+  description: LiftMaster 811LM series single button visor remotes
+  cost: 10.50 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: 813LM
+  description: LiftMaster 813LM series 3-button visor remotes
+  cost: 26.25
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: PPLV
+  description: LiftMaster PPLV-1 single button visor remotes (numbered credential).
+  cost: 12.2
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: PPLK
+  description: LiftMaster Passport PPLK1PH 1-Button mini proximity remote controls (numbered credentials with built-in fobs).
+  cost: 17.85
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: ACT31B
+  description: Linear ACT-31B one-button keychain remotes (numbered credential)
+  cost: 16.25 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: ACT34B
+  description: Linear ACT-34B 4-button keychain remotes
+  cost: 18.92 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: 893MAX
+  description: LiftMaster 893MAX 3-button visor remotes.
+  cost: 31.8
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: 8069-080
+  description: Doorking 8069-080 1-button remote without built-in fob
+  cost: 17 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: 8069-082
+  description: Doorking 8069-082 1-button remote with built-in AWID fob
+  cost: 22 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+- code: 8071-082
+  description: Doorking 8071-082 3-button remote with built-in AWID fob
+  cost: 23 each
+  category: REMOTES
+  section: scope
+  sheet: Remotes
+Other:
+- code: L1
+  description: One year labor warranty
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: L2
+  description: We ran a MEG/OHM test on your loops and found a “bad” reading. The loop is still working at this time, but will continue to malfunction and hold the gate open (or closed) due to continuing
+    degradation of the loop wire
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: O1
+  description: Set of digital O&M manuals
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: O2
+  description: 'OPTIONS – Circle options chosen to be added to totals:'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: P1
+  description: Certified payroll and prevailing wage labor
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: T1
+  description: Taxes not included in above totals and will be added to final billing
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: T1A
+  description: Taxes not included in above totals and will be added to final billing, unless a re-seller permit is provided
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: T2
+  description: 'Current lead time to start work as of date of quote:'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: UL
+  description: 'Current lead time to start work as of date of quote:'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: F1
+  description: 'Follow up from PM service (billed separately):'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: F2
+  description: 'Follow up from recent service call (billed separately):'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: MYQ
+  description: LiftMaster MyQ – Enables smartphone control of Elite openers. Performance subject to wireless capabilities, requires open port on customer’s network
+  cost: 828LM
+  category: OTHER
+  notes: 61 | 2 hours
+  section: scope
+  sheet: Other
+- code: PED1
+  description: Pedestrians must have egress other than automated gate, per UL 325 code.
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: 12D3
+  description: Additional training available by the hour at $164 per hour
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: INTRO1
+  description: 'Metro Access will provide all labor, materials, equipment, and supervision for the following work:'
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: VISIT
+  description: Site visit required to confirm quote
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: PERMIT
+  description: Electrical permit as defined by local code for devices called out above
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: CLEANUP
+  description: Clean-up and removal of excavated materials from site. If Metro cannot spread or drop excavated dirt/asphalt/concrete on site within 40' of work area, add for pickup and removal of spoils
+    from site
+  cost: "$675 base (operator pad and gooseneck). \n\nAdd $280 for 2 posts."
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: LOCKBAR
+  description: "1)    ⅝” Cross bar with 1 ¹⁄₁₆\" knurled end.\n1)    Barrier key cylinder with knurled end.\n2)    Brackets riveted into the callbox frame. \nClients will not be given copies of keys"
+  cost: 649 for standard units.
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: LOWVOLT
+  description: Supply a conduit layout drawing for devices called out in automation scope. Provide and install wet rated, low voltage wire in existing conduit raceways (by others). Final wiring and termination
+    of low voltage devices. Supply low voltage electrical permit and schedule inspection with local municipalities when required. Test system
+  cost: "Consumer: \n    $965 single\n    $1375 double. \nFence Contractors: \n    $755 single.\n    $1185 double."
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: ZOOM
+  description: Live software training session up to one hour (virtual)
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: WZP
+  description: "Supply: - One year labor warranty.\n 1) Software training session via Zoom – To be recorded for later use.\n 1) Electrical permit as defined by local code for devices called out above."
+  category: OTHER
+  section: scope
+  sheet: Other
+- code: CMP
+  description: Complete as Stated Above for the Lump Sum Price of
+  category: OTHER
+  section: scope
+  sheet: Other
+Readers:
+- code: SURE-W
+  description: Sure-Fi Wireless Wiegand Receiver and transmitter kit
+  model: SFK-DS004-Wiegand 531
+  cost: 652
+  labor: 3
+  category: RECEIVERS
+  section: scope
+  sheet: Readers
+- code: SURE-R
+  description: Sure-Fi Wireless Relay Bridge Kit
+  model: SFK-DS006-Relay
+  cost: 570
+  labor: 3
+  category: RECEIVERS
+  section: scope
+  sheet: Readers
+- code: RP10
+  description: HID Multiclass RP10 mini mullion mount card reader, Model B-900PTNNEK00
+  cost: 176
+  labor: 2
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: RP15
+  description: HID Multiclass RP15 mullion mount card reader, Model B-910PTNNEK00
+  cost: 223
+  labor: 2
+  category: HID
+  notes: do not reorder | 2026-01-01 00:00:00
+  section: scope
+  sheet: Readers
+- code: RP40
+  description: HID Multiclass RP40 wall box card reader, Model B-920PTNNEK00
+  cost: 261
+  labor: 2
+  category: HID
+  notes: do not reorder | 2026-01-01 00:00:00
+  section: scope
+  sheet: Readers
+- code: RPK40
+  description: HID Multiclass RPK40 wall box card reader with built-in keypad, Model B-921PTNNEK0003R
+  cost: 397
+  labor: 2
+  category: HID
+  notes: do not reorder | 2026-01-01 00:00:00
+  section: scope
+  sheet: Readers
+- code: R90
+  description: HID iClass SE R90 long range reader with up to 14” read range. Includes UHMW block 13" × 13" – Model B-940NTNEK00000.
+  cost: 470
+  labor: 3
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SIG40
+  description: HID Signo Proximity Reader, Model 40NKS multiclass wall box series
+  cost: 198
+  labor: 2
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SIG20
+  description: HID Signo Proximity Reader, Model 20NKS multiclass mullion series
+  cost: 191
+  labor: 2
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SIG40K
+  description: HID Signo Keypad/Proximity Reader, Model 40NKS multiclass wall box series
+  cost: 305
+  labor: 2
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SIG20K
+  description: HID Signo Keypad/Proximity Reader, Model 20NKS multiclass mullion series
+  cost: 325
+  labor: 2
+  category: HID
+  notes: '2026-01-01 00:00:00'
+  section: scope
+  sheet: Readers
+- code: R1
+  description: HID proximity cards, EACH
+  cost: Charge 3.5
+  category: CREDENTIALS
+  section: scope
+  sheet: Readers
+- code: R2
+  description: HID proximity fobs, EACH
+  cost: Charge 6.5
+  category: CREDENTIALS
+  section: scope
+  sheet: Readers
+- code: R3
+  description: HID iClass proximity cards, EACH
+  cost: Charge 3.5
+  category: CREDENTIALS
+  section: scope
+  sheet: Readers
+- code: R4
+  description: HID iClass proximity fobs, EACH
+  cost: Charge 6.5
+  category: CREDENTIALS
+  section: scope
+  sheet: Readers
+- code: BSC
+  description: Brivo Smart High Security 56 Bit 13.56 MHZ Proximity Cards – DESFire EV2 LEAF 8k
+  model: B-BUC3-56-SC25 pack of 25
+  cost: 'Cost 3.61 each
+
+    Charge 4.87'
+  category: CREDENTIALS
+  notes: works with Brivo and LM smart readers
+  section: scope
+  sheet: Readers
+- code: BSF
+  description: Brivo Proximity High Security 56 bit 13.56 Smart Fobs – DESFire EV2 LEAF 8k smart proximity Fobs
+  model: B-BUC3-56-SF25 pack of 25
+  cost: 'Cost 4.86 each
+
+    Charge 6.56'
+  category: CREDENTIALS
+  notes: works with Brivo and LM smart readers
+  section: scope
+  sheet: Readers
+- code: A1
+  description: NEDAP UHF Windshield Tag Credential for Long Range Reader
+  model: 9947426
+  cost: Charge 9
+  category: NEDAP
+  notes: 9988807 for special order minimum 200 | Cost 6.33
+  section: scope
+  sheet: Readers
+- code: A1A
+  description: NEDAP UHF Headlight External tag
+  cost: Charge 9
+  category: NEDAP
+  notes: 25 quantity tag stock no special order using this part number
+  section: scope
+  sheet: Readers
+- code: A2
+  description: NEDAP UHF Windshield Heavy Duty Tag for Long Range Reader with up to 33' Range (screws onto the body of a commericial vehicle and designed for commercial use)
+  model: 9219641
+  cost: Charge 22
+  category: NEDAP
+  notes: cost 14.00 minimum order of 10
+  section: scope
+  sheet: Readers
+- code: A3
+  description: NEDAP UHF Mirror Hang Tag Credential for Long Range Readers
+  model: 9988823
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A4
+  description: NEDAP long-range AVI reader with up to 50' range – Model uPASS Target with mounting kit
+  model: 9217371
+  cost: 3264
+  labor: 10
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A5
+  description: AVI reader mounting post
+  model: Metrofab
+  cost: 250
+  labor: 4
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A6
+  description: NEDAP long-range AVI reader with up to 30' range – Model uPASS GO with mounting kit
+  model: 9234357
+  cost: 1750
+  labor: 10
+  category: NEDAP
+  notes: '9234357'
+  section: scope
+  sheet: Readers
+- code: A7
+  description: NEDAP uPASS Go  Weather Hood
+  model: 9567658
+  cost: 164
+  labor: 1
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A8
+  description: NEDAP Target Weather Hood
+  model: 9218335
+  cost: 246
+  labor: 1
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A9
+  description: NEDAP Target Pole Mount Kit
+  model: 5626595
+  cost: 190
+  labor: 1
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: A11
+  description: NEDAP uPASS Target Antenna (for add to first unit)
+  model: '9219048'
+  cost: 997
+  labor: 8
+  category: NEDAP
+  section: scope
+  sheet: Readers
+- code: SRDRST
+  description: LiftMaster Smart Proximity Reader, Model SRDRST. Works with  and 125KHz and 13.56MHz credentials. (Black).
+  cost: 198
+  labor: 2
+  category: LIFTMASTER
+  notes: '2026-02-26 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SRDRKP
+  description: LiftMaster Smart Keypad/Proximity Reader, Model SRDRKP. Works with 125KHz and 13.56MHz credentials. (Black).
+  cost: 278
+  labor: 2
+  category: LIFTMASTER
+  notes: '2026-02-26 00:00:00'
+  section: scope
+  sheet: Readers
+- code: SRDRMM
+  description: LiftMaster Smart Proximity Mullion Mount Reader, Model SRDRMM. Works with 125KHz and 13.56MHz credentials. (Black).
+  cost: 185
+  labor: 2
+  category: LIFTMASTER
+  notes: '2026-02-26 00:00:00'
+  section: scope
+  sheet: Readers
+- code: BSPSF
+  description: Brivo B-BSPSF-B black single gang tri-technology reader. Compatible with 125KHz proximity credentials, B-SC, B-SCP smartcards, and B-SF KeyFobs
+  model: B-BSPSF-B
+  cost: 198
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Readers
+- code: BSPMF
+  description: Brivo B-BSPMF-B black mullion mount tri-technology reader. Compatible 125KHz proximity credentials, B-SC, B-SCP smartcards and B-SF KeyFobs
+  model: B-BSPMF-B
+  cost: 165
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Readers
+- code: BSPKF
+  description: Brivo B-BSPKF-B black single gang tri-technology reader with keypad. Compatible with 125KHz proximity credentials, B-SC, B-SCP smartcards and B-SF KeyFobs
+  model: B-BSPKF-B
+  cost: 314
+  labor: 2
+  category: BRIVO
+  section: scope
+  sheet: Readers
+Door Hardware:
+- code: '8916'
+  description: Dorma 8916 ___ finish closer surface mount
+  cost: 211 plus 18
+  category: CLOSERS
+  notes: 689 painted silver 695 black
+  section: scope
+  sheet: Door Hardware
+- code: '8956'
+  description: Dorma 8956 ___ finish closer surface mount
+  cost: 211 plus 18 for drop plate
+  category: CLOSERS
+  notes: For larger doors
+  section: scope
+  sheet: Door Hardware
+- code: DP82
+  description: Dorma drop plate DP82 Aluminum
+  cost: 18
+  category: CLOSERS
+  section: scope
+  sheet: Door Hardware
+- code: DP89
+  description: Dorma drop plate DP89 693 finish
+  cost: 18
+  category: CLOSERS
+  section: scope
+  sheet: Door Hardware
+- code: D3A
+  description: Jackson ___degree HO concealed overhead closer
+  category: CLOSERS
+  section: scope
+  sheet: Door Hardware
+- code: D5A
+  description: LCN __ Closer aluminum finish
+  category: CLOSERS
+  section: scope
+  sheet: Door Hardware
+- code: D5D
+  description: LCN __ Drop down plate
+  category: CLOSERS
+  section: scope
+  sheet: Door Hardware
+- code: D7A
+  description: Record 8100 surface mount automatic operator, _” with __ __ finish
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7B
+  description: BEA transmitters 900MHz
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7C
+  description: BEA receivers 900MHz
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7D
+  description: BEA touch switches stainless steel finish
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7E
+  description: BEA surface mounting boxes
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: ELK
+  description: ELK relay modules
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7G
+  description: BEA BR3 relay
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7H
+  description: BEA Eagle motion sensor
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7I
+  description: BEA IXIO sensor
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7J
+  description: BEA __________ maglock
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7K
+  description: Panic bar with retraction kit - Command Access MDARLP8800EU24 with Rex and 36" width
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D7L
+  description: Securitron Model MM15 4000 lb. Hybrid Maglock for interior use in 32D finish for 12/24VDC
+  category: AUTO OPERATORS
+  section: scope
+  sheet: Door Hardware
+- code: D8A
+  description: Adams Rite ____ exit device, __” with ___ finish
+  category: EXIT DEVICES
+  notes: 8800 has star wheel for aluminum narrow storefront
+  section: scope
+  sheet: Door Hardware
+- code: D8B
+  description: Dorma ____ exit device __” with ___ finish
+  cost: 724/838
+  category: EXIT DEVICES
+  notes: Narrow stile panic 36 and 48 – 9700 narrow rim panic $838 cost ($758+$80 freight)  (do not stock in large amounts so do not always have on hand)
+  section: scope
+  sheet: Door Hardware
+- code: D8C
+  description: Dorma trim _____
+  cost: YR03 $220
+  category: EXIT DEVICES
+  notes: Standard panic 9300 36 and 48 – rim panic $724 cost ($644+$80 freight)
+  section: scope
+  sheet: Door Hardware
+- code: D8D
+  description: Von Duprin____ exit Device __” US26D
+  category: EXIT DEVICES
+  section: scope
+  sheet: Door Hardware
+- code: D8E
+  description: Von Duprin trim ____
+  category: EXIT DEVICES
+  section: scope
+  sheet: Door Hardware
+- code: D8801
+  description: Adams Rite RIM exit device with satin aluminum clear anodized finish
+  cost: 283
+  category: EXIT DEVICES
+  section: scope
+  sheet: Door Hardware
+- code: D8803
+  description: Adams Rite RIM exit device with satin aluminum black anodized finish
+  cost: 283
+  category: EXIT DEVICES
+  section: scope
+  sheet: Door Hardware
+- code: D9A
+  description: 36” sweep with aluminum finish
+  category: DOORS, SWEEPS, AND HINGES
+  section: scope
+  sheet: Door Hardware
+- code: D9B
+  description: 4 ½” × 4 ½” hinges NRP 26D
+  category: DOORS, SWEEPS, AND HINGES
+  section: scope
+  sheet: Door Hardware
+- code: D9C
+  description: 84” astragal aluminum finish
+  category: DOORS, SWEEPS, AND HINGES
+  section: scope
+  sheet: Door Hardware
+- code: D9D
+  description: 84” astragal steel, prime painted
+  category: DOORS, SWEEPS, AND HINGES
+  section: scope
+  sheet: Door Hardware
+- code: D9E
+  description: Electrified power transfer hinge - Command Access ETH4W4545-626
+  category: DOORS, SWEEPS, AND HINGES
+  section: scope
+  sheet: Door Hardware
+- code: D10
+  description: Dorma ____ _______ function 626 finish
+  category: DOOR LOCKS
+  notes: C153 (Entry) is $222 and C180 is $222 cost
+  section: scope
+  sheet: Door Hardware
+- code: D10A
+  description: Dorma grade one storeroom function lever lockset 626 Stainless Finish. Model C180
+  cost: 248
+  category: DOOR LOCKS
+  section: scope
+  sheet: Door Hardware
+- code: D10B
+  description: Dorma 2 ³/₈” back latch 626 finish
+  category: DOOR LOCKS
+  section: scope
+  sheet: Door Hardware
+- code: D10C
+  description: Keedex Box _____________
+  category: DOOR LOCKS
+  notes: Trilogy K-BXSIM | 74
+  section: scope
+  sheet: Door Hardware
+- code: D10D
+  description: Trilogy DL_____ alarm lock 26D
+  category: DOOR LOCKS
+  notes: DL2700 WP | 428
+  section: scope
+  sheet: Door Hardware
+- code: D10E
+  description: Simplex _____ alarm lock 26D
+  category: DOOR LOCKS
+  section: scope
+  sheet: Door Hardware
+- code: D10F
+  description: Marks grade one storeroom function lever lockset with clutch and "C" keyway. In 26D stainless finish - Model 195F.
+  cost: 125
+  category: DOOR LOCKS
+  section: scope
+  sheet: Door Hardware
+- code: D10G
+  description: Electrified leverset lock - Command Access CL180EU L6 Rex 626
+  category: DOOR LOCKS
+  section: scope
+  sheet: Door Hardware
+- code: HES1006C
+  description: HES 1006C fire rated electric strike 630 finish
+  cost: 439
+  category: STRIKES
+  notes: made for deadlatch locks
+  section: scope
+  sheet: Door Hardware
+- code: HES7000C
+  description: HES 7000C electric strike 630 finish
+  cost: 171
+  category: STRIKES
+  notes: For preload
+  section: scope
+  sheet: Door Hardware
+- code: HES4500C
+  description: HES 4500C fire rated electric strike 630 finish
+  cost: 311
+  category: STRIKES
+  section: scope
+  sheet: Door Hardware
+- code: HES5200C
+  description: HES 5200C electric strike 630 finish
+  cost: 102
+  category: STRIKES
+  notes: Go-to strike - Outdoor rated
+  section: scope
+  sheet: Door Hardware
+- code: HES1500C
+  description: HES 1500C electric strike 630 finish
+  cost: 358
+  category: STRIKES
+  notes: for mortise
+  section: scope
+  sheet: Door Hardware
+- code: HES1600C
+  description: HES 1600C electric strike 630 finish
+  cost: 358
+  category: STRIKES
+  notes: For mortise with built in deadbolt
+  section: scope
+  sheet: Door Hardware
+- code: '6211'
+  description: Von Duprin 6211 __ __ VDC electric strike
+  cost: 580
+  category: STRIKES
+  notes: Outdoor rated
+  section: scope
+  sheet: Door Hardware
+- code: BUMPOUT
+  description: Custom fabricated mounting assembly for rim strikes
+  cost: 85
+  category: Rim Strikes
+  section: scope
+  sheet: Door Hardware
+- code: HES9400
+  description: HES 9400 electric rim strike 630 finish (slim)
+  cost: 276
+  category: Rim Strikes
+  notes: 613 oil rubbed bronze
+  section: scope
+  sheet: Door Hardware
+- code: HES9600
+  description: HES 9600 electric rim strike 630 finish
+  cost: 284
+  category: Rim Strikes
+  notes: 9600-630
+  section: scope
+  sheet: Door Hardware
+- code: HES9500F
+  description: HES 9500F fire rated electric rim strike 630 finish
+  cost: 323
+  category: Rim Strikes
+  section: scope
+  sheet: Door Hardware
+- code: HES9800
+  description: HES 9800 electric rim strike door release in 630 finish
+  cost: 303
+  category: Rim Strikes
+  section: scope
+  sheet: Door Hardware
+- code: CAM
+  description: Camden electric rim strike with 630 Finish
+  cost: 252
+  category: Rim Strikes
+  section: scope
+  sheet: Door Hardware
+- code: DPC
+  description: Door position contact
+  category: MISC
+  section: scope
+  sheet: Door Hardware
+- code: DLA
+  description: Keedex K-DLA door loop for power transfer
+  category: MISC
+  section: scope
+  sheet: Door Hardware
+- code: EL1
+  description: Design Hardware M-Z86-F-US26D Electrified Leverset in satin chrome 12/24v AC/DC
+  cost: 198
+  category: MISC
+  section: scope
+  sheet: Door Hardware
+- code: DH1
+  description: Trilogy DL5200 Two Sided Outdoor Keypad Leverset lock
+  cost: 859
+  category: MISC
+  section: scope
+  sheet: Door Hardware
+- code: FLD1
+  description: 'Frontline Defense aluminum interlocking door astragal model #SP1004-95'
+  cost: 258
+  category: MISC
+  notes: outswing
+  section: scope
+  sheet: Door Hardware
+- code: FLD2
+  description: 'Frontline Defense aluminum interlocking door astragal model #SP1001-95'
+  cost: 258
+  category: MISC
+  section: scope
+  sheet: Door Hardware
+Storage:
+- code: PT1
+  description: PTI Falcon XT storage facility controller
+  cost: 1965
+  labor: 8
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT1A
+  description: PTI Cloud controller for storage facility control
+  cost: 1965
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT2
+  description: PTI Storlogix Software Package
+  cost: 630
+  labor: 2
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT3
+  description: PTI Apex Series Keypads with metal keys, LCD screen, intercom
+  cost: 1036
+  labor: 3
+  category: PTI
+  notes: 1232 with reader
+  section: scope
+  sheet: Storage
+- code: PT4
+  description: PTI “VP” Series Keypad with metal keys, LCD screen, no intercom
+  cost: 718
+  labor: 3
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT5
+  description: Yellow Bollard Cap for 10" bollards for keypad mounting
+  cost: 870
+  labor: 3
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT6
+  description: Agreement for annual PTI fees to be arranged between PTI and the client directly to avoid dealer mark-up of fees
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: PT7
+  description: PTI Keypad with Display model AP1 (no intercom)
+  cost: 760
+  labor: 3
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: OT1
+  description: OpenTech Gateway – Insomniac Model CIA G-600-02
+  category: PTI
+  section: scope
+  sheet: Storage
+- code: OT2
+  description: OpenTech Keypad – Model CIA-K-501-02
+  cost: 1265
+  category: PTI
+  notes: the CIA-K-502-2 is 1265
+  section: scope
+  sheet: Storage
+N:
+- code: N1
+  description: Excavated dirt and materials to be spread on site, within 30' of the gate, unless otherwise negotiated. Let us know if this is not possible
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N2
+  description: No permits, bonds, trenching, conduits, piping or wire pulls to opener, keypad/s or eyes are included in this quote – We will provide wire specs and layouts per your request.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N2A
+  description: If electrical option not chosen – No permits, bonds, trenching, conduits, piping or wire pulls to opener, keypad/s or eyes are included in this quote – We will provide wire specs and layouts
+    per your request
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N3
+  description: Property owner to coordinate phone company line drop – If customer uses DSL, customer to coordinate their provider to install DSL filter
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N3A
+  description: Entry code length may differ from existing unit
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N4
+  description: Labor quoted at standard wage rates during normal working hours.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N5
+  description: UL 325 requires gate and counterbalance to be fully meshed with no holes larger than 2 ¼”. Rollers must have protective covers, and pedestrians must have egress other than automated gate
+    – These requirements to be the responsibility of fence contractor.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N6
+  description: The above quotation is based on Metro Overhead Door, Inc. standard insurance limits. We do not carry Builder’s Risk, Professional Liability, Cyber Security, Errors & Omissions or Crime Fidelity
+    Insurance
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N7
+  description: If insurance buy-in (OCIP) program is required, we will charge additional fees for administrative and “real” costs to cover our participation
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N8
+  description: Prices do not reflect recent service call which will be billed separately
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N9
+  description: Labor quoted at prevailing wage rates during normal working hours.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N10
+  description: Labor quoted at Davis Bacon wage rates during normal working hours
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N11
+  description: Price based on normal ground conditions and does not include boring in rock. Metro not responsible for damage to non-located or non-locatable utilities or services
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N12
+  description: Operator requires a 20 amp dedicated breaker
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N13
+  description: IF CITY APPROVAL PROCESS IS REQUIRED, WE EXCLUDE ALL RELATED COSTS INCLUDING, BUT NOT LIMITED TO, PLAN REVIEW FEES, SURVEYS, BUILDING PERMITS
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N14
+  description: Price based on assumption of solid structure. Any extra work due to degradation of structure will be charged on a T&M basis as authorized.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N15
+  description: Every attempt has been made in design but no guarantee is made due to inherent problems with solar in our region. Area must be clear of obstructions to panel at all times of the day
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N29
+  description: Service calls for work on solar systems during the warranty period related to low battery are not covered and will be billed on a time and material basis
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N18
+  description: Any changes to pool enclosure are subject to approval by the local Authority Having Jurisdiction (AHJ).  It is customer’s responsibility to contact their local AHJ to ensure that there are
+    no special requirements which could change our scope of work
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N19
+  description: 'Estimated substantial completion if quote is accepted within 24 hours of receipt: ___'
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N20
+  description: Shipping, if necessary, not included in above totals.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N21
+  description: No labor warranty on over the counter equipment
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N22
+  description: Quote assumes wiring in conduit is not crushed and can be pulled through
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N23
+  description: Flaggers, if required for traffic direction, are the responsibility (and cost) of others
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N24
+  description: It is illegal and unsafe to use a cell phone while driving and any applicable smart phone app should not be used while in a moving vehicle or on a public road
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N25
+  description: This is an estimate based on a visual inspection and does not take into account for hidden damages that may only become evident once the repair process has started. Thank you for understanding
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N26
+  description: Bid does not account for repair of doors that are in poor operating condition.  It assumes they close smoothly and latch securely with no binding
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N27
+  description: For license plate capture only.  This technology will not take pictures of surrounding areas
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N28
+  description: Per UL 325, if gate has 6” gap or more along swing path add gate edge sensor on bottom of gate. To be the responsibility of contractor hanging the gate to know if the gate will be 6” above
+    grade at any point during travel
+  category: 'NOTES:'
+  notes: Base Cost = $874.2
+  section: note
+  sheet: N
+- code: N30
+  description: Homelink – Metro does not offer support or programming assistance for customer’s built-in car remote systems or customer provided remotes
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N31
+  description: Any site orientations, mandatory fire watch, or any other additional site time required by customer will be added to project totals at $180 per hour per man. You will need to notify Metro
+    salesman if this will be required to add this value to this project
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N32
+  description: If a client-supplied contract in excess of two pages is required, an additional $350 fee will apply
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N33
+  description: Truck and equipment access to work area for material delivery and installation will need to be allowed.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N34
+  description: This proposal is based on normal digging conditions (Price is subject to change if unforeseen rock and fill material is encountered)
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N35
+  description: Specialty order materials may require payment in full or 50% down before shipping (based on supplier’s terms)
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N36
+  description: Contractor/Owner shall provide a schedule or completion date, and a reasonable amount of time to complete the work
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N17
+  description: Installation by a certified AAADM inspector in compliance with ANSI A156.19
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N17A
+  description: Installation by a certified AAADM inspector in compliance with ANSI A156.10
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N37
+  description: Due to current supply chain limitations, shipping and manufacturing times are unknown and will need to be verified upon approval of project.
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N38
+  description: This quote & prices included herein are subject to modification at any time to take into account effects of any new tariffs, import taxes, surtaxes, duties and/or fees that may be imposed
+    by US authorities against any of the products listed in this quote
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: N39
+  description: The prices and totals reflected in this quote include all known tariffs as of the date shown in this quote
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: NR
+  description: 'On gates this size, Metro Access requires the following:'
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: NR1
+  description: LM 3000 lbs. gate hinges or equal
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: NR2
+  description: A 2" × 4" sway brace to be installed. Contractor to provide and Metro Access will install
+  category: 'NOTES:'
+  section: note
+  sheet: N
+- code: NR3
+  description: With chain-link gates, Metro Access asks that the mesh be held off of the bottom rail to allow for the install of gate contact edges
+  category: 'NOTES:'
+  section: note
+  sheet: N
+W:
+- code: W1
+  description: LiftMaster Elite series opener – years parts, no warranty on battery
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W6
+  description: LiftMaster gate operator – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W12
+  description: LiftMaster CAPX Controllers – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W2
+  description: All other parts and labor – 1 year
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W2A
+  description: All parts and labor – 1 year
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W3
+  description: Warranty work not covered for operation during ice/snow build up – Warranty work done during normal working hours
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W3A
+  description: Warranty work to be done during normal working hours
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W5
+  description: Byan opener – 3 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W7
+  description: HySecurity operator – 5 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W8
+  description: Viking opener – years on operator, 3 years battery
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W8A
+  description: Maximum Controls gate opener 3 years parts, no warranty on batteries
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W9
+  description: FAAC opener – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W10
+  description: Ironwork and powder coating – 1 year
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W11
+  description: Magnetic Autocontrol – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W13
+  description: Doorking phone system – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W14A
+  description: Doorking operator – 5 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W15
+  description: No warranty on reconnected/existing equipment or customer-supplied parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W17
+  description: ACTi system – 3 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W18
+  description: Record operator – 2 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+- code: W19
+  description: Brivo system – 3 years parts
+  category: WARRANTIES
+  section: warranty
+  sheet: W
+E:
+- code: EX1
+  description: Patching, painting, database programming
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX3
+  description: Standard best practices for routing of low voltage wiring, where applicable, does not include running of conduits or conduits between floors, where needed
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX4
+  description: Conduit, conduit runs, wire, wire pulls and bollards
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX4A
+  description: Conduit, conduit runs, wire, wire pulls and bollards, other than low voltage
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX5
+  description: Provide all trenching, boring, patching, conduit runs, and wire pulls for all devices listed
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX6
+  description: Excludes any potential correction of code violations that may currently exist
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX7
+  description: Fence and gate work
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX8A
+  description: Landscape, landscape repair
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX8B
+  description: Asphalt, asphalt repair
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX8C
+  description: Asphalt, landscape, repair thereof
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX9
+  description: Access control, card readers
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX10
+  description: All electrical
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX10A
+  description: All electrical, other than low voltage
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX11
+  description: 120V AC to header
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX12
+  description: All permits, engineering, testing, inspections, signage, and traffic control
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX12A
+  description: All permits, engineering, testing, inspections, signage, and traffic control, other than low voltage
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX13
+  description: Removal of spoil, clearing, grading, grubbing, surveying and staking of gate work area
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX14
+  description: Private underground utility repairs and locates, including irrigation systems
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX15
+  description: Saw cutting, core drilling, concrete mow strips, block outs, and imbeds
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX15A
+  description: Saw cutting, core drilling, concrete mow strips, block outs, and imbeds, other than for loops
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX16
+  description: Any attachments and/or other materials not covered by (scope) above.
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX17
+  description: The repair or replacement of any existing equipment found to be faulty at time of installation
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EX18
+  description: Troubleshooting/repair due to sagging, warped, or damaged door frames
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
+- code: EXN
+  description: 'Exclusion Note: Low voltage work will only be done if the option is accepted and paid for'
+  category: EXCLUSIONS
+  section: exclusion
+  sheet: E
