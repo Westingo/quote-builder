@@ -431,8 +431,8 @@ def build_proposal(doc, out_path):
     section.page_height = Inches(11)
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
-    section.top_margin = Inches(2.55)     # room for the info box header
-    section.bottom_margin = Inches(2.05)  # room for the footer block
+    section.top_margin = Inches(2.0)      # room for the info box header
+    section.bottom_margin = Inches(1.95)  # room for the footer block
     section.header_distance = Inches(0.3)
     section.footer_distance = Inches(0.3)
     U.set_page_border(section)
