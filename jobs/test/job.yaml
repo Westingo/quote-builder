@@ -3,33 +3,30 @@ proposal:
   attention: test
   address: test
   phone: test
-  email: tesst
+  email: test
   date: ''
   terms: test
-  job_address: ''
+  job_address: test
   bid_number: test
   submitted_by: test
   ccb: '46091'
   cc: METROOD121MJ
   job_footer: ''
 gate_summary:
-- (1) BRIVO acs-300
+- (1) brivo ACS-300
 gates:
-- title: 'Work to be Done at Pool Gate Gate Location:'
+- title: 'Work to be Done at Pool Gate Location:'
   lines:
   - code: ACS300-E
     sheet: Brivo
     qty: 1
-  - code: SIG40
-    sheet: Readers
-    qty: 1
 options: []
 notes:
-- N2
+- N2A
 warranties:
 - W19
 exclusions:
 - EX1
 - EX3
-- EX4A
-total: $1,000,000
+- EX4
+total: null

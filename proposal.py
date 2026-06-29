@@ -128,7 +128,7 @@ def _build_header(section, h):
 
     def field(cell, label, value, value_bold=False, hang=None):
         p = cell.paragraphs[0]
-        U.no_space(p, before=5, after=5)
+        U.no_space(p, before=3, after=3)
         if hang is not None:                  # hanging indent: wrapped/2nd lines align
             p.paragraph_format.left_indent = hang
             p.paragraph_format.first_line_indent = -hang
@@ -146,7 +146,7 @@ def _build_header(section, h):
     field(grid.cell(1, 1), "", "")
     # Date + Terms share a line
     p = grid.cell(2, 0).paragraphs[0]
-    U.no_space(p, before=5, after=5)
+    U.no_space(p, before=3, after=3)
     _run(p, "Date: ", bold=True, size=10)
     _run(p, f"{h.get('date','')}      ", size=10)
     _run(p, "Terms: ", bold=True, size=10)
@@ -457,7 +457,7 @@ def build_proposal(doc, out_path):
     section.page_height = Inches(11)
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
-    section.top_margin = Inches(2.55)     # must exceed header height so the band
+    section.top_margin = Inches(2.7)      # must exceed header height so the band
     section.bottom_margin = Inches(1.95)  # lands here; footer block room below
     section.header_distance = Inches(0.3)
     section.footer_distance = Inches(0.3)

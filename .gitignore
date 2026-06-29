@@ -20,3 +20,5 @@ desktop.ini
 # runtime logs
 desktop.log
 desktop-error.log
+jobs/*/_x.pdf
+jobs/*/_p1.pdf
