@@ -248,12 +248,10 @@ function renderResults(){
 }
 
 // ---------- gates ----------
-function titleFor(g){
-  return ('Work to be Done at '+(g.loc||'').trim()+':').replace(/\s+/g,' ').replace(/\s+:/,':');
-}
+function titleFor(g){ return (g.title||'').trim(); }   // fully custom, verbatim
 function addGate(){
   const id='g'+(++gateSeq);
-  JOB.gates.push({id, loc:'', lines:[]});
+  JOB.gates.push({id, title:'', lines:[]});
   renderGates();
 }
 function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); redraw(); }
@@ -267,7 +265,7 @@ function redraw(){ renderGates(); renderOptions(); }   // refreshPicker runs ins
 function refreshPicker(){
   const pg=$('#pick-gate'); const cur=pg.value; pg.innerHTML='';
   JOB.gates.forEach(g=>{const o=document.createElement('option');
-    o.value=g.id; o.textContent=titleFor(g); pg.appendChild(o);});
+    o.value=g.id; o.textContent=titleFor(g)||'(untitled location)'; pg.appendChild(o);});
   JOB.options.filter(o=>o.lines && o.kind!=='block').forEach(o=>{
     const op=document.createElement('option');
     op.value=o.id; op.textContent='Option: '+(o.title||'(untitled)'); pg.appendChild(op);});
@@ -330,9 +328,9 @@ function renderGates(){
   JOB.gates.forEach(g=>{
     const el=document.createElement('div'); el.className='gate';
     el.innerHTML=`<div class="ghead">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap">Work to be Done at</span>
-        <input type="text" value="${escAttr(g.loc)}" placeholder="24' Gate Location  ·  head end  ·  electrical room"
-               style="flex:1" oninput="setGateLoc('${g.id}',this.value)">
+        <input type="text" value="${escAttr(g.title||'')}" style="flex:1;font-weight:600"
+               placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
+               oninput="setGateTitle('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
       <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id)}`;
     box.appendChild(el);
@@ -344,8 +342,8 @@ function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
   let i=0; return t.replace(/_+/g, m => (i<fills.length && fills[i]!=='')?fills[i++]:(i++,m));
 }
-function setGateLoc(id,v){const g=JOB.gates.find(g=>g.id===id);g.loc=v;
-  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g);}
+function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;
+  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g)||'(untitled location)';}
 function setQty(id,i,v){findLines(id).lines[i].qty=v===''?null:Number(v);}
 function setFills(id,i,v){findLines(id).lines[i].fills=v.split('|').map(s=>s.trim());redraw();}
 function rmLine(id,i){findLines(id).lines.splice(i,1);redraw();}
@@ -508,10 +506,8 @@ async function loadJob(){
   $('#f-subby').value=p.submitted_by||''; $('#f-ccb').value=p.ccb||''; $('#f-cc').value=p.cc||'';
   $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
   JOB.gate_summary=(j.gate_summary||[]).slice();
-  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>{
-    const m=(g.title||'').match(/^Work to be Done at (.*?):?\s*$/);
-    return {id:'g'+(++gateSeq), loc:m?m[1].trim():(g.title||''),
-      lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};});
+  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'',
+    lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
   JOB.options=(j.options||[]).map(o=>{
     if(o && o.lines && o.kind!=='block'){
       return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct,
