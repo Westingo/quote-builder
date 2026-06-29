@@ -1,0 +1,35 @@
+# Per-job input. Copy this to jobs/<slug>/job.yaml (or use the web UI / new_job.py),
+# then: python build.py jobs/<slug>
+proposal:
+  for: ""                 # customer (required)
+  attention: ""
+  address: ""
+  phone: ""
+  email: ""
+  date: ""                # e.g. 06/26/2026
+  terms: ""
+  job_address: ""         # use \n for a second line
+  bid_number: ""
+  submitted_by: ""        # current salesperson
+  ccb: "46091"
+  cc: "METROOD121MJ"
+  job_footer: ""          # small tag in the footer, e.g. HOODLAND FIRE STATION #74 –F
+  # tariff_notes / intro default automatically (N38, N39, INTRO1); override only if needed.
+
+gate_summary: []          # centered "Install:" list, e.g. "(1) 24' x 8' Vertical Pivot Gate"
+
+gates:
+  - title: "Work to be Done at  Gate Location:"
+    lines:
+      # - { code: "6", sheet: "Gate Accessories", qty: 1 }   # dictionary lookup
+      # - { code: "15", sheet: "Ironwork", qty: 1, fills: ["24'", "8'"] }  # fill _ blanks in order
+      # - { code: "3", sheet: "Operators", qty: 1, note: "With rebar per manufacturer's install manual" }
+      # - { text: "Free-text line not in the dictionary", qty: 1 }  # qty null -> "—" no-count marker
+
+options: []               # see jobs/hoodland-tc for the block + priced + deduct shapes
+
+notes: []                 # N codes (or { text: "..." }) for the Notes (Cont.) section
+warranties: []            # W codes (or { text: "..." })
+exclusions: []            # EX codes (or { text: "..." })
+
+total: null               # salesman fills; tool leaves blank
