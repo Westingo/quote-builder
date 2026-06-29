@@ -136,7 +136,7 @@
       <ul class="lines" id="summary"></ul></div></section>
 
     <!-- GATES -->
-    <section class="sheet"><h2>Gate Locations <button class="btn sm" onclick="addGate()">+ gate</button></h2>
+    <section class="sheet"><h2>Work Locations <button class="btn sm" onclick="addGate()">+ location</button></h2>
       <div class="pad" id="gates"></div></section>
 
     <!-- OPTIONS -->
@@ -163,7 +163,7 @@
 
   <!-- CODE PICKER -->
   <aside><section class="sheet picker"><h2>Code Picker</h2><div class="pad">
-    <label>Add picked code to</label>
+    <label>Add picked code to location</label>
     <select id="pick-gate"></select>
     <input type="search" id="search" placeholder="search code or description…">
     <select id="sheetfilter"><option value="scope">All scope sheets</option></select>
@@ -246,7 +246,7 @@ function renderResults(){
 
 // ---------- gates ----------
 function titleFor(g){
-  return ('Work to be Done at '+(g.loc||'')+' Gate Location:').replace(/\s+/g,' ');
+  return ('Work to be Done at '+(g.loc||'').trim()+':').replace(/\s+/g,' ').replace(/\s+:/,':');
 }
 function addGate(){
   const id='g'+(++gateSeq);
@@ -288,11 +288,10 @@ function renderGates(){
   JOB.gates.forEach(g=>{
     const el=document.createElement('div'); el.className='gate';
     el.innerHTML=`<div class="ghead">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">Work to be Done at</span>
-        <input type="text" value="${escAttr(g.loc)}" placeholder="24'  (or: Pool)" style="max-width:160px"
-               oninput="setGateLoc('${g.id}',this.value)">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">Gate Location:</span>
-        <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove gate</button></div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap">Work to be Done at</span>
+        <input type="text" value="${escAttr(g.loc)}" placeholder="24' Gate Location  ·  head end  ·  electrical room"
+               style="flex:1" oninput="setGateLoc('${g.id}',this.value)">
+        <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
       <ul class="lines" id="ls-${g.id}"></ul>
       <div class="addrow">
         <input class="code" id="cc-${g.id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${g.id}')">
@@ -466,8 +465,8 @@ async function loadJob(){
   $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>{
-    const m=(g.title||'').match(/Work to be Done at (.*?) Gate Location:/);
-    return {id:'g'+(++gateSeq), loc:m?m[1].trim():'',
+    const m=(g.title||'').match(/^Work to be Done at (.*?):?\s*$/);
+    return {id:'g'+(++gateSeq), loc:m?m[1].trim():(g.title||''),
       lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};});
   JOB.options=(j.options||[]).slice();
   JOB.free={N:[],W:[],E:[]};

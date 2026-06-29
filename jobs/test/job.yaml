@@ -13,20 +13,24 @@ proposal:
   cc: METROOD121MJ
   job_footer: ''
 gate_summary:
-- (1) brivo ACS-300
+- (1) Brivo ACS-300
 gates:
 - title: 'Work to be Done at Pool Gate Location:'
   lines:
   - code: ACS300-E
     sheet: Brivo
     qty: 1
+  - code: SIG40K
+    sheet: Readers
+    qty: 1
 options: []
 notes:
+- N2
 - N2A
 warranties:
 - W19
 exclusions:
 - EX1
 - EX3
-- EX4
-total: null
+- EX4A
+total: $1,000,000
