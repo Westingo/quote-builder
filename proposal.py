@@ -346,21 +346,20 @@ def render_body(body, doc):
         for para in block:
             para.paragraph_format.keep_together = True
 
-    # options
+    # options — flow right after the gates; only spill to a new page if there
+    # isn't room (no forced page break)
     if doc.get("options"):
-        _page_break(body)
-        _band(body)
         render_options(body, doc["options"])
 
-    # notes / warranties / exclusions
+    # notes / warranties / exclusions — likewise flow after options and only
+    # break to a new page when out of space
     if any(doc.get(k) for k in ("notes", "warranties", "exclusions")):
-        _page_break(body)
-        _band(body)
         render_nwe(body, doc)
 
 
 def render_options(body, options):
-    head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=4, after=6)
+    head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=14, after=6)
+    head.paragraph_format.keep_with_next = True
     _run(head, "OPTIONS – Circle options chosen to be added to totals:",
          bold=True, underline=True, size=10.5)
 
@@ -426,7 +425,8 @@ def render_nwe(body, doc):
     def section(label, items, bullet="✱"):
         if not items:
             return
-        h = _para(body, before=8, after=2)
+        h = _para(body, before=10, after=2)
+        h.paragraph_format.keep_with_next = True   # don't orphan the header
         _run(h, label, bold=True, underline=True, size=10.5)
         for it in items:
             p = body.add_paragraph()
