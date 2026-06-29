@@ -49,8 +49,9 @@
 
   /* gates */
   .gate{border:1px solid #c9ccd2;margin:12px 0;background:#fafbfc}
-  .gate .ghead{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e3e4e7;background:#f1f2f5}
-  .gate .ghead input{font-weight:600}
+  .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e3e4e7;background:#f1f2f5}
+  .ghead input[type=text]{width:auto}
+  .gate .ghead>input{font-weight:600}
   .lines{list-style:none;margin:0;padding:6px 8px}
   .lines li{display:flex;gap:8px;align-items:flex-start;padding:3px 0;border-bottom:1px dotted #e3e4e7}
   .lines li .qty{width:54px;flex:none}

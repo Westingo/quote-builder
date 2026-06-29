@@ -12,39 +12,32 @@ proposal:
   ccb: '46091'
   cc: METROOD121MJ
   job_footer: ''
-gate_summary:
-- asasdD
+gate_summary: []
 gates:
 - title: 'Work to be Done at Electrical room:'
   lines:
+  - code: ACS6100R-E
+    sheet: Brivo
+    qty: 1
   - code: ACS6100-DB
     sheet: Brivo
     qty: 1
   - code: ACS6100-IO
     sheet: Brivo
     qty: 1
-  - code: ACS6100R-EXP
-    sheet: Brivo
-    qty: 1
-  - code: ACS6100L-EXP
-    sheet: Brivo
-    qty: 1
-- title: 'Work to be Done at Pool Gate:'
-  lines:
-  - code: EXC1
-    sheet: Access
-    qty: 1
 options:
-- text: Residential Elevator
-  amount: $4,000
-  cost_per_gate: true
+- title: Residential Elevator
+  lines:
+  - code: B5B
+    sheet: Brivo
+    qty: 1
+  amount: $4000
 notes:
 - N2
 - N2A
 warranties:
-- W19
+- W3
 exclusions:
-- EX1
 - EX3
 - EX4A
 total: null
