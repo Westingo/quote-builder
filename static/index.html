@@ -245,9 +245,12 @@ function renderResults(){
 }
 
 // ---------- gates ----------
+function titleFor(g){
+  return ('Work to be Done at '+(g.loc||'')+' Gate Location:').replace(/\s+/g,' ');
+}
 function addGate(){
   const id='g'+(++gateSeq);
-  JOB.gates.push({id, title:'Work to be Done at  Gate Location:', lines:[]});
+  JOB.gates.push({id, loc:'', lines:[]});
   renderGates();
 }
 function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); renderGates(); }
@@ -278,15 +281,18 @@ function renderGates(){
   // keep the "add to gate" dropdown in sync
   const pg=$('#pick-gate'); const cur=pg.value;
   pg.innerHTML=''; JOB.gates.forEach(g=>{const o=document.createElement('option');
-    o.value=g.id;o.textContent=g.title||g.id;pg.appendChild(o);});
+    o.value=g.id;o.textContent=titleFor(g);pg.appendChild(o);});
   if(JOB.gates.find(g=>g.id===cur)) pg.value=cur;
 
   const box=$('#gates'); box.innerHTML='';
   JOB.gates.forEach(g=>{
     const el=document.createElement('div'); el.className='gate';
     el.innerHTML=`<div class="ghead">
-        <input type="text" value="${escAttr(g.title)}" oninput="setGateTitle('${g.id}',this.value)">
-        <button class="btn x sm" onclick="removeGate('${g.id}')">remove gate</button></div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">Work to be Done at</span>
+        <input type="text" value="${escAttr(g.loc)}" placeholder="24'  (or: Pool)" style="max-width:160px"
+               oninput="setGateLoc('${g.id}',this.value)">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">Gate Location:</span>
+        <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove gate</button></div>
       <ul class="lines" id="ls-${g.id}"></ul>
       <div class="addrow">
         <input class="code" id="cc-${g.id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${g.id}')">
@@ -318,8 +324,8 @@ function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
   let i=0; return t.replace(/_+/g, m => (i<fills.length && fills[i]!=='')?fills[i++]:(i++,m));
 }
-function setGateTitle(id,v){JOB.gates.find(g=>g.id===id).title=v;
-  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=v;}
+function setGateLoc(id,v){const g=JOB.gates.find(g=>g.id===id);g.loc=v;
+  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g);}
 function setQty(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].qty=v===''?null:Number(v);}
 function setFills(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].fills=v.split('|').map(s=>s.trim());renderGates();}
 function rmLine(id,i){JOB.gates.find(g=>g.id===id).lines.splice(i,1);renderGates();}
@@ -407,7 +413,7 @@ function collect(){
       submitted_by:$('#f-subby').value, ccb:$('#f-ccb').value, cc:$('#f-cc').value,
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
-    gates:JOB.gates.map(g=>({title:g.title, lines:g.lines.map(cleanLine)})),
+    gates:JOB.gates.map(g=>({title:titleFor(g), lines:g.lines.map(cleanLine)})),
     options:JOB.options.map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
@@ -459,8 +465,10 @@ async function loadJob(){
   $('#f-subby').value=p.submitted_by||''; $('#f-ccb').value=p.ccb||''; $('#f-cc').value=p.cc||'';
   $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
   JOB.gate_summary=(j.gate_summary||[]).slice();
-  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq),title:g.title,
-    lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
+  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>{
+    const m=(g.title||'').match(/Work to be Done at (.*?) Gate Location:/);
+    return {id:'g'+(++gateSeq), loc:m?m[1].trim():'',
+      lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};});
   JOB.options=(j.options||[]).slice();
   JOB.free={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);

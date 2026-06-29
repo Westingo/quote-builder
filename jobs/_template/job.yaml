@@ -19,7 +19,7 @@ proposal:
 gate_summary: []          # centered "Install:" list, e.g. "(1) 24' x 8' Vertical Pivot Gate"
 
 gates:
-  - title: "Work to be Done at  Gate Location:"
+  - title: "Work to be Done at 24' Gate Location:"
     lines:
       # - { code: "6", sheet: "Gate Accessories", qty: 1 }   # dictionary lookup
       # - { code: "15", sheet: "Ironwork", qty: 1, fills: ["24'", "8'"] }  # fill _ blanks in order

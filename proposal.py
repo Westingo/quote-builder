@@ -115,9 +115,12 @@ def _build_header(section, h):
     U.clear_table_borders(grid)
     U.set_col_widths(grid, [Inches(4.6), Inches(3.0)])
 
-    def field(cell, label, value, value_bold=False):
+    def field(cell, label, value, value_bold=False, hang=None):
         p = cell.paragraphs[0]
-        U.no_space(p, before=1, after=1)
+        U.no_space(p, before=5, after=5)
+        if hang is not None:                  # hanging indent: wrapped/2nd lines align
+            p.paragraph_format.left_indent = hang
+            p.paragraph_format.first_line_indent = -hang
         _run(p, f"{label} ", bold=True, size=10)
         if value:
             for i, ln in enumerate(str(value).split("\n")):
@@ -132,13 +135,14 @@ def _build_header(section, h):
     field(grid.cell(1, 1), "", "")
     # Date + Terms share a line
     p = grid.cell(2, 0).paragraphs[0]
-    U.no_space(p, before=1, after=1)
+    U.no_space(p, before=5, after=5)
     _run(p, "Date: ", bold=True, size=10)
     _run(p, f"{h.get('date','')}      ", size=10)
     _run(p, "Terms: ", bold=True, size=10)
     _run(p, h.get("terms", "") or "", size=10)
     field(grid.cell(2, 1), "Email:", h.get("email"))
-    field(grid.cell(3, 0), "Job Address:", h.get("job_address"), value_bold=True)
+    field(grid.cell(3, 0), "Job Address:", h.get("job_address"),
+          value_bold=True, hang=Inches(1.0))
     field(grid.cell(3, 1), "Attention:", h.get("attention"))
 
     # bottom rule under the info box
@@ -169,7 +173,7 @@ FINE_PRINT = (
 )
 
 
-def _build_footer(section, h):
+def _build_footer(section, h, total=None):
     footer = section.footer
     footer.is_linked_to_previous = False
     for p in list(footer.paragraphs):
@@ -189,6 +193,12 @@ def _build_footer(section, h):
     rp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     U.no_space(rp, before=1, after=1)
     _run(rp, "TOTAL", bold=True, size=10, smallcaps=True)
+    if total:
+        tp = band.cell(0, 1).add_paragraph()
+        tp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        U.no_space(tp, before=0, after=1)
+        amt = str(total)
+        _run(tp, amt if amt.startswith("$") else f"${amt}", bold=True, size=11)
     U.set_cell_borders(band.cell(0, 1), edges=("top", "bottom", "left"), sz="8")
 
     # --- fine print ---
@@ -255,18 +265,25 @@ def _band(body):
     return t
 
 
-def _scope_line(body, qty, text):
-    """One scope line: '  1)  <text>' or '  —  <text>' for no-count items."""
+def _scope_line(body, qty, text, install_label=False):
+    """One scope line, in three aligned columns like the original:
+        Install:   1)        <description>
+                   1)        <description>
+                   —         <no-count description>
+    'Install:' prints once (first line); the qty and description columns stay
+    aligned via fixed tab stops + a hanging indent so wrapped text lines up too.
+    """
+    QTY_TAB, DESC_TAB = Inches(0.62), Inches(1.25)
     p = body.add_paragraph()
     U.no_space(p, before=0, after=1, line=1.0)
     pf = p.paragraph_format
-    pf.left_indent = Inches(0.9)
-    pf.first_line_indent = Inches(-0.55)
+    pf.left_indent = DESC_TAB
+    pf.first_line_indent = -DESC_TAB
+    pf.tab_stops.add_tab_stop(QTY_TAB)
+    pf.tab_stops.add_tab_stop(DESC_TAB)
     marker = f"{qty})" if qty not in (None, 0, "") else "—"
-    _run(p, f"{marker}\t", size=10)
+    _run(p, ("Install:" if install_label else "") + f"\t{marker}\t", size=10)
     _run(p, text, size=10)
-    # tab stop so the text column aligns
-    p.paragraph_format.tab_stops.add_tab_stop(Inches(0.35))
     return p
 
 
@@ -309,13 +326,9 @@ def render_body(body, doc):
         block = [title]
         first = True
         for ln in gate["lines"]:
-            p = _scope_line(body, ln.get("qty"), ln["text"])
+            p = _scope_line(body, ln.get("qty"), ln["text"], install_label=first)
             block.append(p)
-            if first:
-                # prefix the very first line with the "Install:" label
-                run = p.runs[0]
-                run.text = "Install:  " + run.text
-                first = False
+            first = False
         for para in block[:-1]:
             para.paragraph_format.keep_with_next = True
         for para in block:
@@ -431,14 +444,14 @@ def build_proposal(doc, out_path):
     section.page_height = Inches(11)
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
-    section.top_margin = Inches(2.0)      # room for the info box header
+    section.top_margin = Inches(2.35)     # room for the (airier) info box header
     section.bottom_margin = Inches(1.95)  # room for the footer block
     section.header_distance = Inches(0.3)
     section.footer_distance = Inches(0.3)
     U.set_page_border(section)
 
     _build_header(section, doc["header"])
-    _build_footer(section, doc["header"])
+    _build_footer(section, doc["header"], total=doc.get("total"))
     render_body(document, doc)
 
     document.save(out_path)
