@@ -4,3 +4,4 @@ python-docx
 pyyaml
 python-multipart
 openpyxl
+pywebview

@@ -1,0 +1,77 @@
+proposal:
+  for: "Town & Country Fence of Oregon"
+  address: "PO Box 443; Clackamas, OR 97015"
+  phone: "503.655.2055"
+  email: "Troy@tcfence.us"
+  attention: "Troy Deming"
+  date: "06/26/2026"
+  terms: ""
+  job_address: "Hoodland Fire District Station #74\n25400 E Salmon River Rd; Welches, OR 97067"
+  bid_number: "G20260319"
+  submitted_by: "Patrick Duty"
+  ccb: "46091"
+  cc: "METROOD121MJ"
+  job_footer: "HOODLAND FIRE STATION #74 –F"
+
+gate_summary:
+  - "(1) 24' x 8' Vertical Pivot Gate"
+  - "(1) 30' x 8' Double Vertical Pivot Gate"
+
+gates:
+  - title: "Work to be Done at 24' Gate Location:"
+    lines:
+      - { code: "3", qty: 1, sheet: "Operators", note: "With rebar per manufacturer's install manual" }
+      - { text: "24' vertical pivot gate model VPG2490 manufactured by AutoGate 120V 1PH", qty: 1 }
+      - { text: "Ground rod", qty: 1 }
+      - { code: "6", qty: 1, sheet: "Gate Accessories" }
+      - { code: "7", qty: 1, sheet: "Gate Accessories" }
+      - { text: "Loop detectors", qty: 2 }
+      - { text: "Cold weather package", qty: 1 }
+      - { text: "Mat heater", qty: 1 }
+      - { text: "Photo eye", qty: 1 }
+      - { text: "Gate yoke with a concrete pad (stanchion)", qty: 1 }
+      - { text: "Reflective tape on both sides of the gate frame (both sides)", qty: null }
+      - { text: "Group 24 — 12V 100 Amp batteries", qty: 2 }
+
+  - title: "Work to be Done at 30' Double Gate Location:"
+    lines:
+      - { code: "3", qty: 2, sheet: "Operators", note: "With rebar per manufacturer's install manual" }
+      - { text: "15' vertical pivot gates model VPG2490 manufactured by AutoGate 120V 1PH", qty: 2 }
+      - { text: "Ground rod", qty: 2 }
+      - { code: "6", qty: 2, sheet: "Gate Accessories" }
+      - { code: "7", qty: 1, sheet: "Gate Accessories" }
+      - { text: "Loop detectors", qty: 2 }
+      - { text: "Cold weather package", qty: 1 }
+      - { text: "Mat heater", qty: 1 }
+      - { text: "Photo eye", qty: 1 }
+      - { text: "Gate yoke with a concrete pad (stanchion)", qty: 2 }
+      - { text: "Reflective tape on both sides of the gate frame (both sides)", qty: null }
+      - { text: "Group 24 — 12V 100 Amp batteries", qty: 4 }
+
+options:
+  - kind: block
+    title: "Low Voltage Electrical Option:"
+    bullets:
+      - "Supply a conduit layout drawing for devices called out in automation scope."
+      - "Provide and install wet rated, low voltage wire in existing conduit (raceways by others)."
+      - "Final wiring and termination of low voltage devices."
+      - "Supply low voltage electrical permit & schedule inspection with local municipalities when required."
+      - "Test system for functionality."
+    priced:
+      - { label: "Single Gate", amount: "920.00" }
+      - { label: "Double Gate", amount: "1,385.00" }
+  - { text: "(1) Clackamas County fire access: FLB-100-Mini with Clackamas Fire padlock. — If required.", amount: "942.00" }
+  - { text: "Clean-up and removal of excavated materials from site.", amount: "1,768.00" }
+  - { text: "Deduct for (1) 42\" & 72” Dual-height gooseneck mounting pedestal fabricated from 3\" × 3\" tube powder-coated finish – Metro to provide concrete footing.", amount: "1,071.00", deduct: true }
+  - { text: "Deduct if reflective tape is only installed on one side of the gate.", amount: "390.00", cost_per_gate: true }
+
+# Notes (Cont.) section mirrors the sample (the two tariff notes)
+notes: [ "N38", "N39" ]
+warranties:
+  - { text: "Standard as provided by AutoGate." }
+  - "W2"
+  - "W3"
+  - "W15"
+exclusions: [ "EX1", "EX4A", "EX6", "EX7", "EX8C", "EX9", "EX10A", "EX12A", "EX13", "EX14", "EX15A", "EX16", "EX17" ]
+
+total: null

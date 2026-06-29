@@ -7,6 +7,7 @@ venv/
 # Generated proposals (job inputs are tracked; built .docx are not)
 jobs/*/*.docx
 jobs/*/~$*.docx
+jobs/*/_preview.pdf
 
 # OS / editor
 Thumbs.db
