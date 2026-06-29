@@ -45,6 +45,7 @@
   .btn.sm{padding:3px 8px;font-size:12px}
   .btn.x{border-color:#c9a;color:var(--bad);padding:2px 8px}
   .muted{color:var(--faint);font-size:12px}
+  input.ro{background:#eceef1;color:#555;cursor:not-allowed}
 
   /* gates */
   .gate{border:1px solid #c9ccd2;margin:12px 0;background:#fafbfc}
@@ -125,8 +126,8 @@
         <div><label>Job footer tag</label><input type="text" id="f-jobfooter" placeholder="HOODLAND FIRE STATION #74 –F"></div>
       </div>
       <div class="row">
-        <div><label>CCB #</label><input type="text" id="f-ccb" value="46091"></div>
-        <div><label>CC #</label><input type="text" id="f-cc" value="METROOD121MJ"></div>
+        <div><label>CCB # (fixed)</label><input type="text" id="f-ccb" value="46091" readonly class="ro" title="Metro license number — never changes"></div>
+        <div><label>CC # (fixed)</label><input type="text" id="f-cc" value="METROOD121MJ" readonly class="ro" title="Metro license number — never changes"></div>
       </div>
     </div></section>
 

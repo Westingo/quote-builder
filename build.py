@@ -147,8 +147,9 @@ def build_doc(job, data, index):
             "attention": p.get("attention", ""),
             "bid_number": p.get("bid_number", ""),
             "submitted_by": p.get("submitted_by", ""),
-            "ccb": p.get("ccb", "46091"),
-            "cc": p.get("cc", "METROOD121MJ"),
+            # Metro's fixed license numbers — never change, not overridable
+            "ccb": "46091",
+            "cc": "METROOD121MJ",
             "job_footer": p.get("job_footer", ""),
         },
         "tariff_notes": tariff,
