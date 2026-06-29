@@ -88,9 +88,16 @@ def _build_header(section, h):
     U.no_space(c0, after=0)
     _run(c0, "PROPOSAL", bold=True, size=30, font=SERIF)
 
-    c1 = trow.cell(0, 1).paragraphs[0]
+    # boxed "Pg. X of Y" — nested 1-cell table so the border hugs the text
+    midcell = trow.cell(0, 1)
+    midcell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    U.no_space(midcell.paragraphs[0], after=0)
+    pgbox = midcell.add_table(rows=1, cols=1)
+    pgbox.alignment = WD_TABLE_ALIGNMENT.CENTER
+    U.set_cell_borders(pgbox.cell(0, 0), sz="6")
+    c1 = pgbox.cell(0, 0).paragraphs[0]
     c1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    U.no_space(c1, after=0)
+    U.no_space(c1, before=1, after=1)
     _run(c1, "Pg. ", size=11)
     U.add_field(c1, "PAGE", "1")
     _run(c1, " of ", size=11)

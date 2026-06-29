@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quote Builder — Metro Access Control</title>
+<style>
+  :root{
+    --ink:#15171a; --navy:#1b254b; --accent:#1b254b; --line:#15171a;
+    --bench:#e9eaec; --sheet:#fff; --faint:#8a8d93; --good:#1d7a3a; --bad:#b3261e;
+    --serif:Cambria, Georgia, "Times New Roman", serif;
+    --sans:system-ui, "Segoe UI", sans-serif; --mono:ui-monospace, Consolas, monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bench);color:var(--ink);font-family:var(--sans);font-size:14px}
+  [hidden]{display:none!important}
+  header{background:var(--sheet);border-bottom:2px solid var(--line)}
+  .tb{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 16px;gap:14px}
+  .tb .brand{font-family:var(--serif);font-weight:bold;font-size:19px;letter-spacing:.03em}
+  .tb .brand span{color:var(--navy)}
+  .tb .role{font-family:var(--serif);font-variant:small-caps;letter-spacing:.18em;color:var(--faint);margin-left:auto}
+  main{max-width:1180px;margin:0 auto 90px;padding:16px 14px}
+  .grid2{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+  @media(max-width:980px){.grid2{grid-template-columns:1fr}}
+
+  .sheet{background:var(--sheet);border:1.5px solid var(--line);margin-bottom:18px}
+  .sheet>h2{margin:0;border-bottom:1px solid var(--line);padding:9px 14px;
+    font-family:var(--serif);font-variant:small-caps;letter-spacing:.16em;font-size:15px;font-weight:600;
+    display:flex;align-items:center;gap:10px}
+  .sheet>h2 button{margin-left:auto}
+  .pad{padding:14px}
+  label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:9px 0 3px}
+  input[type=text],input[type=date],input[type=search],input[type=number],select,textarea{
+    width:100%;border:1px solid #b9bcc2;background:#fff;padding:7px 8px;font:inherit;border-radius:0}
+  textarea{resize:vertical;min-height:54px}
+  input:focus,select:focus,textarea:focus,button:focus{outline:2px solid var(--navy);outline-offset:1px}
+  .row{display:flex;gap:12px}.row>*{flex:1}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  button{font:inherit;cursor:pointer}
+  .btn{border:1.5px solid var(--line);background:#fff;padding:6px 12px;font-family:var(--serif);
+    font-variant:small-caps;letter-spacing:.08em}
+  .btn:hover{background:#eef0ff}
+  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.primary:hover{background:#2a3666}
+  .btn.sm{padding:3px 8px;font-size:12px}
+  .btn.x{border-color:#c9a;color:var(--bad);padding:2px 8px}
+  .muted{color:var(--faint);font-size:12px}
+
+  /* gates */
+  .gate{border:1px solid #c9ccd2;margin:12px 0;background:#fafbfc}
+  .gate .ghead{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e3e4e7;background:#f1f2f5}
+  .gate .ghead input{font-weight:600}
+  .lines{list-style:none;margin:0;padding:6px 8px}
+  .lines li{display:flex;gap:8px;align-items:flex-start;padding:3px 0;border-bottom:1px dotted #e3e4e7}
+  .lines li .qty{width:54px;flex:none}
+  .lines li .txt{flex:1;font-size:13px;line-height:1.35}
+  .lines li .txt .code{font-family:var(--mono);font-size:11px;color:var(--navy);background:#eef0ff;padding:0 4px;margin-right:6px}
+  .lines li .free{font-style:italic;color:#444}
+  .addrow{display:flex;gap:6px;padding:6px 8px;border-top:1px solid #e3e4e7;flex-wrap:wrap}
+  .addrow input.code{width:90px;flex:none}
+  .addrow input.ftext{flex:1;min-width:160px}
+
+  /* picker */
+  aside{position:sticky;top:12px}
+  .picker .pad{padding:10px}
+  .picker select,.picker input{margin-bottom:6px}
+  .results{max-height:48vh;overflow:auto;border:1px solid #e3e4e7;background:#fff}
+  .res{padding:5px 8px;border-bottom:1px solid #f0f1f3;cursor:pointer;font-size:12.5px;line-height:1.3}
+  .res:hover{background:#eef0ff}
+  .res .code{font-family:var(--mono);font-size:11px;color:var(--navy);font-weight:bold;margin-right:6px}
+  .res .blank{color:var(--bad);font-size:10px;margin-left:4px}
+  .catlabel{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--faint);background:#f1f2f5;padding:3px 8px;position:sticky;top:0}
+
+  /* nwe checklists */
+  .nwe{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:900px){.nwe{grid-template-columns:1fr}}
+  .nwe .col h3{font-family:var(--serif);font-variant:small-caps;letter-spacing:.1em;font-size:13px;margin:0 0 6px}
+  .checklist{max-height:240px;overflow:auto;border:1px solid #e3e4e7;background:#fff;padding:4px}
+  .checklist label{display:flex;gap:6px;text-transform:none;letter-spacing:0;font-family:var(--sans);
+    font-size:12px;color:var(--ink);margin:0;padding:2px;cursor:pointer;align-items:flex-start}
+  .checklist label:hover{background:#eef0ff}
+  .checklist input{width:auto;margin-top:2px}
+  .pill{font-family:var(--mono);font-size:10px;color:var(--navy)}
+
+  /* options */
+  .opt{border:1px solid #d4d5d8;padding:8px;margin:8px 0;background:#fafbfc}
+  .opt .row{align-items:center}
+  .opt .amt{width:120px;flex:none}
+  #log{font-family:var(--mono);font-size:12px;white-space:pre-wrap;background:#0f1115;color:#d7dae0;padding:10px;margin-top:10px}
+  .ok{color:var(--good)} .err{color:var(--bad)}
+  .buildbar{position:fixed;bottom:0;left:0;right:0;background:var(--sheet);border-top:2px solid var(--line);
+    padding:10px 14px;display:flex;gap:12px;align-items:center;z-index:5}
+  .buildbar .sp{margin-left:auto}
+</style>
+</head>
+<body>
+<header><div class="tb">
+  <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
+  <div class="role">Quote Builder</div>
+</div></header>
+
+<main>
+<div class="grid2">
+  <div>
+    <!-- HEADER FIELDS -->
+    <section class="sheet"><h2>Proposal Header</h2><div class="pad">
+      <div class="row">
+        <div><label>For (customer) *</label><input type="text" id="f-for"></div>
+        <div><label>Attention</label><input type="text" id="f-attention"></div>
+      </div>
+      <div class="row">
+        <div><label>Address</label><input type="text" id="f-address"></div>
+        <div><label>Phone</label><input type="text" id="f-phone"></div>
+      </div>
+      <div class="row">
+        <div><label>Email</label><input type="text" id="f-email"></div>
+        <div><label>Date</label><input type="text" id="f-date" placeholder="06/26/2026"></div>
+        <div><label>Terms</label><input type="text" id="f-terms"></div>
+      </div>
+      <label>Job Address (two lines ok)</label><textarea id="f-jobaddr"></textarea>
+      <div class="row3">
+        <div><label>Bid / Quote #</label><input type="text" id="f-bid"></div>
+        <div><label>Submitted By</label><input type="text" id="f-subby"></div>
+        <div><label>Job footer tag</label><input type="text" id="f-jobfooter" placeholder="HOODLAND FIRE STATION #74 –F"></div>
+      </div>
+      <div class="row">
+        <div><label>CCB #</label><input type="text" id="f-ccb" value="46091"></div>
+        <div><label>CC #</label><input type="text" id="f-cc" value="METROOD121MJ"></div>
+      </div>
+    </div></section>
+
+    <!-- INSTALL SUMMARY -->
+    <section class="sheet"><h2>Install Summary <button class="btn sm" onclick="addSummary()">+ line</button></h2>
+      <div class="pad"><div class="muted">Centered “Install:” list at the top, e.g. <i>(1) 24' x 8' Vertical Pivot Gate</i></div>
+      <ul class="lines" id="summary"></ul></div></section>
+
+    <!-- GATES -->
+    <section class="sheet"><h2>Gate Locations <button class="btn sm" onclick="addGate()">+ gate</button></h2>
+      <div class="pad" id="gates"></div></section>
+
+    <!-- OPTIONS -->
+    <section class="sheet"><h2>Options
+        <button class="btn sm" onclick="addLowVoltage()">+ Low-Voltage block</button>
+        <button class="btn sm" onclick="addOption()">+ option</button></h2>
+      <div class="pad" id="options"><div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div></div></section>
+
+    <!-- NOTES / WARRANTIES / EXCLUSIONS -->
+    <section class="sheet"><h2>Notes · Warranties · Exclusions</h2>
+      <div class="pad"><div class="nwe">
+        <div class="col"><h3>Notes (N)</h3><div class="checklist" id="cl-N"></div>
+          <input type="text" id="free-N" placeholder="+ free-text note, Enter"></div>
+        <div class="col"><h3>Warranties (W)</h3><div class="checklist" id="cl-W"></div>
+          <input type="text" id="free-W" placeholder="+ free-text warranty, Enter"></div>
+        <div class="col"><h3>Exclusions (E)</h3><div class="checklist" id="cl-E"></div>
+          <input type="text" id="free-E" placeholder="+ free-text exclusion, Enter"></div>
+      </div>
+      <div id="free-list" class="muted" style="margin-top:8px"></div>
+      <label style="margin-top:10px">Total (leave blank — salesman fills)</label>
+      <input type="text" id="f-total" style="max-width:200px">
+      </div></section>
+  </div>
+
+  <!-- CODE PICKER -->
+  <aside><section class="sheet picker"><h2>Code Picker</h2><div class="pad">
+    <label>Add picked code to</label>
+    <select id="pick-gate"></select>
+    <input type="search" id="search" placeholder="search code or description…">
+    <select id="sheetfilter"><option value="scope">All scope sheets</option></select>
+    <div class="results" id="results"></div>
+    <div class="muted" style="margin-top:6px">Click a result to add it (qty 1). Edit qty on the line. Lines with <span class="blank" style="color:var(--bad)">␣</span> have fill-in blanks.</div>
+  </div></section></aside>
+</div>
+</main>
+
+<div class="buildbar">
+  <button class="btn" onclick="loadJob()">Load saved…</button>
+  <select id="jobs" style="width:auto"></select>
+  <span class="sp"></span>
+  <span id="status" class="muted"></span>
+  <button class="btn primary" onclick="build()">Build Proposal</button>
+  <a id="dl" class="btn" hidden>Open .docx</a>
+</div>
+<div id="log" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let CODES = null;            // {sheets:[...]}
+let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclusions:[],
+           free:{N:[],W:[],E:[]}};
+let gateSeq = 0;
+
+// ---------- load dictionary ----------
+async function init(){
+  CODES = await (await fetch('/api/codes')).json();
+  // sheet filter = scope sheets
+  const sf = $('#sheetfilter');
+  CODES.sheets.filter(s=>s.section==='scope').forEach(s=>{
+    const o=document.createElement('option'); o.value=s.sheet; o.textContent=s.sheet; sf.appendChild(o);
+  });
+  sf.onchange = renderResults;
+  $('#search').oninput = renderResults;
+  renderResults();
+  buildChecklists();
+  addGate();           // start with one gate
+  refreshJobs();
+  // free-text N/W/E enter handlers
+  for(const k of ['N','W','E']){
+    $('#free-'+k).addEventListener('keydown',e=>{
+      if(e.key==='Enter' && e.target.value.trim()){
+        JOB.free[k].push(e.target.value.trim()); e.target.value=''; renderFree();
+      }
+    });
+  }
+}
+
+// ---------- code picker ----------
+function scopeItems(){
+  const out=[];
+  const want=$('#sheetfilter').value;
+  for(const s of CODES.sheets){
+    if(s.section!=='scope') continue;
+    if(want!=='scope' && s.sheet!==want) continue;
+    for(const c of s.categories) for(const it of c.items)
+      out.push({...it, sheet:s.sheet, cat:c.name});
+  }
+  return out;
+}
+function renderResults(){
+  const q=$('#search').value.toLowerCase().trim();
+  const items=scopeItems().filter(it=>!q ||
+      it.code.toLowerCase().includes(q) || it.description.toLowerCase().includes(q));
+  const box=$('#results'); box.innerHTML='';
+  let lastCat=null;
+  for(const it of items.slice(0,400)){
+    if(it.cat!==lastCat){lastCat=it.cat;
+      const h=document.createElement('div');h.className='catlabel';h.textContent=it.sheet+' · '+it.cat;box.appendChild(h);}
+    const d=document.createElement('div'); d.className='res';
+    d.innerHTML=`<span class="code">${it.code}</span>${esc(it.description)}`+
+      (it.blanks?` <span class="blank">␣ blanks</span>`:'');
+    d.onclick=()=>addCodeLine(it);
+    box.appendChild(d);
+  }
+  if(!items.length) box.innerHTML='<div class="res muted">no matches</div>';
+}
+
+// ---------- gates ----------
+function addGate(){
+  const id='g'+(++gateSeq);
+  JOB.gates.push({id, title:'Work to be Done at  Gate Location:', lines:[]});
+  renderGates();
+}
+function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); renderGates(); }
+function addCodeLine(it){
+  const gid=$('#pick-gate').value; const g=JOB.gates.find(x=>x.id===gid);
+  if(!g){alert('Add a gate first');return;}
+  const line={code:it.code, sheet:it.sheet, qty:1, _desc:it.description, _blanks:it.blanks};
+  if(it.blanks) line.fills=[];
+  g.lines.push(line); renderGates();
+}
+function addFreeLine(gid){
+  const inp=$('#ft-'+gid); const t=inp.value.trim(); if(!t)return;
+  const q=$('#fq-'+gid).value;
+  JOB.gates.find(g=>g.id===gid).lines.push({text:t, qty:q===''?null:Number(q)});
+  inp.value=''; renderGates();
+}
+function addByCode(gid){
+  const ci=$('#cc-'+gid); const code=ci.value.trim(); if(!code)return;
+  // find first scope match
+  const it=scopeItems().find(x=>x.code.toLowerCase()===code.toLowerCase());
+  if(!it){alert('Code '+code+' not found in scope sheets — type it as free text instead.');return;}
+  const q=$('#cq-'+gid).value;
+  const line={code:it.code, sheet:it.sheet, qty:q===''?null:Number(q), _desc:it.description, _blanks:it.blanks};
+  if(it.blanks) line.fills=[];
+  JOB.gates.find(g=>g.id===gid).lines.push(line); ci.value=''; renderGates();
+}
+function renderGates(){
+  // keep the "add to gate" dropdown in sync
+  const pg=$('#pick-gate'); const cur=pg.value;
+  pg.innerHTML=''; JOB.gates.forEach(g=>{const o=document.createElement('option');
+    o.value=g.id;o.textContent=g.title||g.id;pg.appendChild(o);});
+  if(JOB.gates.find(g=>g.id===cur)) pg.value=cur;
+
+  const box=$('#gates'); box.innerHTML='';
+  JOB.gates.forEach(g=>{
+    const el=document.createElement('div'); el.className='gate';
+    el.innerHTML=`<div class="ghead">
+        <input type="text" value="${escAttr(g.title)}" oninput="setGateTitle('${g.id}',this.value)">
+        <button class="btn x sm" onclick="removeGate('${g.id}')">remove gate</button></div>
+      <ul class="lines" id="ls-${g.id}"></ul>
+      <div class="addrow">
+        <input class="code" id="cc-${g.id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${g.id}')">
+        <input class="qty" type="number" id="cq-${g.id}" value="1" style="width:60px">
+        <button class="btn sm" onclick="addByCode('${g.id}')">+ code</button>
+        <input class="ftext" id="ft-${g.id}" placeholder="…or free-text line" onkeydown="if(event.key==='Enter')addFreeLine('${g.id}')">
+        <input class="qty" type="number" id="fq-${g.id}" placeholder="qty" style="width:60px">
+        <button class="btn sm" onclick="addFreeLine('${g.id}')">+ text</button>
+      </div>`;
+    box.appendChild(el);
+    const ul=el.querySelector('#ls-'+g.id);
+    g.lines.forEach((ln,i)=>{
+      const li=document.createElement('li');
+      const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
+                     onchange="setQty('${g.id}',${i},this.value)">`;
+      let body;
+      if(ln.code!==undefined){
+        body=`<span class="code">${ln.code}</span>${esc(applyFills(ln))}`+
+             (ln._blanks?` <input type="text" placeholder="fill blanks: a | b" style="width:160px"
+                 value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${g.id}',${i},this.value)">`:'');
+      } else { body=`<span class="free">${esc(ln.text)}</span>`; }
+      li.innerHTML=`${marker}<div class="txt">${body}</div>
+        <button class="btn x sm" onclick="rmLine('${g.id}',${i})">✕</button>`;
+      ul.appendChild(li);
+    });
+  });
+}
+function applyFills(ln){
+  let t=ln._desc||''; const fills=ln.fills||[];
+  let i=0; return t.replace(/_+/g, m => (i<fills.length && fills[i]!=='')?fills[i++]:(i++,m));
+}
+function setGateTitle(id,v){JOB.gates.find(g=>g.id===id).title=v;
+  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=v;}
+function setQty(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].qty=v===''?null:Number(v);}
+function setFills(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].fills=v.split('|').map(s=>s.trim());renderGates();}
+function rmLine(id,i){JOB.gates.find(g=>g.id===id).lines.splice(i,1);renderGates();}
+
+// ---------- install summary ----------
+function addSummary(){JOB.gate_summary.push('');renderSummary();}
+function renderSummary(){
+  const ul=$('#summary');ul.innerHTML='';
+  JOB.gate_summary.forEach((s,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<input type="text" value="${escAttr(s)}" oninput="JOB.gate_summary[${i}]=this.value"
+        placeholder="(1) 24' x 8' Vertical Pivot Gate">
+      <button class="btn x sm" onclick="JOB.gate_summary.splice(${i},1);renderSummary()">✕</button>`;
+    ul.appendChild(li);
+  });
+}
+
+// ---------- options ----------
+function addOption(){JOB.options.push({text:'',amount:'',deduct:false,cost_per_gate:false});renderOptions();}
+function addLowVoltage(){
+  JOB.options.unshift({kind:'block',title:'Low Voltage Electrical Option:',
+    bullets:["Supply a conduit layout drawing for devices called out in automation scope.",
+      "Provide and install wet rated, low voltage wire in existing conduit (raceways by others).",
+      "Final wiring and termination of low voltage devices.",
+      "Supply low voltage electrical permit & schedule inspection with local municipalities when required.",
+      "Test system for functionality."],
+    priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
+  renderOptions();
+}
+function renderOptions(){
+  const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
+  JOB.options.forEach((o,i)=>{
+    const el=document.createElement('div');el.className='opt';
+    if(o.kind==='block'){
+      el.innerHTML=`<div class="row"><b>Low-Voltage block</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
+        <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
+        <div class="row"><div><label>Single Gate $</label><input type="text" value="${escAttr(o.priced[0].amount)}" oninput="JOB.options[${i}].priced[0].amount=this.value"></div>
+        <div><label>Double Gate $</label><input type="text" value="${escAttr(o.priced[1].amount)}" oninput="JOB.options[${i}].priced[1].amount=this.value"></div></div>`;
+    } else {
+      el.innerHTML=`<label>Option text</label>
+        <div class="row"><input type="text" value="${escAttr(o.text)}" oninput="JOB.options[${i}].text=this.value">
+          <input class="amt" type="text" placeholder="amount" value="${escAttr(o.amount)}" oninput="JOB.options[${i}].amount=this.value">
+          <button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
+        <label style="display:inline-block;margin-right:14px"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct &lt;$&gt;</label>
+        <label style="display:inline-block"><input type="checkbox" style="width:auto" ${o.cost_per_gate?'checked':''} onchange="JOB.options[${i}].cost_per_gate=this.checked"> “Cost Per Gate”</label>`;
+    }
+    box.appendChild(el);
+  });
+}
+
+// ---------- N/W/E checklists ----------
+function buildChecklists(){
+  const map={N:'cl-N',W:'cl-W',E:'cl-E'};
+  for(const sh of CODES.sheets){
+    const key={note:'N',warranty:'W',exclusion:'E'}[sh.section]; if(!key)continue;
+    const box=$('#'+map[key]);
+    for(const c of sh.categories) for(const it of c.items){
+      const lab=document.createElement('label');
+      lab.innerHTML=`<input type="checkbox" value="${it.code}"><span><span class="pill">${it.code}</span> ${esc(it.description)}</span>`;
+      box.appendChild(lab);
+    }
+  }
+}
+function collectNWE(key,sheetSection){
+  const map={N:'cl-N',W:'cl-W',E:'cl-E'};
+  const picked=[...$('#'+map[key]).querySelectorAll('input:checked')].map(i=>i.value);
+  const free=JOB.free[key].map(t=>({text:t}));
+  return [...picked, ...free];
+}
+function renderFree(){
+  const parts=[];
+  for(const k of ['N','W','E']) if(JOB.free[k].length)
+    parts.push(`<b>${k} free-text:</b> `+JOB.free[k].map((t,i)=>
+      `${esc(t)} <a href="#" onclick="JOB.free['${k}'].splice(${i},1);renderFree();return false">✕</a>`).join(' · '));
+  $('#free-list').innerHTML=parts.join('<br>');
+}
+
+// ---------- collect + build ----------
+function collect(){
+  const j={
+    proposal:{
+      for:$('#f-for').value, attention:$('#f-attention').value, address:$('#f-address').value,
+      phone:$('#f-phone').value, email:$('#f-email').value, date:$('#f-date').value,
+      terms:$('#f-terms').value, job_address:$('#f-jobaddr').value, bid_number:$('#f-bid').value,
+      submitted_by:$('#f-subby').value, ccb:$('#f-ccb').value, cc:$('#f-cc').value,
+      job_footer:$('#f-jobfooter').value },
+    gate_summary:JOB.gate_summary.filter(x=>x.trim()),
+    gates:JOB.gates.map(g=>({title:g.title, lines:g.lines.map(cleanLine)})),
+    options:JOB.options.map(cleanOption),
+    notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
+    total:$('#f-total').value||null,
+  };
+  return j;
+}
+function cleanLine(ln){
+  if(ln.code!==undefined){
+    const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
+    if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;
+    return o;
+  }
+  return {text:ln.text, qty:ln.qty};
+}
+function cleanOption(o){
+  if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
+  const r={text:o.text}; if(o.amount)r.amount=o.amount;
+  if(o.deduct)r.deduct=true; if(o.cost_per_gate)r.cost_per_gate=true; return r;
+}
+async function build(){
+  const job=collect();
+  if(!job.proposal.for.trim()){$('#status').innerHTML='<span class="err">Customer (For:) is required.</span>';return;}
+  $('#status').textContent='Building…'; $('#dl').hidden=true; $('#log').hidden=true;
+  const r=await fetch('/api/build',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(job)});
+  const d=await r.json();
+  $('#log').hidden=false; $('#log').textContent=d.log||'';
+  if(d.ok){
+    $('#status').innerHTML='<span class="ok">Built '+d.docx+'</span>';
+    const a=$('#dl'); a.hidden=false; a.textContent='Open '+d.docx;
+    a.href='/download/'+d.slug+'/'+encodeURIComponent(d.docx);
+    if(window.pywebview){a.onclick=e=>{e.preventDefault();window.pywebview.api.open_docx(d.slug,d.docx);};}
+    refreshJobs();
+  } else { $('#status').innerHTML='<span class="err">Build failed</span>'; }
+}
+
+// ---------- saved jobs ----------
+async function refreshJobs(){
+  const list=await (await fetch('/api/jobs')).json();
+  const sel=$('#jobs'); sel.innerHTML='';
+  list.forEach(j=>{const o=document.createElement('option');o.value=j.slug;o.textContent=j.slug;sel.appendChild(o);});
+}
+async function loadJob(){
+  const slug=$('#jobs').value; if(!slug)return;
+  const j=await (await fetch('/api/job/'+slug)).json();
+  const p=j.proposal||{};
+  $('#f-for').value=p.for||''; $('#f-attention').value=p.attention||''; $('#f-address').value=p.address||'';
+  $('#f-phone').value=p.phone||''; $('#f-email').value=p.email||''; $('#f-date').value=p.date||'';
+  $('#f-terms').value=p.terms||''; $('#f-jobaddr').value=p.job_address||''; $('#f-bid').value=p.bid_number||'';
+  $('#f-subby').value=p.submitted_by||''; $('#f-ccb').value=p.ccb||''; $('#f-cc').value=p.cc||'';
+  $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
+  JOB.gate_summary=(j.gate_summary||[]).slice();
+  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq),title:g.title,
+    lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
+  JOB.options=(j.options||[]).slice();
+  JOB.free={N:[],W:[],E:[]};
+  applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
+  renderSummary();renderGates();renderOptions();renderFree();
+  $('#status').textContent='Loaded '+slug;
+}
+function descOf(code,sheet){
+  for(const s of CODES.sheets){ if(sheet&&s.sheet!==sheet)continue;
+    for(const c of s.categories)for(const it of c.items)if(it.code===code)return it.description;}
+  return '';
+}
+function applyNWE(key,arr){
+  const map={N:'cl-N',W:'cl-W',E:'cl-E'};
+  (arr||[]).forEach(v=>{
+    if(typeof v==='object'){JOB.free[key].push(v.text);return;}
+    const cb=$('#'+map[key]).querySelector(`input[value="${v}"]`); if(cb)cb.checked=true;
+  });
+}
+
+// ---------- util ----------
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+init();
+</script>
+</body>
+</html>
