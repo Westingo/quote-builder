@@ -39,6 +39,10 @@ gates:
     amount: '180'
   - amount_note: Overtime Rate
     amount: '248'
+  - amount_note: Materials Mark up (Travel and Per-Diems as well)
+    amount: 15%
+  - text: New Enclosure
+    qty: null
 options: []
 notes: []
 warranties: []

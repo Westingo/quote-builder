@@ -221,9 +221,25 @@ def main(jobdir):
     data, index = load_codes()
     doc = build_doc(job, data, index)
     out = _slug_outfile(jobdir, job)
-    proposal.build_proposal(doc, out)
-    print(f"wrote {out}")
-    return out
+
+    # If the proposal is open in Word (the usual cause of a save failure), the
+    # file is locked — write to a numbered name instead so the build still works.
+    base, ext = os.path.splitext(out)
+    candidates = [out] + [f"{base} ({i}){ext}" for i in range(2, 50)]
+    for i, cand in enumerate(candidates):
+        try:
+            proposal.build_proposal(doc, cand)
+            if i:
+                print(f"note: '{os.path.basename(out)}' was open in Word, "
+                      f"so this was saved as '{os.path.basename(cand)}'. "
+                      f"Close the old one to reuse the main name.")
+            print(f"wrote {cand}")
+            return cand
+        except PermissionError:
+            continue
+    raise PermissionError(
+        f"Could not save the proposal — '{os.path.basename(out)}' (and its "
+        f"numbered copies) are open in Word. Close them and build again.")
 
 
 if __name__ == "__main__":
