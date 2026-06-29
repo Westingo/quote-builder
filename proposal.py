@@ -38,7 +38,7 @@ SERIF = "Times New Roman"
 CONTENT_W = Inches(6.6)      # left content column
 AMOUNT_W = Inches(1.0)       # right AMOUNT gutter
 PAGE_BODY_W = CONTENT_W + AMOUNT_W
-TEXT_GAP = Inches(0.15)      # keep body text clear of the AMOUNT divider line
+TEXT_GAP = Inches(0.28)      # keep body text clear of the AMOUNT divider line
 RIGHT_INDENT = AMOUNT_W + TEXT_GAP   # right indent for full-width body paragraphs
 
 
@@ -313,6 +313,9 @@ def _priced_note_row(body, label, amount, deduct=False):
     U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
     lp = t.cell(0, 0).paragraphs[0]
     lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    # confine the label to the right ~half so a long label wraps to a narrow,
+    # right-aligned column (instead of stretching across to the divider)
+    lp.paragraph_format.left_indent = Inches(3.0)
     lp.paragraph_format.right_indent = TEXT_GAP   # stay clear of the divider line
     U.no_space(lp, before=2, after=2)
     if label:
