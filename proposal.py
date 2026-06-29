@@ -38,6 +38,8 @@ SERIF = "Times New Roman"
 CONTENT_W = Inches(6.6)      # left content column
 AMOUNT_W = Inches(1.0)       # right AMOUNT gutter
 PAGE_BODY_W = CONTENT_W + AMOUNT_W
+TEXT_GAP = Inches(0.15)      # keep body text clear of the AMOUNT divider line
+RIGHT_INDENT = AMOUNT_W + TEXT_GAP   # right indent for full-width body paragraphs
 
 
 # ----------------------------------------------------------------------------
@@ -65,7 +67,7 @@ def _para(container, *, align=None, before=0, after=2, line=1.0, reserve_amount=
     if align is not None:
         p.alignment = align
     if reserve_amount:                 # keep body text left of the AMOUNT column
-        p.paragraph_format.right_indent = AMOUNT_W
+        p.paragraph_format.right_indent = RIGHT_INDENT
     U.no_space(p, before=before, after=after, line=line)
     return p
 
@@ -291,8 +293,9 @@ def _scope_line(container, qty, text, label="", reserve_amount=True):
     pf = p.paragraph_format
     pf.left_indent = DESC_TAB
     pf.first_line_indent = -DESC_TAB
-    if reserve_amount:                  # never cross the AMOUNT column (body only)
-        pf.right_indent = AMOUNT_W
+    # keep text clear of the AMOUNT divider (full body indent, or a small gap
+    # when already inside a content-width cell, e.g. an option block)
+    pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
     pf.tab_stops.add_tab_stop(QTY_TAB)
     pf.tab_stops.add_tab_stop(DESC_TAB)
     marker = f"{qty})" if qty not in (None, 0, "") else "—"
@@ -310,6 +313,7 @@ def _priced_note_row(body, label, amount, deduct=False):
     U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
     lp = t.cell(0, 0).paragraphs[0]
     lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    lp.paragraph_format.right_indent = TEXT_GAP   # stay clear of the divider line
     U.no_space(lp, before=2, after=2)
     if label:
         _run(lp, label, bold=True, underline=True, size=10)
@@ -503,7 +507,7 @@ def render_nwe(body, doc):
             U.no_space(p, after=1, line=1.0)
             p.paragraph_format.left_indent = Inches(0.3)
             p.paragraph_format.first_line_indent = Inches(-0.2)
-            p.paragraph_format.right_indent = AMOUNT_W
+            p.paragraph_format.right_indent = RIGHT_INDENT
             _run(p, f"{bullet}  ", size=9.5)
             _run(p, it, size=9.5)
 

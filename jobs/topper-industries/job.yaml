@@ -34,9 +34,12 @@ gates:
   - text: Test Maglocks, Position Sensors, UPS Unit, Control Station, Red/Green Lights
       and Limit Sensors
     qty: null
-options:
-- title: ''
-  lines: []
+  - amount_note: Hourly rate for tech - Billed for all Job related Labor (Travel,
+      Site Time, Support/Planning, ect)
+    amount: '180'
+  - amount_note: Overtime Rate
+    amount: '248'
+options: []
 notes: []
 warranties: []
 exclusions: []
