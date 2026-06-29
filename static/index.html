@@ -142,9 +142,10 @@
 
     <!-- OPTIONS -->
     <section class="sheet"><h2>Options
+        <button class="btn sm" onclick="addDetailOption()">+ detailed option</button>
         <button class="btn sm" onclick="addLowVoltage()">+ Low-Voltage block</button>
-        <button class="btn sm" onclick="addOption()">+ option</button></h2>
-      <div class="pad" id="options"><div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div></div></section>
+        <button class="btn sm" onclick="addOption()">+ one-line option</button></h2>
+      <div class="pad" id="options"><div class="muted">Detailed options take codes + free-text lines (like a location) plus a price; one-line options are just text + price. Prices show in the AMOUNT column.</div></div></section>
 
     <!-- NOTES / WARRANTIES / EXCLUSIONS -->
     <section class="sheet"><h2>Notes · Warranties · Exclusions</h2>
@@ -254,37 +255,76 @@ function addGate(){
   JOB.gates.push({id, loc:'', lines:[]});
   renderGates();
 }
-function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); renderGates(); }
-function addCodeLine(it){
-  const gid=$('#pick-gate').value; const g=JOB.gates.find(x=>x.id===gid);
-  if(!g){alert('Add a gate first');return;}
+function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); redraw(); }
+
+// a "lines container" is a gate OR a detailed option (both have id + lines[])
+function findLines(id){
+  return JOB.gates.find(g=>g.id===id) || JOB.options.find(o=>o.id===id && o.lines);
+}
+function redraw(){ renderGates(); renderOptions(); }   // refreshPicker runs inside
+
+function refreshPicker(){
+  const pg=$('#pick-gate'); const cur=pg.value; pg.innerHTML='';
+  JOB.gates.forEach(g=>{const o=document.createElement('option');
+    o.value=g.id; o.textContent=titleFor(g); pg.appendChild(o);});
+  JOB.options.filter(o=>o.lines && o.kind!=='block').forEach(o=>{
+    const op=document.createElement('option');
+    op.value=o.id; op.textContent='Option: '+(o.title||'(untitled)'); pg.appendChild(op);});
+  if([...pg.options].some(o=>o.value===cur)) pg.value=cur;
+}
+
+function addCodeLine(it){          // from the right-side picker -> selected target
+  const c=findLines($('#pick-gate').value);
+  if(!c){alert('Add a location or detailed option first');return;}
   const line={code:it.code, sheet:it.sheet, qty:1, _desc:it.description, _blanks:it.blanks};
   if(it.blanks) line.fills=[];
-  g.lines.push(line); renderGates();
+  c.lines.push(line); redraw();
 }
-function addFreeLine(gid){
-  const inp=$('#ft-'+gid); const t=inp.value.trim(); if(!t)return;
-  const q=$('#fq-'+gid).value;
-  JOB.gates.find(g=>g.id===gid).lines.push({text:t, qty:q===''?null:Number(q)});
-  inp.value=''; renderGates();
-}
-function addByCode(gid){
-  const ci=$('#cc-'+gid); const code=ci.value.trim(); if(!code)return;
-  // find first scope match
+function addByCode(id){
+  const ci=$('#cc-'+id); const code=ci.value.trim(); if(!code)return;
   const it=scopeItems().find(x=>x.code.toLowerCase()===code.toLowerCase());
   if(!it){alert('Code '+code+' not found in scope sheets — type it as free text instead.');return;}
-  const q=$('#cq-'+gid).value;
+  const q=$('#cq-'+id).value;
   const line={code:it.code, sheet:it.sheet, qty:q===''?null:Number(q), _desc:it.description, _blanks:it.blanks};
   if(it.blanks) line.fills=[];
-  JOB.gates.find(g=>g.id===gid).lines.push(line); ci.value=''; renderGates();
+  findLines(id).lines.push(line); ci.value=''; redraw();
+}
+function addFreeLine(id){
+  const inp=$('#ft-'+id); const t=inp.value.trim(); if(!t)return;
+  const q=$('#fq-'+id).value;
+  findLines(id).lines.push({text:t, qty:q===''?null:Number(q)});
+  inp.value=''; redraw();
+}
+
+// shared line-editor markup used by gate cards and detailed-option cards
+function addRowHTML(id){
+  return `<div class="addrow">
+    <input class="code" id="cc-${id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${id}')">
+    <input class="qty" type="number" id="cq-${id}" value="1" style="width:60px">
+    <button class="btn sm" onclick="addByCode('${id}')">+ code</button>
+    <input class="ftext" id="ft-${id}" placeholder="…or free-text line" onkeydown="if(event.key==='Enter')addFreeLine('${id}')">
+    <input class="qty" type="number" id="fq-${id}" placeholder="qty" style="width:60px">
+    <button class="btn sm" onclick="addFreeLine('${id}')">+ text</button>
+  </div>`;
+}
+function renderLineList(id, lines, ul){
+  ul.innerHTML='';
+  lines.forEach((ln,i)=>{
+    const li=document.createElement('li');
+    const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
+                   onchange="setQty('${id}',${i},this.value)">`;
+    let body;
+    if(ln.code!==undefined){
+      body=`<span class="code">${ln.code}</span>${esc(applyFills(ln))}`+
+           (ln._blanks?` <input type="text" placeholder="fill blanks: a | b" style="width:160px"
+               value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${id}',${i},this.value)">`:'');
+    } else { body=`<span class="free">${esc(ln.text)}</span>`; }
+    li.innerHTML=`${marker}<div class="txt">${body}</div>
+      <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+    ul.appendChild(li);
+  });
 }
 function renderGates(){
-  // keep the "add to gate" dropdown in sync
-  const pg=$('#pick-gate'); const cur=pg.value;
-  pg.innerHTML=''; JOB.gates.forEach(g=>{const o=document.createElement('option');
-    o.value=g.id;o.textContent=titleFor(g);pg.appendChild(o);});
-  if(JOB.gates.find(g=>g.id===cur)) pg.value=cur;
-
   const box=$('#gates'); box.innerHTML='';
   JOB.gates.forEach(g=>{
     const el=document.createElement('div'); el.className='gate';
@@ -293,32 +333,11 @@ function renderGates(){
         <input type="text" value="${escAttr(g.loc)}" placeholder="24' Gate Location  ·  head end  ·  electrical room"
                style="flex:1" oninput="setGateLoc('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
-      <ul class="lines" id="ls-${g.id}"></ul>
-      <div class="addrow">
-        <input class="code" id="cc-${g.id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${g.id}')">
-        <input class="qty" type="number" id="cq-${g.id}" value="1" style="width:60px">
-        <button class="btn sm" onclick="addByCode('${g.id}')">+ code</button>
-        <input class="ftext" id="ft-${g.id}" placeholder="…or free-text line" onkeydown="if(event.key==='Enter')addFreeLine('${g.id}')">
-        <input class="qty" type="number" id="fq-${g.id}" placeholder="qty" style="width:60px">
-        <button class="btn sm" onclick="addFreeLine('${g.id}')">+ text</button>
-      </div>`;
+      <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id)}`;
     box.appendChild(el);
-    const ul=el.querySelector('#ls-'+g.id);
-    g.lines.forEach((ln,i)=>{
-      const li=document.createElement('li');
-      const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
-                     onchange="setQty('${g.id}',${i},this.value)">`;
-      let body;
-      if(ln.code!==undefined){
-        body=`<span class="code">${ln.code}</span>${esc(applyFills(ln))}`+
-             (ln._blanks?` <input type="text" placeholder="fill blanks: a | b" style="width:160px"
-                 value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${g.id}',${i},this.value)">`:'');
-      } else { body=`<span class="free">${esc(ln.text)}</span>`; }
-      li.innerHTML=`${marker}<div class="txt">${body}</div>
-        <button class="btn x sm" onclick="rmLine('${g.id}',${i})">✕</button>`;
-      ul.appendChild(li);
-    });
+    renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id));
   });
+  refreshPicker();
 }
 function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
@@ -326,9 +345,9 @@ function applyFills(ln){
 }
 function setGateLoc(id,v){const g=JOB.gates.find(g=>g.id===id);g.loc=v;
   const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g);}
-function setQty(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].qty=v===''?null:Number(v);}
-function setFills(id,i,v){JOB.gates.find(g=>g.id===id).lines[i].fills=v.split('|').map(s=>s.trim());renderGates();}
-function rmLine(id,i){JOB.gates.find(g=>g.id===id).lines.splice(i,1);renderGates();}
+function setQty(id,i,v){findLines(id).lines[i].qty=v===''?null:Number(v);}
+function setFills(id,i,v){findLines(id).lines[i].fills=v.split('|').map(s=>s.trim());redraw();}
+function rmLine(id,i){findLines(id).lines.splice(i,1);redraw();}
 
 // ---------- install summary ----------
 function addSummary(){JOB.gate_summary.push('');renderSummary();}
@@ -345,6 +364,10 @@ function renderSummary(){
 
 // ---------- options ----------
 function addOption(){JOB.options.push({text:'',amount:'',deduct:false,cost_per_gate:false});renderOptions();}
+function addDetailOption(){
+  JOB.options.push({id:'o'+(++gateSeq), title:'', lines:[], amount:'', deduct:false});
+  renderOptions();
+}
 function addLowVoltage(){
   JOB.options.unshift({kind:'block',title:'Low Voltage Electrical Option:',
     bullets:["Supply a conduit layout drawing for devices called out in automation scope.",
@@ -359,6 +382,20 @@ function renderOptions(){
   const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
   JOB.options.forEach((o,i)=>{
     const el=document.createElement('div');el.className='opt';
+    if(o.lines && o.kind!=='block'){
+      // detailed option: title + coded/free-text scope lines + amount
+      el.innerHTML=`<div class="ghead" style="background:#eef0ff">
+          <input type="text" value="${escAttr(o.title)}" placeholder="Option title — e.g. Residential Elevator:"
+                 style="flex:1;font-weight:600" oninput="JOB.options[${i}].title=this.value">
+          <span class="muted">$</span><input class="amt" type="text" placeholder="amount" value="${escAttr(o.amount||'')}"
+                 oninput="JOB.options[${i}].amount=this.value" style="width:100px">
+          <label style="display:inline-flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0;margin:0;color:var(--ink)"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct</label>
+          <button class="btn x sm" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
+        <ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
+      box.appendChild(el);
+      renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id));
+      return;
+    }
     if(o.kind==='block'){
       el.innerHTML=`<div class="row"><b>Low-Voltage block</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
         <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
@@ -374,6 +411,7 @@ function renderOptions(){
     }
     box.appendChild(el);
   });
+  refreshPicker();
 }
 
 // ---------- N/W/E checklists ----------
@@ -430,6 +468,10 @@ function cleanLine(ln){
 }
 function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
+  if(o.lines){   // detailed option
+    const r={title:o.title, lines:o.lines.map(cleanLine)};
+    if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true; return r;
+  }
   const r={text:o.text}; if(o.amount)r.amount=o.amount;
   if(o.deduct)r.deduct=true; if(o.cost_per_gate)r.cost_per_gate=true; return r;
 }
@@ -469,7 +511,13 @@ async function loadJob(){
     const m=(g.title||'').match(/^Work to be Done at (.*?):?\s*$/);
     return {id:'g'+(++gateSeq), loc:m?m[1].trim():(g.title||''),
       lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};});
-  JOB.options=(j.options||[]).slice();
+  JOB.options=(j.options||[]).map(o=>{
+    if(o && o.lines && o.kind!=='block'){
+      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct,
+        lines:(o.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};
+    }
+    return o;
+  });
   JOB.free={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();

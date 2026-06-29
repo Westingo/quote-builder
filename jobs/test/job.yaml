@@ -1,29 +1,43 @@
 proposal:
-  for: test
-  attention: test
-  address: test
-  phone: test
-  email: test
+  for: Test
+  attention: Test
+  address: Test
+  phone: Test
+  email: Test
   date: ''
-  terms: test
-  job_address: test
-  bid_number: test
-  submitted_by: test
+  terms: Test
+  job_address: Test
+  bid_number: Test
+  submitted_by: Test
   ccb: '46091'
   cc: METROOD121MJ
   job_footer: ''
 gate_summary:
-- (1) Brivo ACS-300
+- asasdD
 gates:
-- title: 'Work to be Done at Pool Gate Location:'
+- title: 'Work to be Done at Electrical room:'
   lines:
-  - code: ACS300-E
+  - code: ACS6100-DB
     sheet: Brivo
     qty: 1
-  - code: SIG40K
-    sheet: Readers
+  - code: ACS6100-IO
+    sheet: Brivo
     qty: 1
-options: []
+  - code: ACS6100R-EXP
+    sheet: Brivo
+    qty: 1
+  - code: ACS6100L-EXP
+    sheet: Brivo
+    qty: 1
+- title: 'Work to be Done at Pool Gate:'
+  lines:
+  - code: EXC1
+    sheet: Access
+    qty: 1
+options:
+- text: Residential Elevator
+  amount: $4,000
+  cost_per_gate: true
 notes:
 - N2
 - N2A
@@ -33,4 +47,4 @@ exclusions:
 - EX1
 - EX3
 - EX4A
-total: $1,000,000
+total: null

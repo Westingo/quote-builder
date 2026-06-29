@@ -26,7 +26,7 @@ import os
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_BREAK
-from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.enum.section import WD_SECTION
 
 import docx_utils as U
@@ -276,25 +276,27 @@ def _band(body):
     return t
 
 
-def _scope_line(body, qty, text, install_label=False):
+def _scope_line(container, qty, text, label="", reserve_amount=True):
     """One scope line, in three aligned columns like the original:
         Install:   1)        <description>
                    1)        <description>
-                   —         <no-count description>
-    'Install:' prints once (first line); the qty and description columns stay
-    aligned via fixed tab stops + a hanging indent so wrapped text lines up too.
+        Other:     —         <no-count description>
+    `label` (e.g. "Install:" / "Other:") prints on the rows it's given; the qty
+    and description columns stay aligned via fixed tab stops + a hanging indent
+    so wrapped text lines up too. Used for gate scope and inside option blocks.
     """
     QTY_TAB, DESC_TAB = Inches(0.62), Inches(1.25)
-    p = body.add_paragraph()
+    p = container.add_paragraph()
     U.no_space(p, before=0, after=1, line=1.0)
     pf = p.paragraph_format
     pf.left_indent = DESC_TAB
     pf.first_line_indent = -DESC_TAB
-    pf.right_indent = AMOUNT_W          # never cross the AMOUNT column
+    if reserve_amount:                  # never cross the AMOUNT column (body only)
+        pf.right_indent = AMOUNT_W
     pf.tab_stops.add_tab_stop(QTY_TAB)
     pf.tab_stops.add_tab_stop(DESC_TAB)
     marker = f"{qty})" if qty not in (None, 0, "") else "—"
-    _run(p, ("Install:" if install_label else "") + f"\t{marker}\t", size=10)
+    _run(p, (label or "") + f"\t{marker}\t", size=10)
     _run(p, text, size=10)
     return p
 
@@ -338,7 +340,8 @@ def render_body(body, doc):
         block = [title]
         first = True
         for ln in gate["lines"]:
-            p = _scope_line(body, ln.get("qty"), ln["text"], install_label=first)
+            p = _scope_line(body, ln.get("qty"), ln["text"],
+                            label="Install:" if first else "")
             block.append(p)
             first = False
         for para in block[:-1]:
@@ -357,6 +360,37 @@ def render_body(body, doc):
         render_nwe(body, doc)
 
 
+def _detail_option(body, opt):
+    """A titled option block: bold-underlined title, coded/free-text scope lines
+    (Install: / qty / description), and one amount aligned in the AMOUNT column."""
+    t = body.add_table(rows=1, cols=2)
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    U.clear_table_borders(t)
+    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
+    left = t.cell(0, 0)
+    tp = left.paragraphs[0]
+    U.no_space(tp, before=2, after=2)
+    if opt.get("title"):
+        _run(tp, opt["title"], bold=True, underline=True, size=10.5)
+    for ln in opt.get("lines", []):
+        p = _scope_line(left, ln.get("qty"), ln["text"],
+                        label=ln.get("label", ""), reserve_amount=False)
+        if ln.get("bold"):
+            for r in p.runs:
+                r.bold = True
+
+    rc = t.cell(0, 1)
+    rc.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    ap = rc.paragraphs[0]
+    ap.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    U.no_space(ap, after=0)
+    amt = opt.get("amount")
+    if amt:
+        amt = str(amt).lstrip("$").strip()
+        _run(ap, f"<${amt}>" if opt.get("deduct") else f"${amt}", size=10)
+    _para(body, after=8)   # spacer between options
+
+
 def render_options(body, options):
     head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=14, after=6)
     head.paragraph_format.keep_with_next = True
@@ -372,6 +406,12 @@ def render_options(body, options):
             _run(p, txt, size=10)
 
     for opt in options:
+        # detailed option: a titled block of coded/free-text scope lines + an
+        # amount (e.g. "Residential Elevator:" with a Brivo panel, a reader, ...)
+        if isinstance(opt, dict) and opt.get("lines") is not None and "kind" not in opt:
+            _detail_option(body, opt)
+            continue
+
         # each option is a 2-col table row: text | amount
         t = body.add_table(rows=1, cols=2)
         t.alignment = WD_TABLE_ALIGNMENT.CENTER

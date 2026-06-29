@@ -115,6 +115,30 @@ def resolve_codes(index, codes, section):
 # ----------------------------------------------------------------------------
 # assemble normalized doc
 # ----------------------------------------------------------------------------
+def process_options(index, options):
+    """Resolve coded scope lines inside detailed option blocks; pass simple/block
+    options through unchanged."""
+    out = []
+    for opt in options or []:
+        if isinstance(opt, dict) and opt.get("lines") is not None and "kind" not in opt:
+            lines = []
+            for orig in opt["lines"]:
+                res = resolve_line(index, orig)
+                if orig.get("label"):
+                    res["label"] = orig["label"]
+                if orig.get("bold"):
+                    res["bold"] = True
+                lines.append(res)
+            if (lines and not lines[0].get("label")
+                    and lines[0].get("qty") not in (None, 0, "")):
+                lines[0]["label"] = "Install:"
+            out.append({"title": opt.get("title", ""), "lines": lines,
+                        "amount": opt.get("amount"), "deduct": opt.get("deduct")})
+        else:
+            out.append(opt)
+    return out
+
+
 def build_doc(job, data, index):
     p = job.get("proposal", {})
 
@@ -156,7 +180,7 @@ def build_doc(job, data, index):
         "intro": intro,
         "gate_summary": job.get("gate_summary", []),
         "gates": gates,
-        "options": job.get("options", []),
+        "options": process_options(index, job.get("options")),
         "notes": resolve_codes(index, job.get("notes"), "note"),
         "warranties": resolve_codes(index, job.get("warranties"), "warranty"),
         "exclusions": resolve_codes(index, job.get("exclusions"), "exclusion"),
