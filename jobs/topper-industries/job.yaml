@@ -1,0 +1,43 @@
+proposal:
+  for: Topper Industries
+  attention: Bryan
+  address: 1333 Glenwood St; Woodland, WA 98674
+  phone: 360.841.8320
+  email: Bryan@topperfloats.com
+  date: ''
+  terms: ''
+  job_address: Honolulu Site
+  bid_number: ''
+  submitted_by: ''
+  ccb: '46091'
+  cc: METROOD121MJ
+  job_footer: ''
+gate_summary:
+- On Clients Existing 80' Bridge w/ HySecurity Hydraulic Operator
+gates:
+- title: Provide Trained HySecurity Technician/Electrician to
+  lines:
+  - text: Attend Offsite Video Meetings
+    qty: null
+  - text: Travel to Site
+    qty: null
+  - text: Give Direction to site electrician for conduits and wiring to devices
+    qty: null
+  - text: Replace Enclosure and reinstall components
+    qty: null
+  - text: Install hinges on Pedestrian Gate entry
+    qty: null
+  - text: Tie in access control wiring (Installed by Others)
+    qty: null
+  - text: Commission System
+    qty: null
+  - text: Test Maglocks, Position Sensors, UPS Unit, Control Station, Red/Green Lights
+      and Limit Sensors
+    qty: null
+options:
+- title: ''
+  lines: []
+notes: []
+warranties: []
+exclusions: []
+total: null

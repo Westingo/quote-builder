@@ -296,8 +296,8 @@ function addFreeLine(id){
 }
 
 // shared line-editor markup used by gate cards and detailed-option cards
-function addRowHTML(id){
-  return `<div class="addrow">
+function addRowHTML(id, withPriced){
+  let h=`<div class="addrow">
     <input class="code" id="cc-${id}" placeholder="code" onkeydown="if(event.key==='Enter')addByCode('${id}')">
     <input class="qty" type="number" id="cq-${id}" value="1" style="width:60px">
     <button class="btn sm" onclick="addByCode('${id}')">+ code</button>
@@ -305,11 +305,33 @@ function addRowHTML(id){
     <input class="qty" type="number" id="fq-${id}" placeholder="qty" style="width:60px">
     <button class="btn sm" onclick="addFreeLine('${id}')">+ text</button>
   </div>`;
+  if(withPriced){
+    h+=`<div class="addrow" style="border-top:none;padding-top:0">
+      <span class="muted" style="align-self:center;white-space:nowrap">priced note →</span>
+      <input class="ftext" id="pn-${id}" placeholder="label e.g. Not-To-Exceed Total:" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
+      <span style="align-self:center">$</span>
+      <input id="pa-${id}" placeholder="amount" style="width:90px" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
+      <button class="btn sm" onclick="addPricedNote('${id}')">+ priced note</button>
+    </div>`;
+  }
+  return h;
+}
+function addPricedNote(id){
+  const l=$('#pn-'+id).value.trim(); const a=$('#pa-'+id).value.trim();
+  if(!l && !a) return;
+  findLines(id).lines.push({amount_note:l, amount:a});
+  redraw();
 }
 function renderLineList(id, lines, ul){
   ul.innerHTML='';
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
+    if(ln.amount_note!==undefined){
+      li.innerHTML=`<div class="txt"><span class="pill">$ note</span> <b>${esc(ln.amount_note)}</b>
+        <span class="muted">→ AMOUNT:</span> <b>$${esc(ln.amount||'')}</b></div>
+        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+      ul.appendChild(li); return;
+    }
     const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
                    onchange="setQty('${id}',${i},this.value)">`;
     let body;
@@ -332,7 +354,7 @@ function renderGates(){
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
-      <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id)}`;
+      <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}`;
     box.appendChild(el);
     renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id));
   });
@@ -458,6 +480,10 @@ function collect(){
   return j;
 }
 function cleanLine(ln){
+  if(ln.amount_note!==undefined){
+    const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
+    if(ln.deduct)r.deduct=true; return r;
+  }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
     if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;

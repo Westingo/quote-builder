@@ -301,6 +301,26 @@ def _scope_line(container, qty, text, label="", reserve_amount=True):
     return p
 
 
+def _priced_note_row(body, label, amount, deduct=False):
+    """A custom priced note: right-aligned label in the content column and a
+    price in the AMOUNT column on the same row (e.g. 'Not-To-Exceed Total: $540')."""
+    t = body.add_table(rows=1, cols=2)
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    U.clear_table_borders(t)
+    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
+    lp = t.cell(0, 0).paragraphs[0]
+    lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    U.no_space(lp, before=2, after=2)
+    if label:
+        _run(lp, label, bold=True, underline=True, size=10)
+    rp = t.cell(0, 1).paragraphs[0]
+    U.no_space(rp, before=2, after=2)
+    if amount not in (None, ""):
+        amt = str(amount).lstrip("$").strip()
+        _run(rp, f"<${amt}>" if deduct else f"$ {amt}", size=10)
+    return t
+
+
 def _page_break(body):
     p = body.add_paragraph()
     U.no_space(p, after=0)
@@ -338,12 +358,19 @@ def render_body(body, doc):
         # keep the whole gate block on one page (gives one-gate-per-page when a
         # gate is too long to fit in the remaining space, like the sample)
         block = [title]
-        first = True
+        first_scope = True
         for ln in gate["lines"]:
-            p = _scope_line(body, ln.get("qty"), ln["text"],
-                            label="Install:" if first else "")
+            if ln.get("amount_note") is not None:
+                # custom priced note: right-aligned label + price in AMOUNT column
+                _priced_note_row(body, ln.get("amount_note", ""),
+                                 ln.get("amount"), ln.get("deduct"))
+                continue
+            # only label the first counted line "Install:" (not a no-count line)
+            label = "Install:" if (first_scope and
+                                   ln.get("qty") not in (None, 0, "")) else ""
+            p = _scope_line(body, ln.get("qty"), ln["text"], label=label)
             block.append(p)
-            first = False
+            first_scope = False
         for para in block[:-1]:
             para.paragraph_format.keep_with_next = True
         for para in block:
@@ -373,6 +400,8 @@ def _detail_option(body, opt):
     if opt.get("title"):
         _run(tp, opt["title"], bold=True, underline=True, size=10.5)
     for ln in opt.get("lines", []):
+        if ln.get("amount_note") is not None:
+            continue   # options carry a single block amount, not per-line notes
         p = _scope_line(left, ln.get("qty"), ln["text"],
                         label=ln.get("label", ""), reserve_amount=False)
         if ln.get("bold"):

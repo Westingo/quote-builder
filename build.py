@@ -95,6 +95,19 @@ def resolve_line(index, line):
     return {"qty": qty, "text": _terminate(text)}
 
 
+def resolve_lines(index, lines):
+    """Resolve a location/option line list: priced notes pass through; everything
+    else is a coded or free-text scope line."""
+    out = []
+    for ln in lines or []:
+        if isinstance(ln, dict) and ln.get("amount_note") is not None:
+            out.append({"amount_note": ln["amount_note"],
+                        "amount": ln.get("amount"), "deduct": ln.get("deduct")})
+        else:
+            out.append(resolve_line(index, ln))
+    return out
+
+
 def resolve_codes(index, codes, section):
     """N/W/E lists -> [description, ...]. Accepts bare strings or {code,...}."""
     out = []
@@ -123,6 +136,10 @@ def process_options(index, options):
         if isinstance(opt, dict) and opt.get("lines") is not None and "kind" not in opt:
             lines = []
             for orig in opt["lines"]:
+                if orig.get("amount_note") is not None:
+                    lines.append({"amount_note": orig["amount_note"],
+                                  "amount": orig.get("amount"), "deduct": orig.get("deduct")})
+                    continue
                 res = resolve_line(index, orig)
                 if orig.get("label"):
                     res["label"] = orig["label"]
@@ -156,7 +173,7 @@ def build_doc(job, data, index):
     for g in job.get("gates", []):
         gates.append({
             "title": g["title"],
-            "lines": [resolve_line(index, ln) for ln in g.get("lines", [])],
+            "lines": resolve_lines(index, g.get("lines", [])),
         })
 
     doc = {
