@@ -316,8 +316,9 @@ def _priced_note_row(body, label, amount, deduct=False):
     rp = t.cell(0, 1).paragraphs[0]
     U.no_space(rp, before=2, after=2)
     if amount not in (None, ""):
-        amt = str(amount).lstrip("$").strip()
-        _run(rp, f"<${amt}>" if deduct else f"$ {amt}", size=10)
+        amt = str(amount).strip()
+        body = amt if "%" in amt else f"$ {amt.lstrip('$').strip()}"  # % renders as-is
+        _run(rp, f"<{body}>" if deduct else body, size=10)
     return t
 
 

@@ -67,16 +67,28 @@ def api_codes():
 
 @app.get("/api/jobs")
 def api_jobs():
+    """Recent quotes, newest first — for the sidebar list and reload."""
     out = []
     if os.path.isdir(JOBS):
-        for d in sorted(os.listdir(JOBS)):
+        for d in os.listdir(JOBS):
             jd = os.path.join(JOBS, d)
             if d.startswith("_") or not os.path.isdir(jd):
                 continue
+            yml = os.path.join(jd, "job.yaml")
+            cust, date = d, ""
+            if os.path.isfile(yml):
+                try:
+                    p = (yaml.safe_load(open(yml, encoding="utf-8")) or {}).get("proposal", {})
+                    cust = (p.get("for") or "").strip() or d
+                    date = p.get("date", "") or ""
+                except Exception:
+                    pass
             docs = sorted(glob.glob(os.path.join(jd, "*.docx")),
                           key=os.path.getmtime, reverse=True)
-            out.append({"slug": d,
+            mtime = os.path.getmtime(yml) if os.path.isfile(yml) else os.path.getmtime(jd)
+            out.append({"slug": d, "for": cust, "date": date, "mtime": mtime,
                         "docx": os.path.basename(docs[0]) if docs else None})
+    out.sort(key=lambda x: x["mtime"], reverse=True)
     return out
 
 

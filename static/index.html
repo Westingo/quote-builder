@@ -308,9 +308,8 @@ function addRowHTML(id, withPriced){
   if(withPriced){
     h+=`<div class="addrow" style="border-top:none;padding-top:0">
       <span class="muted" style="align-self:center;white-space:nowrap">priced note →</span>
-      <input class="ftext" id="pn-${id}" placeholder="label e.g. Not-To-Exceed Total:" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
-      <span style="align-self:center">$</span>
-      <input id="pa-${id}" placeholder="amount" style="width:90px" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
+      <input class="ftext" id="pn-${id}" placeholder="label e.g. Not-To-Exceed Total: / Material Markup:" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
+      <input id="pa-${id}" placeholder="$ amount or 15%" style="width:110px" onkeydown="if(event.key==='Enter')addPricedNote('${id}')">
       <button class="btn sm" onclick="addPricedNote('${id}')">+ priced note</button>
     </div>`;
   }
@@ -327,8 +326,9 @@ function renderLineList(id, lines, ul){
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
     if(ln.amount_note!==undefined){
+      const av=(ln.amount||''); const disp=av.includes('%')?av:('$'+av);
       li.innerHTML=`<div class="txt"><span class="pill">$ note</span> <b>${esc(ln.amount_note)}</b>
-        <span class="muted">→ AMOUNT:</span> <b>$${esc(ln.amount||'')}</b></div>
+        <span class="muted">→ AMOUNT:</span> <b>${esc(disp)}</b></div>
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
