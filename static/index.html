@@ -326,9 +326,12 @@ function renderLineList(id, lines, ul, withLineAmount){
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
     if(ln.amount_note!==undefined){
-      const av=(ln.amount||''); const disp=av.includes('%')?av:('$'+av);
-      li.innerHTML=`<div class="txt"><span class="pill">$ note</span> <b>${esc(ln.amount_note)}</b>
-        <span class="muted">→ AMOUNT:</span> <b>${esc(disp)}</b></div>
+      li.innerHTML=`<span class="pill" style="flex:none;align-self:center">$ note</span>
+        <input type="text" value="${escAttr(ln.amount_note)}" placeholder="label e.g. Not-To-Exceed Total:"
+          style="flex:1" onchange="setNoteLabel('${id}',${i},this.value)">
+        <input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / %"
+          title="amount shown in the AMOUNT column" style="width:96px;flex:none"
+          onchange="setNoteAmount('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
@@ -352,6 +355,8 @@ function renderLineList(id, lines, ul, withLineAmount){
 }
 function setLineAmount(id,i,v){const ln=findLines(id).lines[i]; v=v.trim();
   if(v) ln.amount=v; else delete ln.amount;}
+function setNoteLabel(id,i,v){findLines(id).lines[i].amount_note=v;}
+function setNoteAmount(id,i,v){findLines(id).lines[i].amount=v.trim();}
 function renderGates(){
   const box=$('#gates'); box.innerHTML='';
   JOB.gates.forEach(g=>{

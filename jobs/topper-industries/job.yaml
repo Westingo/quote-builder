@@ -43,6 +43,7 @@ gates:
     amount: 15%
   - text: New Enclosure
     qty: null
+    amount: In Separate Quote
 options: []
 notes: []
 warranties: []
