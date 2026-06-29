@@ -81,9 +81,11 @@ def _build_header(section, h):
         p._element.getparent().remove(p._element)
 
     # full-height AMOUNT-column divider: a page-anchored line from the band
-    # (top margin) down to the TOTAL box, drawn here so it repeats every page.
+    # (top of the body content area) down into the TOTAL box, drawn here so it
+    # repeats on every page. top_margin is sized to always exceed the header
+    # height, so the band sits at top_margin and the line starts right at it.
     x = section.left_margin.pt + CONTENT_W.pt
-    y_top = section.top_margin.pt
+    y_top = section.top_margin.pt + 1
     y_bottom = section.page_height.pt - section.bottom_margin.pt + 17  # into TOTAL box
     U.add_page_line(header, round(x, 1), round(y_top, 1), round(y_bottom, 1))
 
@@ -116,7 +118,7 @@ def _build_header(section, h):
     c2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     U.no_space(c2, after=0)
     if os.path.isfile(LOGO):
-        c2.add_run().add_picture(LOGO, width=Inches(1.35))
+        c2.add_run().add_picture(LOGO, width=Inches(1.15))
 
     # --- fields grid: 2 columns ---
     grid = header.add_table(rows=4, cols=2, width=PAGE_BODY_W)
@@ -455,8 +457,8 @@ def build_proposal(doc, out_path):
     section.page_height = Inches(11)
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
-    section.top_margin = Inches(2.35)     # room for the (airier) info box header
-    section.bottom_margin = Inches(1.95)  # room for the footer block
+    section.top_margin = Inches(2.55)     # must exceed header height so the band
+    section.bottom_margin = Inches(1.95)  # lands here; footer block room below
     section.header_distance = Inches(0.3)
     section.footer_distance = Inches(0.3)
     U.set_page_border(section)
