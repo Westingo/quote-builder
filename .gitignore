@@ -16,3 +16,7 @@ desktop.ini
 
 # Word/OneDrive lock files
 ~$*
+
+# runtime logs
+desktop.log
+desktop-error.log
