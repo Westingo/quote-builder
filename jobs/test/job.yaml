@@ -1,24 +1,23 @@
 proposal:
   for: test
-  attention: John Krueger
-  address: 2525 NE Columbia Blvd
-  phone: 503.583.4716
-  email: dispatcher@metrogates.com
+  attention: test
+  address: test
+  phone: test
+  email: test
   date: ''
-  terms: ''
-  job_address: 2525 NE Columbia Blvd
-  bid_number: '48363940376'
-  submitted_by: Westin
+  terms: test
+  job_address: test
+  bid_number: test
+  submitted_by: test
   ccb: '46091'
   cc: METROOD121MJ
-  job_footer: test test
+  job_footer: test
 gate_summary:
-- (1) Brivo ACS-600
-- (1) HID Signo reader at Pool Gate
+- (1) Brivo ACS-300
 gates:
-- title: 'Work to be Done at  Gate Location: Pool Gate'
+- title: 'Work to be Done at Pool Gate Location:'
   lines:
-  - code: ACS6100R-E
+  - code: ACS300-E
     sheet: Brivo
     qty: 1
   - code: SIG40
@@ -26,11 +25,9 @@ gates:
     qty: 1
 options: []
 notes:
-- N2
+- N2A
 warranties:
 - W19
 exclusions:
-- EX1
 - EX3
-- EX6
 total: $1,000,000

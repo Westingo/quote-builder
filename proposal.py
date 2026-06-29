@@ -60,10 +60,12 @@ def _run(p, text, *, bold=False, italic=False, size=10, font=SERIF,
     return r
 
 
-def _para(container, *, align=None, before=0, after=2, line=1.0):
+def _para(container, *, align=None, before=0, after=2, line=1.0, reserve_amount=True):
     p = container.add_paragraph()
     if align is not None:
         p.alignment = align
+    if reserve_amount:                 # keep body text left of the AMOUNT column
+        p.paragraph_format.right_indent = AMOUNT_W
     U.no_space(p, before=before, after=after, line=line)
     return p
 
@@ -77,6 +79,13 @@ def _build_header(section, h):
     # clear the default empty paragraph
     for p in list(header.paragraphs):
         p._element.getparent().remove(p._element)
+
+    # full-height AMOUNT-column divider: a page-anchored line from the band
+    # (top margin) down to the TOTAL box, drawn here so it repeats every page.
+    x = section.left_margin.pt + CONTENT_W.pt
+    y_top = section.top_margin.pt
+    y_bottom = section.page_height.pt - section.bottom_margin.pt + 17  # into TOTAL box
+    U.add_page_line(header, round(x, 1), round(y_top, 1), round(y_bottom, 1))
 
     # --- title row: PROPOSAL | Pg X of Y | logo ---
     trow = header.add_table(rows=1, cols=3, width=PAGE_BODY_W)
@@ -279,6 +288,7 @@ def _scope_line(body, qty, text, install_label=False):
     pf = p.paragraph_format
     pf.left_indent = DESC_TAB
     pf.first_line_indent = -DESC_TAB
+    pf.right_indent = AMOUNT_W          # never cross the AMOUNT column
     pf.tab_stops.add_tab_stop(QTY_TAB)
     pf.tab_stops.add_tab_stop(DESC_TAB)
     marker = f"{qty})" if qty not in (None, 0, "") else "—"
@@ -421,6 +431,7 @@ def render_nwe(body, doc):
             U.no_space(p, after=1, line=1.0)
             p.paragraph_format.left_indent = Inches(0.3)
             p.paragraph_format.first_line_indent = Inches(-0.2)
+            p.paragraph_format.right_indent = AMOUNT_W
             _run(p, f"{bullet}  ", size=9.5)
             _run(p, it, size=9.5)
 
