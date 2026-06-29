@@ -321,7 +321,7 @@ function addPricedNote(id){
   findLines(id).lines.push({amount_note:l, amount:a});
   redraw();
 }
-function renderLineList(id, lines, ul){
+function renderLineList(id, lines, ul, withLineAmount){
   ul.innerHTML='';
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
@@ -340,11 +340,18 @@ function renderLineList(id, lines, ul){
            (ln._blanks?` <input type="text" placeholder="fill blanks: a | b" style="width:160px"
                value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${id}',${i},this.value)">`:'');
     } else { body=`<span class="free">${esc(ln.text)}</span>`; }
-    li.innerHTML=`${marker}<div class="txt">${body}</div>
+    const amt=withLineAmount
+      ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
+           title="price or note shown in the AMOUNT column for this item"
+           style="width:96px;flex:none" onchange="setLineAmount('${id}',${i},this.value)">`
+      : '';
+    li.innerHTML=`${marker}<div class="txt">${body}</div>${amt}
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
 }
+function setLineAmount(id,i,v){const ln=findLines(id).lines[i]; v=v.trim();
+  if(v) ln.amount=v; else delete ln.amount;}
 function renderGates(){
   const box=$('#gates'); box.innerHTML='';
   JOB.gates.forEach(g=>{
@@ -356,7 +363,7 @@ function renderGates(){
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
       <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}`;
     box.appendChild(el);
-    renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id));
+    renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id), true);
   });
   refreshPicker();
 }
@@ -414,7 +421,7 @@ function renderOptions(){
           <button class="btn x sm" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
         <ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
       box.appendChild(el);
-      renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id));
+      renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id), false);
       return;
     }
     if(o.kind==='block'){
@@ -487,9 +494,12 @@ function cleanLine(ln){
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
     if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;
+    if(ln.amount) o.amount=ln.amount;
     return o;
   }
-  return {text:ln.text, qty:ln.qty};
+  const o={text:ln.text, qty:ln.qty};
+  if(ln.amount) o.amount=ln.amount;
+  return o;
 }
 function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};

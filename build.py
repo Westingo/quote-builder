@@ -92,7 +92,12 @@ def resolve_line(index, line):
         text = _fill_blanks(text, line.get("fills"))
     if line.get("note"):
         text = _terminate(text) + " — " + str(line["note"])
-    return {"qty": qty, "text": _terminate(text)}
+    res = {"qty": qty, "text": _terminate(text)}
+    if line.get("amount") not in (None, ""):   # per-item price/note in AMOUNT col
+        res["amount"] = line["amount"]
+        if line.get("deduct"):
+            res["deduct"] = True
+    return res
 
 
 def resolve_lines(index, lines):

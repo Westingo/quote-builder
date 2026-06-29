@@ -278,17 +278,27 @@ def _band(body):
     return t
 
 
-def _scope_line(container, qty, text, label="", reserve_amount=True):
-    """One scope line, in three aligned columns like the original:
-        Install:   1)        <description>
-                   1)        <description>
-        Other:     —         <no-count description>
-    `label` (e.g. "Install:" / "Other:") prints on the rows it's given; the qty
-    and description columns stay aligned via fixed tab stops + a hanging indent
-    so wrapped text lines up too. Used for gate scope and inside option blocks.
-    """
-    QTY_TAB, DESC_TAB = Inches(0.62), Inches(1.25)
-    p = container.add_paragraph()
+QTY_TAB, DESC_TAB = Inches(0.62), Inches(1.25)
+
+
+def _format_amount_text(val, deduct=False):
+    """Render a value for the AMOUNT column: a percent stays as-is, a number gets
+    a '$' prefix, anything else (a note like 'by others') renders verbatim."""
+    import re
+    s = str(val).strip()
+    if not s:
+        return ""
+    if "%" in s:
+        body = s
+    elif re.fullmatch(r"\$?[\d,]+(\.\d+)?", s):
+        body = f"$ {s.lstrip('$').strip()}"
+    else:
+        body = s
+    return f"<{body}>" if deduct else body
+
+
+def _format_scope_para(p, qty, text, label="", reserve_amount=True):
+    """Format an existing paragraph as a 3-column scope line (label / qty / desc)."""
     U.no_space(p, before=0, after=1, line=1.0)
     pf = p.paragraph_format
     pf.left_indent = DESC_TAB
@@ -302,6 +312,36 @@ def _scope_line(container, qty, text, label="", reserve_amount=True):
     _run(p, (label or "") + f"\t{marker}\t", size=10)
     _run(p, text, size=10)
     return p
+
+
+def _scope_line(container, qty, text, label="", reserve_amount=True):
+    """One scope line, in three aligned columns like the original:
+        Install:   1)        <description>
+                   1)        <description>
+        Other:     —         <no-count description>
+    `label` (e.g. "Install:" / "Other:") prints on the rows it's given; the qty
+    and description columns stay aligned via fixed tab stops + a hanging indent
+    so wrapped text lines up too. Used for gate scope and inside option blocks.
+    """
+    return _format_scope_para(container.add_paragraph(), qty, text,
+                              label=label, reserve_amount=reserve_amount)
+
+
+def _scope_amount_row(body, qty, text, label, amount, deduct=False):
+    """A scope line with a per-item price/note shown in the AMOUNT column on the
+    same row (e.g. 'New Enclosure ....... $450' or '... by others')."""
+    t = body.add_table(rows=1, cols=2)
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    U.clear_table_borders(t)
+    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
+    _format_scope_para(t.cell(0, 0).paragraphs[0], qty, text,
+                       label=label, reserve_amount=False)
+    rc = t.cell(0, 1)
+    rc.vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
+    rp = rc.paragraphs[0]
+    U.no_space(rp, before=0, after=1)
+    _run(rp, _format_amount_text(amount, deduct), size=10)
+    return t
 
 
 def _priced_note_row(body, label, amount, deduct=False):
@@ -325,9 +365,7 @@ def _priced_note_row(body, label, amount, deduct=False):
     rp = rc.paragraphs[0]
     U.no_space(rp, before=2, after=2)
     if amount not in (None, ""):
-        amt = str(amount).strip()
-        body = amt if "%" in amt else f"$ {amt.lstrip('$').strip()}"  # % renders as-is
-        _run(rp, f"<{body}>" if deduct else body, size=10)
+        _run(rp, _format_amount_text(amount, deduct), size=10)
     return t
 
 
@@ -378,9 +416,13 @@ def render_body(body, doc):
             # only label the first counted line "Install:" (not a no-count line)
             label = "Install:" if (first_scope and
                                    ln.get("qty") not in (None, 0, "")) else ""
-            p = _scope_line(body, ln.get("qty"), ln["text"], label=label)
-            block.append(p)
             first_scope = False
+            if ln.get("amount") not in (None, ""):
+                # scope line with a per-item price/note in the AMOUNT column
+                _scope_amount_row(body, ln.get("qty"), ln["text"], label,
+                                  ln["amount"], ln.get("deduct"))
+                continue
+            block.append(_scope_line(body, ln.get("qty"), ln["text"], label=label))
         for para in block[:-1]:
             para.paragraph_format.keep_with_next = True
         for para in block:
@@ -423,10 +465,8 @@ def _detail_option(body, opt):
     ap = rc.paragraphs[0]
     ap.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     U.no_space(ap, after=0)
-    amt = opt.get("amount")
-    if amt:
-        amt = str(amt).lstrip("$").strip()
-        _run(ap, f"<${amt}>" if opt.get("deduct") else f"${amt}", size=10)
+    if opt.get("amount") not in (None, ""):
+        _run(ap, _format_amount_text(opt["amount"], opt.get("deduct")), size=10)
     _para(body, after=8)   # spacer between options
 
 
