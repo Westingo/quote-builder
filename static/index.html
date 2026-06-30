@@ -105,6 +105,14 @@
 <main>
 <div class="grid2">
   <div>
+    <!-- IMPORT FROM SCAN -->
+    <section class="sheet"><h2>Start from a Scan <span class="muted" style="font-weight:400;letter-spacing:0;text-transform:none">optional</span></h2>
+      <div class="pad">
+      <div class="muted" style="margin-bottom:6px">Upload a scanned sales sheet, quote, or email (image or PDF). Claude reads it and pre-fills a <b>draft</b> below — review and fix every line before building.</div>
+      <label class="btn" style="display:inline-block">Choose scan (image / PDF)…
+        <input type="file" accept="image/*,application/pdf" style="display:none" onchange="importScan(this)"></label>
+    </div></section>
+
     <!-- HEADER FIELDS -->
     <section class="sheet"><h2>Proposal Header</h2><div class="pad">
       <div class="row">
@@ -540,12 +548,15 @@ async function refreshJobs(){
 async function loadJob(){
   const slug=$('#jobs').value; if(!slug)return;
   const j=await (await fetch('/api/job/'+slug)).json();
+  loadJobObject(j);
+  $('#status').textContent='Loaded '+slug;
+}
+function loadJobObject(j){
   const p=j.proposal||{};
   $('#f-for').value=p.for||''; $('#f-attention').value=p.attention||''; $('#f-address').value=p.address||'';
   $('#f-phone').value=p.phone||''; $('#f-email').value=p.email||''; $('#f-date').value=p.date||'';
   $('#f-terms').value=p.terms||''; $('#f-jobaddr').value=p.job_address||''; $('#f-bid').value=p.bid_number||'';
-  $('#f-subby').value=p.submitted_by||''; $('#f-ccb').value=p.ccb||''; $('#f-cc').value=p.cc||'';
-  $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
+  $('#f-subby').value=p.submitted_by||''; $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'',
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
@@ -556,10 +567,26 @@ async function loadJob(){
     }
     return o;
   });
+  // reset and re-apply N/W/E checkboxes
+  document.querySelectorAll('.checklist input:checked').forEach(cb=>cb.checked=false);
   JOB.free={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
-  $('#status').textContent='Loaded '+slug;
+}
+async function importScan(input){
+  const f=input.files&&input.files[0]; if(!f)return;
+  $('#status').innerHTML='<span class="muted">Reading scan with AI… (a few seconds)</span>';
+  $('#log').hidden=true;
+  try{
+    const fd=new FormData(); fd.append('file', f);
+    const r=await fetch('/api/import',{method:'POST',body:fd});
+    const d=await r.json();
+    if(d.ok){ loadJobObject(d.job);
+      $('#status').innerHTML='<span class="ok">Imported a draft — review &amp; fix every line, then Build.</span>'; }
+    else { $('#log').hidden=false; $('#log').textContent=d.log||'Import failed';
+      $('#status').innerHTML='<span class="err">Import failed</span>'; }
+  }catch(e){ $('#status').innerHTML='<span class="err">Import failed: '+esc(''+e)+'</span>'; }
+  input.value='';
 }
 function descOf(code,sheet){
   for(const s of CODES.sheets){ if(sheet&&s.sheet!==sheet)continue;

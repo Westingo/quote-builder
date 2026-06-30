@@ -16,10 +16,11 @@ import json
 import contextlib
 
 import yaml
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, UploadFile, File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
-import build as builder
+import build
+import scan_import as builder
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -132,6 +133,18 @@ def api_build(job: dict = Body(...)):
         return JSONResponse({"ok": False, "log": buf.getvalue()}, status_code=500)
     return {"ok": True, "log": buf.getvalue(), "slug": slug,
             "docx": os.path.basename(out)}
+
+
+@app.post("/api/import")
+def api_import(file: UploadFile = File(...)):
+    """Read a scanned sheet/quote/email with Claude vision -> draft job dict."""
+    try:
+        data = file.file.read()
+        job, raw = scan_import.import_scan(data, file.content_type, file.filename or "")
+        return {"ok": True, "job": job}
+    except Exception as e:
+        return JSONResponse({"ok": False, "log": f"Import failed: {e}"},
+                            status_code=500)
 
 
 @app.get("/download/{slug}/{fname}")

@@ -42,6 +42,24 @@ Quotes get revised, so the output is an **editable Word doc**, not a flat PDF.
 
 ---
 
+## Import from a scan (AI)
+
+In the window, **Start from a Scan** lets you upload a scanned sales sheet,
+quote, or email (image or PDF). It sends the scan to Claude's vision API, which
+reads it — including handwriting — and pre-fills a **draft** quote you then
+review and fix before building. Great for typed docs/emails; messy handwriting
+will need corrections.
+
+This needs an **Anthropic API key** and internet. Each scan costs roughly
+$0.05–0.15. Set the key one of two ways:
+- environment variable `ANTHROPIC_API_KEY`, or
+- put the key in a file named **`api_key.txt`** next to the app (gitignored).
+
+Model defaults to `claude-opus-4-8`; override with `QUOTE_IMPORT_MODEL`
+(e.g. `claude-haiku-4-5` for lower cost). The scan is sent to Anthropic to be read.
+
+---
+
 ## Command line (optional)
 
 ```

@@ -7,8 +7,8 @@ proposal:
   date: ''
   terms: ''
   job_address: Honolulu Site
-  bid_number: ''
-  submitted_by: ''
+  bid_number: G20260339
+  submitted_by: John Krueger
   ccb: '46091'
   cc: METROOD121MJ
   job_footer: ''
@@ -35,7 +35,7 @@ gates:
       and Limit Sensors
     qty: null
   - amount_note: Hourly rate for tech - Billed for all Job related Labor (Travel,
-      Site Time, Support/Planning, ect)
+      Site Time, Support/Planning, Stand By Time, ect)
     amount: '180'
   - amount_note: Overtime Rate
     amount: '248'
@@ -46,6 +46,8 @@ gates:
     amount: In Separate Quote
 options: []
 notes: []
-warranties: []
-exclusions: []
+warranties:
+- text: No Material/Labor Warranty Offered
+exclusions:
+- text: Warranty, Electrical Scope, Permits
 total: null
