@@ -88,7 +88,10 @@ def _build_header(section, h):
     # height, so the band sits at top_margin and the line starts right at it.
     x = section.left_margin.pt + CONTENT_W.pt
     y_top = section.top_margin.pt + 1
-    y_bottom = section.page_height.pt - section.bottom_margin.pt + 17  # into TOTAL box
+    # end at the body bottom (top of the DATE/TOTAL band); the band's own
+    # TOTAL-cell left border carries the divider down through the box, so the
+    # line never spills past the band into the fine print below.
+    y_bottom = section.page_height.pt - section.bottom_margin.pt
     U.add_page_line(header, round(x, 1), round(y_top, 1), round(y_bottom, 1))
 
     # --- title row: PROPOSAL | Pg X of Y | logo ---
