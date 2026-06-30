@@ -394,8 +394,12 @@ def _gate_block(body, gate):
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
         keepers.append(lp)
 
-    for para in keepers[:-1]:
-        para.paragraph_format.keep_with_next = True
+    # Keep only the title glued to its first line (so a heading never strands at
+    # the bottom of a page). Let the rest of the lines flow naturally, so a long
+    # gate fills the current page and breaks mid-gate instead of jumping whole to
+    # the next page and leaving the first one empty.
+    if len(keepers) > 1:
+        keepers[0].paragraph_format.keep_with_next = True
     return t
 
 
