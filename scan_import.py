@@ -51,11 +51,18 @@ Return ONLY a JSON object (no markdown fences, no prose) with this exact shape:
   "gate_summary": ["(1) 24' x 8' Vertical Pivot Gate"],
   "gates": [
     {{"title":"Work to be Done at 24' Gate Location:",
-      "lines":[ {{"code":"6","qty":1}}, {{"text":"Ground rod","qty":1}},
-                {{"text":"Reflective tape on both sides","qty":null}} ]}}
+      "lines":[
+        {{"code":"6","qty":1}},
+        {{"text":"Ground rod","qty":1}},
+        {{"text":"Reflective tape on both sides","qty":null}},
+        {{"text":"HID proximity cards","qty":300,"amount":"$1,050.00"}},
+        {{"text":"New enclosure","qty":1,"amount":"by others"}},
+        {{"text":"Gooseneck pedestal","qty":1,"amount":"$1,071.00","deduct":true}},
+        {{"amount_note":"Total to Install all Options (minus monthly fees)","amount":"$29,729.00"}}
+      ]}}
   ],
   "notes": ["N4","N6"], "warranties": ["W2"], "exclusions": ["EX1","EX6"],
-  "total": null
+  "total": "29,729.00"
 }}
 
 Rules:
@@ -69,9 +76,20 @@ not in the dictionary (e.g. "Ground rod", "Cold weather package"), put it in \
 "text" instead — never guess a code.
 - qty is the number before ")" (e.g. "2) Loop detectors" -> qty 2). A "—" or no \
 number -> qty null.
+- PRICES GO IN THE RIGHT COLUMN. Put every dollar amount, price, or percent on a \
+line into that line's "amount" field — it prints in the right-hand AMOUNT column. \
+NEVER write a price inside "text"; "text" is only the description for the left \
+column. "amount" may be a dollar value ("$1,050.00"), a percent ("15%"), or a \
+short note ("by others", "included", "TBD").
+- A deduct or credit (shown in <angle brackets>, or labeled "Deduct"/"Credit"/ \
+"<...>") -> set "deduct": true and put the number in "amount".
+- A line that is ONLY a priced label or running total with no scope item (e.g. \
+"Total to Install all Options ... $29,729.00", "Not-To-Exceed Total: $540", \
+"Cost Per Gate $390") -> use {{"amount_note":"<the label text>","amount":"<the price>"}}.
 - notes / warranties / exclusions are usually listed as codes after "N:", "W:", \
 "E:" or "Ex:". Map to code keys from the N, W, E sheets. If written out in full, \
 return the text instead of a code.
+- "total" is the single grand TOTAL for the whole proposal, if shown.
 - Leave a field "" or null when it is not present. Do not invent values.
 
 DICTIONARY (code | sheet | description):
@@ -105,15 +123,30 @@ def _to_job(parsed, index):
     for g in parsed.get("gates", []) or []:
         lines = []
         for ln in g.get("lines", []) or []:
-            qty = ln.get("qty")
+            amount = ln.get("amount")
+            deduct = bool(ln.get("deduct"))
             code = str(ln.get("code") or "").strip()
+            text = str(ln.get("text") or "").strip()
+            # a priced label / running total: right-aligned label + price in the
+            # AMOUNT column (no scope item of its own)
+            if ln.get("amount_note") is not None or (
+                    amount not in (None, "") and not code and not text):
+                lines.append({"amount_note": str(ln.get("amount_note") or "").strip(),
+                              "amount": amount, "deduct": deduct})
+                continue
             rows = index.get(code) if code else None
             if rows:
-                lines.append({"code": code, "sheet": rows[0][0], "qty": qty})
+                row = {"code": code, "sheet": rows[0][0], "qty": ln.get("qty")}
             else:
-                txt = str(ln.get("text") or code or "").strip()
-                if txt:
-                    lines.append({"text": txt, "qty": qty})
+                txt = text or code
+                if not txt:
+                    continue
+                row = {"text": txt, "qty": ln.get("qty")}
+            if amount not in (None, ""):   # price/percent/note -> right-hand column
+                row["amount"] = amount
+                if deduct:
+                    row["deduct"] = True
+            lines.append(row)
         gates.append({"title": (g.get("title") or "Work to be Done:").strip(),
                       "lines": lines})
     return {
