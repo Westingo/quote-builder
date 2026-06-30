@@ -121,10 +121,37 @@ def resolve_lines(index, lines):
     return out
 
 
+# N/W/E code prefixes — salesmen write the bare Copy_Paste code (34, 4a, 8c);
+# the dictionary stores them prefixed by section (N34, EX4A, EX8C).
+NWE_PREFIX = {"note": "N", "warranty": "W", "exclusion": "EX"}
+
+
+def find_nwe(index, code, section):
+    """Resolve an N/W/E code tolerantly: try it as written, then add the section
+    prefix (note->N, warranty->W, exclusion->EX), case-insensitively. So '34'
+    finds 'N34', '4a' finds 'EX4A', 'W2'/'w2'/'2' all find 'W2'. Returns the item
+    dict or None."""
+    sheet, pre = NWE_SHEET[section], NWE_PREFIX[section]
+    raw = str(code).strip()
+    cands = [raw, raw.upper(), pre + raw, pre + raw.upper()]
+    # build an upper-cased view of the index once per section is overkill; just
+    # scan candidates against exact keys, then fall back to a case-insensitive pass
+    for cand in cands:
+        for s, it in index.get(cand, []):
+            if s == sheet:
+                return it
+    want = {c.upper() for c in cands}
+    for key, rows in index.items():
+        if key.upper() in want:
+            for s, it in rows:
+                if s == sheet:
+                    return it
+    return None
+
+
 def resolve_codes(index, codes, section):
     """N/W/E lists -> [description, ...]. Accepts bare strings or {code,...}."""
     out = []
-    sheet = NWE_SHEET[section]
     for c in codes or []:
         if isinstance(c, dict):
             code, fills = c.get("code"), c.get("fills")
@@ -133,8 +160,11 @@ def resolve_codes(index, codes, section):
                 continue
         else:
             code, fills = c, None
-        item, _ = lookup(index, code, sheet)
-        out.append(_fill_blanks(item.get("description", ""), fills))
+        item = find_nwe(index, code, section)
+        if item is None:                       # unknown code: keep it, don't crash
+            out.append(str(code))
+        else:
+            out.append(_fill_blanks(item.get("description", ""), fills))
     return out
 
 

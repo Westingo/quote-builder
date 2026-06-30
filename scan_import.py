@@ -103,14 +103,14 @@ def _extract_json(text):
 
 
 def _nwe_items(values, index, section):
-    """Pass valid codes through as strings; wrap free text as {text: ...}."""
+    """Pass valid codes through as strings (bare or prefixed); wrap free text as
+    {text: ...}."""
     out = []
     for v in values or []:
         s = str(v).strip()
         if not s:
             continue
-        rows = index.get(s)
-        if rows and any(it.get("section") == section for _, it in rows):
+        if build.find_nwe(index, s, section) is not None:
             out.append(s)
         else:
             out.append({"text": s})

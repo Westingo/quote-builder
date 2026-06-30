@@ -159,11 +159,17 @@
     <!-- NOTES / WARRANTIES / EXCLUSIONS -->
     <section class="sheet"><h2>Notes · Warranties · Exclusions</h2>
       <div class="pad"><div class="nwe">
-        <div class="col"><h3>Notes (N)</h3><div class="checklist" id="cl-N"></div>
+        <div class="col"><h3>Notes (N)</h3>
+          <input type="text" id="codes-N" placeholder="paste codes e.g. 34 36 39, Enter" onkeydown="if(event.key==='Enter')addNWECodes('N')">
+          <div class="checklist" id="cl-N"></div>
           <input type="text" id="free-N" placeholder="+ free-text note, Enter"></div>
-        <div class="col"><h3>Warranties (W)</h3><div class="checklist" id="cl-W"></div>
+        <div class="col"><h3>Warranties (W)</h3>
+          <input type="text" id="codes-W" placeholder="paste codes e.g. 2 3 15, Enter" onkeydown="if(event.key==='Enter')addNWECodes('W')">
+          <div class="checklist" id="cl-W"></div>
           <input type="text" id="free-W" placeholder="+ free-text warranty, Enter"></div>
-        <div class="col"><h3>Exclusions (E)</h3><div class="checklist" id="cl-E"></div>
+        <div class="col"><h3>Exclusions (E)</h3>
+          <input type="text" id="codes-E" placeholder="paste codes e.g. 4a 6 8c, Enter" onkeydown="if(event.key==='Enter')addNWECodes('E')">
+          <div class="checklist" id="cl-E"></div>
           <input type="text" id="free-E" placeholder="+ free-text exclusion, Enter"></div>
       </div>
       <div id="free-list" class="muted" style="margin-top:8px"></div>
@@ -476,6 +482,21 @@ function buildChecklists(){
       box.appendChild(lab);
     }
   }
+}
+function addNWECodes(key){
+  // paste bare or prefixed codes ("34 36 4a") -> tick the matching checkboxes
+  const pre={N:'N',W:'W',E:'EX'}[key];
+  const box=$('#cl-'+key), inp=$('#codes-'+key);
+  const miss=[];
+  inp.value.split(/[\s,]+/).map(t=>t.trim()).filter(Boolean).forEach(t=>{
+    const cands=[t, t.toUpperCase(), pre+t, pre+t.toUpperCase()];
+    let cb=null;
+    for(const c of cands){ cb=box.querySelector('input[value="'+CSS.escape(c)+'"]'); if(cb)break; }
+    if(cb){ cb.checked=true; cb.closest('label').scrollIntoView({block:'nearest'}); }
+    else miss.push(t);
+  });
+  inp.value=miss.join(' ');   // leave any that didn't match so you can see them
+  if(miss.length) inp.placeholder='not found: '+miss.join(' ');
 }
 function collectNWE(key,sheetSection){
   const map={N:'cl-N',W:'cl-W',E:'cl-E'};
