@@ -117,6 +117,14 @@ def repeat_row_as_header(row):
     trPr.append(th)
 
 
+def cant_split_row(row):
+    """Keep a table row from being split across a page break."""
+    trPr = row._tr.get_or_add_trPr()
+    cs = OxmlElement("w:cantSplit")
+    cs.set(qn("w:val"), "true")
+    trPr.append(cs)
+
+
 def no_space(paragraph, before=0, after=0, line=None):
     """Tighten paragraph spacing."""
     pf = paragraph.paragraph_format

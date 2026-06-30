@@ -304,7 +304,7 @@ def _format_amount_text(val, deduct=False):
 
 def _format_scope_para(p, qty, text, label="", reserve_amount=True):
     """Format an existing paragraph as a 3-column scope line (label / qty / desc)."""
-    U.no_space(p, before=0, after=1, line=1.0)
+    U.no_space(p, before=0, after=0, line=1.0)
     pf = p.paragraph_format
     pf.left_indent = DESC_TAB
     pf.first_line_indent = -DESC_TAB
@@ -332,45 +332,62 @@ def _scope_line(container, qty, text, label="", reserve_amount=True):
                               label=label, reserve_amount=reserve_amount)
 
 
-def _scope_amount_row(body, qty, text, label, amount, deduct=False):
-    """A scope line with a per-item price/note shown in the AMOUNT column on the
-    same row (e.g. 'New Enclosure ....... $450' or '... by others')."""
-    t = body.add_table(rows=1, cols=2)
-    t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    U.clear_table_borders(t)
-    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
-    _format_scope_para(t.cell(0, 0).paragraphs[0], qty, text,
-                       label=label, reserve_amount=False)
-    rc = t.cell(0, 1)
-    rc.vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
-    rp = rc.paragraphs[0]
-    U.no_space(rp, before=0, after=1)
-    _run(rp, _format_amount_text(amount, deduct), size=10)
-    return t
-
-
-def _priced_note_row(body, label, amount, deduct=False):
-    """A custom priced note: right-aligned label in the content column and a
-    price in the AMOUNT column on the same row (e.g. 'Not-To-Exceed Total: $540')."""
-    t = body.add_table(rows=1, cols=2)
-    t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    U.clear_table_borders(t)
-    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
-    lp = t.cell(0, 0).paragraphs[0]
-    lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    # confine the label to the right ~half so a long label wraps to a narrow,
-    # right-aligned column (instead of stretching across to the divider)
-    lp.paragraph_format.left_indent = Inches(3.0)
-    lp.paragraph_format.right_indent = TEXT_GAP   # stay clear of the divider line
-    U.no_space(lp, before=2, after=2)
-    if label:
-        _run(lp, label, bold=True, underline=True, size=10)
-    rc = t.cell(0, 1)
-    rc.vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM   # align price to the note's last line
-    rp = rc.paragraphs[0]
-    U.no_space(rp, before=2, after=2)
+def _amount_cell(cell, amount, deduct=False, before=0, after=0):
+    """Fill an AMOUNT cell: bottom-aligned, price/percent/note (empty if none).
+    The cell exists either way, so it stays clickable/editable in Word."""
+    cell.vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
+    rp = cell.paragraphs[0]
+    U.no_space(rp, before=before, after=after, line=1.0)
     if amount not in (None, ""):
         _run(rp, _format_amount_text(amount, deduct), size=10)
+    return rp
+
+
+def _gate_block(body, gate):
+    """One gate location as a single 2-column table (title + scope lines).
+
+    Every row carries a real AMOUNT cell on the right — so the salesman can click
+    into the price column and type in Word even where no price was entered. Rows
+    are chained keep-with-next so the whole gate holds together on one page
+    (one-gate-per-page when it won't fit the remaining space, like the sample).
+    """
+    lines = gate.get("lines", [])
+    t = body.add_table(rows=1 + len(lines), cols=2)
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    U.clear_table_borders(t)
+    U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
+    for row in t.rows:
+        U.cant_split_row(row)
+
+    tp = t.cell(0, 0).paragraphs[0]
+    U.no_space(tp, before=10, after=2)
+    _run(tp, gate.get("title", ""), bold=True, underline=True, size=10.5)
+    keepers = [tp]
+
+    first_scope = True
+    for i, ln in enumerate(lines, start=1):
+        lp = t.cell(i, 0).paragraphs[0]
+        if ln.get("amount_note") is not None:
+            # custom priced note: right-aligned label confined to the right ~half
+            lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            lp.paragraph_format.left_indent = Inches(3.0)
+            lp.paragraph_format.right_indent = TEXT_GAP
+            U.no_space(lp, before=2, after=2)
+            if ln.get("amount_note"):
+                _run(lp, ln["amount_note"], bold=True, underline=True, size=10)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"),
+                         before=2, after=2)
+        else:
+            label = "Install:" if (first_scope and
+                                   ln.get("qty") not in (None, 0, "")) else ""
+            first_scope = False
+            _format_scope_para(lp, ln.get("qty"), ln["text"],
+                               label=label, reserve_amount=False)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        keepers.append(lp)
+
+    for para in keepers[:-1]:
+        para.paragraph_format.keep_with_next = True
     return t
 
 
@@ -404,34 +421,9 @@ def render_body(body, doc):
             gp = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=0, after=0)
             _run(gp, g, bold=True, size=11)
 
-    # per-gate scope
-    for gi, gate in enumerate(doc.get("gates", [])):
-        title = _para(body, before=10, after=2)
-        _run(title, gate["title"], bold=True, underline=True, size=10.5)
-        # keep the whole gate block on one page (gives one-gate-per-page when a
-        # gate is too long to fit in the remaining space, like the sample)
-        block = [title]
-        first_scope = True
-        for ln in gate["lines"]:
-            if ln.get("amount_note") is not None:
-                # custom priced note: right-aligned label + price in AMOUNT column
-                _priced_note_row(body, ln.get("amount_note", ""),
-                                 ln.get("amount"), ln.get("deduct"))
-                continue
-            # only label the first counted line "Install:" (not a no-count line)
-            label = "Install:" if (first_scope and
-                                   ln.get("qty") not in (None, 0, "")) else ""
-            first_scope = False
-            if ln.get("amount") not in (None, ""):
-                # scope line with a per-item price/note in the AMOUNT column
-                _scope_amount_row(body, ln.get("qty"), ln["text"], label,
-                                  ln["amount"], ln.get("deduct"))
-                continue
-            block.append(_scope_line(body, ln.get("qty"), ln["text"], label=label))
-        for para in block[:-1]:
-            para.paragraph_format.keep_with_next = True
-        for para in block:
-            para.paragraph_format.keep_together = True
+    # per-gate scope — one 2-column table per gate (description | editable AMOUNT)
+    for gate in doc.get("gates", []):
+        _gate_block(body, gate)
 
     # options — flow right after the gates; only spill to a new page if there
     # isn't room (no forced page break)
