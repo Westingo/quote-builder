@@ -214,14 +214,19 @@ def _build_footer(section, h, total=None):
         _run(tp, amt if amt.startswith("$") else f"${amt}", bold=True, size=11)
     U.set_cell_borders(band.cell(0, 1), edges=("top", "bottom", "left"), sz="8")
 
-    # --- fine print ---
+    # --- fine print + Metro logo in the bottom-right corner (like the original) ---
     fp = footer.add_paragraph()
     U.no_space(fp, before=2, after=2, line=0.9)
     _run(fp, FINE_PRINT, size=6.5)
     ids = footer.add_paragraph()
-    U.no_space(ids, before=0, after=2)
+    U.no_space(ids, before=0, after=0)
     _run(ids, f"CCB # {h.get('ccb','')}   CC # {h.get('cc','')}        "
               f"{h.get('job_footer','')}", size=7)
+    lg = footer.add_paragraph()
+    lg.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    U.no_space(lg, before=2, after=0)
+    if os.path.isfile(LOGO):
+        lg.add_run().add_picture(LOGO, width=Inches(1.1))
 
     # --- signature / address block ---
     sig = footer.add_table(rows=2, cols=2, width=PAGE_BODY_W)
@@ -577,7 +582,7 @@ def build_proposal(doc, out_path):
     section.left_margin = Inches(0.45)
     section.right_margin = Inches(0.45)
     section.top_margin = Inches(2.7)      # must exceed header height so the band
-    section.bottom_margin = Inches(1.95)  # lands here; footer block room below
+    section.bottom_margin = Inches(2.3)   # lands here; footer block + logo room below
     section.header_distance = Inches(0.3)
     section.footer_distance = Inches(0.3)
     U.set_page_border(section)
