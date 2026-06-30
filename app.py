@@ -19,8 +19,8 @@ import yaml
 from fastapi import FastAPI, Body, UploadFile, File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
-import build
-import scan_import as builder
+import build as builder
+import scan_import
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
