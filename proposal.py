@@ -371,18 +371,23 @@ def _gate_block(body, gate):
     for i, ln in enumerate(lines, start=1):
         lp = t.cell(i, 0).paragraphs[0]
         if ln.get("amount_note") is not None:
-            # custom priced note: right-aligned label confined to the right ~half
+            # custom priced note: bold, right-aligned against the AMOUNT column
+            # (e.g. "Complete as Stated Above for the Lump Sum Price of"). The
+            # left indent only sets where it wraps, so a long lump-sum phrase
+            # still fits on one line while a short note hugs the right.
             lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-            lp.paragraph_format.left_indent = Inches(3.0)
+            lp.paragraph_format.left_indent = Inches(1.5)
             lp.paragraph_format.right_indent = TEXT_GAP
             U.no_space(lp, before=2, after=2)
             if ln.get("amount_note"):
-                _run(lp, ln["amount_note"], bold=True, underline=True, size=10)
+                _run(lp, ln["amount_note"], bold=True, size=10)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"),
                          before=2, after=2)
         else:
-            label = "Install:" if (first_scope and
-                                   ln.get("qty") not in (None, 0, "")) else ""
+            label = ln.get("label")        # explicit Install:/Supply:/Other: (or "")
+            if label is None:              # no choice made -> default first counted line
+                label = "Install:" if (first_scope and
+                                       ln.get("qty") not in (None, 0, "")) else ""
             first_scope = False
             _format_scope_para(lp, ln.get("qty"), ln["text"],
                                label=label, reserve_amount=False)

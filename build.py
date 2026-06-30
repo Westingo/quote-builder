@@ -81,6 +81,12 @@ def _terminate(text):
     return t
 
 
+def _norm_label(v):
+    """Normalize a row label (Install/Supply/Other) to print with a trailing colon."""
+    v = str(v or "").strip()
+    return v if (not v or v.endswith(":")) else v + ":"
+
+
 def resolve_line(index, line):
     """A gate scope line -> {qty, text}."""
     qty = line.get("qty")
@@ -93,6 +99,8 @@ def resolve_line(index, line):
     if line.get("note"):
         text = _terminate(text) + " — " + str(line["note"])
     res = {"qty": qty, "text": _terminate(text)}
+    if "label" in line:                        # explicit Install/Supply/Other (or "")
+        res["label"] = _norm_label(line["label"])
     if line.get("amount") not in (None, ""):   # per-item price/note in AMOUNT col
         res["amount"] = line["amount"]
         if line.get("deduct"):
@@ -147,7 +155,7 @@ def process_options(index, options):
                     continue
                 res = resolve_line(index, orig)
                 if orig.get("label"):
-                    res["label"] = orig["label"]
+                    res["label"] = _norm_label(orig["label"])
                 if orig.get("bold"):
                     res["bold"] = True
                 lines.append(res)

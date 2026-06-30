@@ -331,6 +331,8 @@ function addPricedNote(id){
 }
 function renderLineList(id, lines, ul, withLineAmount){
   ul.innerHTML='';
+  const firstCountedIdx=lines.findIndex(l=>l.amount_note===undefined
+        && l.qty!=null && l.qty!=='' && Number(l.qty)!==0);
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
     if(ln.amount_note!==undefined){
@@ -343,6 +345,12 @@ function renderLineList(id, lines, ul, withLineAmount){
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
+    const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
+    const labelSel=`<select class="lblsel" title="row label" style="width:84px;flex:none"
+        onchange="setLabel('${id}',${i},this.value)">`+
+      ['','Install','Supply','Other'].map(o=>
+        `<option value="${o}"${o===effLabel?' selected':''}>${o||'—'}</option>`).join('')+
+      `</select>`;
     const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
                    onchange="setQty('${id}',${i},this.value)">`;
     let body;
@@ -356,11 +364,12 @@ function renderLineList(id, lines, ul, withLineAmount){
            title="price or note shown in the AMOUNT column for this item"
            style="width:96px;flex:none" onchange="setLineAmount('${id}',${i},this.value)">`
       : '';
-    li.innerHTML=`${marker}<div class="txt">${body}</div>${amt}
+    li.innerHTML=`${labelSel}${marker}<div class="txt">${body}</div>${amt}
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
 }
+function setLabel(id,i,v){findLines(id).lines[i].label=v;}  // '' = no label
 function setLineAmount(id,i,v){const ln=findLines(id).lines[i]; v=v.trim();
   if(v) ln.amount=v; else delete ln.amount;}
 function setNoteLabel(id,i,v){findLines(id).lines[i].amount_note=v;}
