@@ -344,8 +344,11 @@ function renderLineList(id, lines, ul, withLineAmount){
         && l.qty!=null && l.qty!=='' && Number(l.qty)!==0);
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
+    const mv=`<span class="ord ln">`+
+      `<button class="btn sm" ${i===0?'disabled':''} title="move up" onclick="moveLine('${id}',${i},-1)">↑</button>`+
+      `<button class="btn sm" ${i===lines.length-1?'disabled':''} title="move down" onclick="moveLine('${id}',${i},1)">↓</button></span>`;
     if(ln.amount_note!==undefined){
-      li.innerHTML=`<span class="pill" style="flex:none;align-self:center">$ note</span>
+      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center">$ note</span>
         <input type="text" value="${escAttr(ln.amount_note)}" placeholder="label e.g. Not-To-Exceed Total:"
           style="flex:1" onchange="setNoteLabel('${id}',${i},this.value)">
         <input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / %"
@@ -373,7 +376,7 @@ function renderLineList(id, lines, ul, withLineAmount){
            title="price or note shown in the AMOUNT column for this item"
            style="width:96px;flex:none" onchange="setLineAmount('${id}',${i},this.value)">`
       : '';
-    li.innerHTML=`${labelSel}${marker}<div class="txt">${body}</div>${amt}
+    li.innerHTML=`${mv}${labelSel}${marker}<div class="txt">${body}</div>${amt}
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
@@ -412,6 +415,12 @@ function moveGate(id,dir){
   if(i<0||j<0||j>=JOB.gates.length) return;
   const [g]=JOB.gates.splice(i,1); JOB.gates.splice(j,0,g);
   redraw();   // reorders the cards, the picker, and the build order
+}
+function moveLine(id,i,dir){
+  const lines=findLines(id).lines, j=i+dir;
+  if(j<0||j>=lines.length) return;
+  const [ln]=lines.splice(i,1); lines.splice(j,0,ln);
+  redraw();
 }
 function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;
   const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g)||'(untitled location)';}
