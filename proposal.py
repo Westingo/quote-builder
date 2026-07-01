@@ -546,7 +546,9 @@ def render_options(body, options):
                 ap = st.cell(0, 1).paragraphs[0]
                 ap.alignment = WD_ALIGN_PARAGRAPH.RIGHT
                 U.no_space(ap, after=0)
-                _run(ap, f"${sub['amount']}", size=10)
+                amt = str(sub.get("amount", "")).lstrip("$").strip()
+                if amt:                       # strip any leading $ so it isn't doubled
+                    _run(ap, f"${amt}", size=10)
         else:
             _run(lp, "•  ", size=10)
             _run(lp, opt.get("text", ""), size=10)

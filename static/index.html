@@ -461,7 +461,7 @@ function addLowVoltage(){
 function addPriced(i){ JOB.options[i].priced.push({label:'',amount:''}); renderOptions(); }
 function rmPriced(i,pi){ JOB.options[i].priced.splice(pi,1); renderOptions(); }
 function addCleanup(){
-  JOB.options.unshift({kind:'block', title:'',   // no title -> "•" line like the sample
+  JOB.options.unshift({kind:'block', title:'Clean-Up Option:',   // left-aligned heading like Low-Voltage
     bullets:["Clean-up and removal of excavated materials from site. If Metro cannot spread or drop excavated dirt/asphalt/concrete on site within 40' of work area, add for pickup and removal of spoils from site."],
     priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
   renderOptions();
@@ -495,6 +495,8 @@ function renderOptions(){
         </div>`).join('');
       const blockName=(o.title||'').includes('Low Voltage')?'Low-Voltage block':'Clean-up block';
       el.innerHTML=`<div class="row"><b>${blockName}</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
+        <label>Heading (bold, left — leave blank for a plain “•” line)</label>
+        <input type="text" value="${escAttr(o.title||'')}" placeholder="e.g. Clean-Up Option:" oninput="JOB.options[${i}].title=this.value">
         <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
         <label>Priced lines (device / $ — editable)</label>${priced}
         <button class="btn sm" style="margin-top:6px" onclick="addPriced(${i})">+ priced line</button>`;
