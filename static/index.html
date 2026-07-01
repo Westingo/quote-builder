@@ -477,7 +477,7 @@ function renderSummary(){
 }
 
 // ---------- options ----------
-function addOption(){JOB.options.push({text:'',amount:'',deduct:false,cost_per_gate:false});renderOptions();}
+function addOption(){JOB.options.push({text:'',amount:'',deduct:false,note:''});renderOptions();}
 function addDetailOption(){
   JOB.options.push({id:'o'+(++gateSeq), title:'', lines:[], amount:'', deduct:false});
   renderOptions();
@@ -539,8 +539,9 @@ function renderOptions(){
         <div class="row"><input type="text" value="${escAttr(o.text)}" oninput="JOB.options[${i}].text=this.value">
           <input class="amt" type="text" placeholder="amount" value="${escAttr(o.amount)}" oninput="JOB.options[${i}].amount=this.value">
           <button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
-        <label style="display:inline-block;margin-right:14px"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct &lt;$&gt;</label>
-        <label style="display:inline-block"><input type="checkbox" style="width:auto" ${o.cost_per_gate?'checked':''} onchange="JOB.options[${i}].cost_per_gate=this.checked"> “Cost Per Gate”</label>`;
+        <label>Price note (right side, next to the price — e.g. “Cost Per Gate”, “Each”, “per month”)</label>
+        <input type="text" value="${escAttr(o.note||'')}" placeholder="optional note shown right-aligned by the price" oninput="JOB.options[${i}].note=this.value">
+        <label style="display:inline-block;margin-right:14px;margin-top:6px"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct &lt;$&gt;</label>`;
     }
     box.appendChild(el);
   });
@@ -635,7 +636,9 @@ function cleanOption(o){
     if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true; return r;
   }
   const r={text:o.text}; if(o.amount)r.amount=o.amount;
-  if(o.deduct)r.deduct=true; if(o.cost_per_gate)r.cost_per_gate=true; return r;
+  if(o.deduct)r.deduct=true;
+  if(o.note && o.note.trim())r.note=o.note.trim();
+  if(o.cost_per_gate)r.cost_per_gate=true; return r;
 }
 async function build(){
   const job=collect();

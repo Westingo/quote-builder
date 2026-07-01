@@ -571,11 +571,13 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
         else:
             _run(lp, "•  ", size=10)
             _run(lp, opt.get("text", ""), size=10)
-            if opt.get("cost_per_gate"):
+            # optional note right-aligned in the main column, next to the price
+            note = opt.get("note") or ("Cost Per Gate" if opt.get("cost_per_gate") else "")
+            if note:
                 cg = left.add_paragraph()
                 cg.alignment = WD_ALIGN_PARAGRAPH.RIGHT
                 U.no_space(cg, after=0)
-                _run(cg, "Cost Per Gate", bold=True, size=9)
+                _run(cg, note, bold=True, size=9)
             amount_para(t.cell(0, 1), opt.get("amount"), opt.get("deduct"))
         # spacer
         sp = _para(body, after=4)
