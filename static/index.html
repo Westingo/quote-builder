@@ -198,6 +198,7 @@
 </main>
 
 <div class="buildbar">
+  <button class="btn" onclick="newQuote()">Start new quote</button>
   <button class="btn" onclick="loadJob()">Load saved…</button>
   <select id="jobs" style="width:auto"></select>
   <span class="sp"></span>
@@ -621,6 +622,14 @@ async function refreshJobs(){
   const list=await (await fetch('/api/jobs')).json();
   const sel=$('#jobs'); sel.innerHTML='';
   list.forEach(j=>{const o=document.createElement('option');o.value=j.slug;o.textContent=j.slug;sel.appendChild(o);});
+}
+function newQuote(){
+  const hasWork = JOB.gates.length || JOB.options.length || $('#f-for').value.trim();
+  if(hasWork && !confirm('Start a new quote? This clears the current form.')) return;
+  loadJobObject({});                 // empty job resets every field + list
+  $('#jobs').value=''; $('#dl').hidden=true; $('#log').hidden=true;
+  $('#status').innerHTML='<span class="muted">New quote — form cleared.</span>';
+  window.scrollTo(0,0);
 }
 async function loadJob(){
   const slug=$('#jobs').value; if(!slug)return;
