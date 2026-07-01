@@ -50,6 +50,9 @@
   /* gates */
   .gate{border:1px solid #c9ccd2;margin:12px 0;background:#fafbfc}
   .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e3e4e7;background:#f1f2f5}
+  .ord{display:flex;align-items:center;gap:2px}
+  .ord .btn.sm{padding:2px 7px;line-height:1}
+  .ord .btn.sm:disabled{opacity:.35;cursor:default}
   .ghead input[type=text]{width:auto}
   .gate .ghead>input{font-weight:600}
   .lines{list-style:none;margin:0;padding:6px 8px}
@@ -382,9 +385,14 @@ function setNoteLabel(id,i,v){findLines(id).lines[i].amount_note=v;}
 function setNoteAmount(id,i,v){findLines(id).lines[i].amount=v.trim();}
 function renderGates(){
   const box=$('#gates'); box.innerHTML='';
-  JOB.gates.forEach(g=>{
+  JOB.gates.forEach((g,gi)=>{
     const el=document.createElement('div'); el.className='gate';
     el.innerHTML=`<div class="ghead">
+        <span class="ord" title="reorder this location">
+          <button class="btn sm" ${gi===0?'disabled':''} title="move up" onclick="moveGate('${g.id}',-1)">↑</button>
+          <button class="btn sm" ${gi===JOB.gates.length-1?'disabled':''} title="move down" onclick="moveGate('${g.id}',1)">↓</button>
+          <b style="margin:0 6px">${gi+1}.</b>
+        </span>
         <input type="text" value="${escAttr(g.title||'')}" style="flex:1;font-weight:600"
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
@@ -398,6 +406,12 @@ function renderGates(){
 function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
   let i=0; return t.replace(/_+/g, m => (i<fills.length && fills[i]!=='')?fills[i++]:(i++,m));
+}
+function moveGate(id,dir){
+  const i=JOB.gates.findIndex(g=>g.id===id), j=i+dir;
+  if(i<0||j<0||j>=JOB.gates.length) return;
+  const [g]=JOB.gates.splice(i,1); JOB.gates.splice(j,0,g);
+  redraw();   // reorders the cards, the picker, and the build order
 }
 function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;
   const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g)||'(untitled location)';}
