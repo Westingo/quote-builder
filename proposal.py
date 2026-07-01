@@ -517,13 +517,18 @@ def render_options(body, options):
         U.no_space(lp, after=2)
 
         if opt.get("kind") == "block":
-            _run(lp, opt.get("title", ""), bold=True, underline=True, size=10)
+            title = opt.get("title", "")
+            first = lp
+            if title:                     # titled block (e.g. Low Voltage) -> "—" bullets
+                _run(lp, title, bold=True, underline=True, size=10)
+                first = None
             for b in opt.get("bullets", []):
-                bp = left.add_paragraph()
+                bp = first if first is not None else left.add_paragraph()
+                first = None
                 U.no_space(bp, after=0)
                 bp.paragraph_format.left_indent = Inches(0.3)
                 bp.paragraph_format.first_line_indent = Inches(-0.2)
-                _run(bp, "—  ", size=10)
+                _run(bp, "—  " if title else "•  ", size=10)
                 _run(bp, b, size=10)
             # priced sub-lines: each label gets its own row so the amount on the
             # right lines up with it

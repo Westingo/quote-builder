@@ -156,6 +156,7 @@
     <section class="sheet"><h2>Options
         <button class="btn sm" onclick="addDetailOption()">+ detailed option</button>
         <button class="btn sm" onclick="addLowVoltage()">+ Low-Voltage block</button>
+        <button class="btn sm" onclick="addCleanup()">+ Clean-up block</button>
         <button class="btn sm" onclick="addOption()">+ one-line option</button></h2>
       <div class="pad" id="options"><div class="muted">Detailed options take codes + free-text lines (like a location) plus a price; one-line options are just text + price. Prices show in the AMOUNT column.</div></div></section>
 
@@ -459,6 +460,12 @@ function addLowVoltage(){
 }
 function addPriced(i){ JOB.options[i].priced.push({label:'',amount:''}); renderOptions(); }
 function rmPriced(i,pi){ JOB.options[i].priced.splice(pi,1); renderOptions(); }
+function addCleanup(){
+  JOB.options.unshift({kind:'block', title:'',   // no title -> "•" line like the sample
+    bullets:["Clean-up and removal of excavated materials from site. If Metro cannot spread or drop excavated dirt/asphalt/concrete on site within 40' of work area, add for pickup and removal of spoils from site."],
+    priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
+  renderOptions();
+}
 function renderOptions(){
   const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
   JOB.options.forEach((o,i)=>{
@@ -486,7 +493,8 @@ function renderOptions(){
             oninput="JOB.options[${i}].priced[${pi}].amount=this.value">
           <button class="btn x sm" style="flex:none" onclick="rmPriced(${i},${pi})">✕</button>
         </div>`).join('');
-      el.innerHTML=`<div class="row"><b>Low-Voltage block</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
+      const blockName=(o.title||'').includes('Low Voltage')?'Low-Voltage block':'Clean-up block';
+      el.innerHTML=`<div class="row"><b>${blockName}</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
         <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
         <label>Priced lines (device / $ — editable)</label>${priced}
         <button class="btn sm" style="margin-top:6px" onclick="addPriced(${i})">+ priced line</button>`;
