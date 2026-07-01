@@ -578,6 +578,8 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
                 cg.alignment = WD_ALIGN_PARAGRAPH.RIGHT
                 U.no_space(cg, after=0)
                 _run(cg, note, bold=True, size=9)
+                # bottom-align the price so it lines up with the note (its last line)
+                t.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
             amount_para(t.cell(0, 1), opt.get("amount"), opt.get("deduct"))
         # spacer
         sp = _para(body, after=4)
