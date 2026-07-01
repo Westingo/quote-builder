@@ -321,6 +321,17 @@ function addSubnote(id){
   findLines(id).lines.push({text:t, sub:true});   // renders "— text" under the item above
   inp.value=''; redraw();
 }
+function addSubBelow(id,i){
+  // insert a blank sub-note right after this item and any sub-notes it already
+  // has, so multiple sub-notes stack in order under the item
+  const lines=findLines(id).lines;
+  let j=i+1; while(j<lines.length && lines[j].sub) j++;
+  lines.splice(j,0,{text:'',sub:true});
+  redraw();
+  const li=document.querySelectorAll('#ls-'+id+' > li')[j];   // focus the new sub-note input
+  const box=li && li.querySelector('input[type=text]');
+  if(box) box.focus();
+}
 
 // shared line-editor markup used by gate cards and detailed-option cards
 function addRowHTML(id, withPriced){
@@ -399,6 +410,7 @@ function renderLineList(id, lines, ul, withLineAmount){
            style="width:96px;flex:none" onchange="setLineAmount('${id}',${i},this.value)">`
       : '';
     li.innerHTML=`${mv}${labelSel}${marker}<div class="txt">${body}</div>${amt}
+      <button class="btn sm" title="add a sub-note under this item" onclick="addSubBelow('${id}',${i})">+sub</button>
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
@@ -588,13 +600,14 @@ function collect(){
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
     options_title:$('#f-optionstitle').value,
-    gates:JOB.gates.map(g=>({title:titleFor(g), lines:g.lines.map(cleanLine)})),
+    gates:JOB.gates.map(g=>({title:titleFor(g), lines:dropEmptySubs(g.lines).map(cleanLine)})),
     options:JOB.options.map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
   };
   return j;
 }
+function dropEmptySubs(lines){return lines.filter(l=>!(l.sub && !String(l.text||'').trim()));}
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
@@ -618,7 +631,7 @@ function cleanLine(ln){
 function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
   if(o.lines){   // detailed option
-    const r={title:o.title, lines:o.lines.map(cleanLine)};
+    const r={title:o.title, lines:dropEmptySubs(o.lines).map(cleanLine)};
     if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true; return r;
   }
   const r={text:o.text}; if(o.amount)r.amount=o.amount;
