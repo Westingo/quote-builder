@@ -311,10 +311,13 @@ def _format_amount_text(val, deduct=False):
     return f"<{body}>" if deduct else body
 
 
-def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False):
+def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False,
+                       atqty=False):
     """Format an existing paragraph as a 3-column scope line (label / qty / desc).
     With sub=True, render an indented '— text' sub-note that hangs under the item
-    above it (e.g. '— With drive rail, 208/230 1PH.')."""
+    above it (e.g. '— With drive rail, 208/230 1PH.'). With atqty=True, the text
+    starts at the qty/number column (lining up with the '1)' markers) and wraps at
+    the description column."""
     U.no_space(p, before=0, after=0, line=1.0)
     pf = p.paragraph_format
     if sub:
@@ -322,6 +325,12 @@ def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False):
         pf.first_line_indent = Inches(-0.25)
         pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
         _run(p, "—  ", size=10)
+        _run(p, text, size=10)
+        return p
+    if atqty:
+        pf.left_indent = DESC_TAB
+        pf.first_line_indent = QTY_TAB - DESC_TAB   # first line at qty col, wrap at desc
+        pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
         _run(p, text, size=10)
         return p
     pf.left_indent = DESC_TAB
@@ -401,6 +410,10 @@ def _gate_block(body, gate):
         elif ln.get("sub"):                # indented "— text" sub-note under the item
             _format_scope_para(lp, None, ln.get("text", ""),
                                reserve_amount=False, sub=True)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        elif ln.get("atqty"):              # note starting at the qty/number column
+            _format_scope_para(lp, None, ln.get("text", ""),
+                               reserve_amount=False, atqty=True)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
         else:
             label = ln.get("label")        # explicit Install:/Supply:/Other: (or "")

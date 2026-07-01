@@ -321,6 +321,11 @@ function addSubnote(id){
   findLines(id).lines.push({text:t, sub:true});   // renders "— text" under the item above
   inp.value=''; redraw();
 }
+function addQtyNote(id){
+  const inp=$('#nt-'+id); const t=inp.value.trim(); if(!t)return;
+  findLines(id).lines.push({text:t, atqty:true});   // text lines up with the qty column
+  inp.value=''; redraw();
+}
 function addSubBelow(id,i){
   // insert a blank sub-note right after this item and any sub-notes it already
   // has, so multiple sub-notes stack in order under the item
@@ -347,6 +352,11 @@ function addRowHTML(id, withPriced){
     <span class="muted" style="align-self:center;white-space:nowrap">sub-note →</span>
     <input class="ftext" id="sn-${id}" placeholder="indented “— …” note under the item above, e.g. With drive rail, 208/230 1PH" onkeydown="if(event.key==='Enter')addSubnote('${id}')">
     <button class="btn sm" onclick="addSubnote('${id}')">+ sub-note</button>
+  </div>
+  <div class="addrow" style="border-top:none;padding-top:0">
+    <span class="muted" style="align-self:center;white-space:nowrap">note →</span>
+    <input class="ftext" id="nt-${id}" placeholder="note lined up with the 1)/qty column, e.g. Brivo B-BSPSF-B reader…" onkeydown="if(event.key==='Enter')addQtyNote('${id}')">
+    <button class="btn sm" onclick="addQtyNote('${id}')">+ note</button>
   </div>`;
   if(withPriced){
     h+=`<div class="addrow" style="border-top:none;padding-top:0">
@@ -386,6 +396,13 @@ function renderLineList(id, lines, ul, withLineAmount){
     if(ln.sub){
       li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:34px">↳ —</span>
         <input type="text" value="${escAttr(ln.text||'')}" title="sub-note under the item above"
+          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+      ul.appendChild(li); return;
+    }
+    if(ln.atqty){
+      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:14px" title="lines up with the qty/number column">note</span>
+        <input type="text" value="${escAttr(ln.text||'')}" title="note aligned with the qty column"
           style="flex:1" onchange="setSubText('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
@@ -608,7 +625,7 @@ function collect(){
   };
   return j;
 }
-function dropEmptySubs(lines){return lines.filter(l=>!(l.sub && !String(l.text||'').trim()));}
+function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty) && !String(l.text||'').trim()));}
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
@@ -616,6 +633,9 @@ function cleanLine(ln){
   }
   if(ln.sub){
     const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return o;
+  }
+  if(ln.atqty){
+    const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return o;
   }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
