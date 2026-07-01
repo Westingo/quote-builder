@@ -134,10 +134,16 @@ def _build_header(section, h):
     def field(cell, label, value, value_bold=False, hang=None):
         p = cell.paragraphs[0]
         U.no_space(p, before=3, after=3)
-        if hang is not None:                  # hanging indent: wrapped/2nd lines align
+        if hang is not None:
+            # value starts at a fixed tab column and wrapped/2nd lines return to
+            # the same column, so every line of the value lines up vertically
             p.paragraph_format.left_indent = hang
             p.paragraph_format.first_line_indent = -hang
-        _run(p, f"{label} ", bold=True, size=10)
+            p.paragraph_format.tab_stops.add_tab_stop(hang)
+            _run(p, label, bold=True, size=10)
+            _run(p, "\t", size=10)
+        else:
+            _run(p, f"{label} ", bold=True, size=10)
         if value:
             for i, ln in enumerate(str(value).split("\n")):
                 if i:
@@ -158,7 +164,7 @@ def _build_header(section, h):
     _run(p, h.get("terms", "") or "", size=10)
     field(grid.cell(2, 1), "Email:", h.get("email"))
     field(grid.cell(3, 0), "Job Address:", h.get("job_address"),
-          value_bold=True, hang=Inches(1.0))
+          value_bold=True, hang=Inches(1.15))
     field(grid.cell(3, 1), "Attention:", h.get("attention"))
 
     # bottom rule under the info box
