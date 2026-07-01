@@ -457,6 +457,8 @@ function addLowVoltage(){
     priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
   renderOptions();
 }
+function addPriced(i){ JOB.options[i].priced.push({label:'',amount:''}); renderOptions(); }
+function rmPriced(i,pi){ JOB.options[i].priced.splice(pi,1); renderOptions(); }
 function renderOptions(){
   const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
   JOB.options.forEach((o,i)=>{
@@ -476,10 +478,18 @@ function renderOptions(){
       return;
     }
     if(o.kind==='block'){
+      const priced=o.priced.map((p,pi)=>`
+        <div class="row" style="gap:6px;margin-top:4px">
+          <input type="text" value="${escAttr(p.label)}" placeholder="device e.g. Single Gate · Barrier Gate"
+            style="flex:1" oninput="JOB.options[${i}].priced[${pi}].label=this.value">
+          <input type="text" value="${escAttr(p.amount)}" placeholder="$" style="width:90px;flex:none"
+            oninput="JOB.options[${i}].priced[${pi}].amount=this.value">
+          <button class="btn x sm" style="flex:none" onclick="rmPriced(${i},${pi})">✕</button>
+        </div>`).join('');
       el.innerHTML=`<div class="row"><b>Low-Voltage block</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
         <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
-        <div class="row"><div><label>Single Gate $</label><input type="text" value="${escAttr(o.priced[0].amount)}" oninput="JOB.options[${i}].priced[0].amount=this.value"></div>
-        <div><label>Double Gate $</label><input type="text" value="${escAttr(o.priced[1].amount)}" oninput="JOB.options[${i}].priced[1].amount=this.value"></div></div>`;
+        <label>Priced lines (device / $ — editable)</label>${priced}
+        <button class="btn sm" style="margin-top:6px" onclick="addPriced(${i})">+ priced line</button>`;
     } else {
       el.innerHTML=`<label>Option text</label>
         <div class="row"><input type="text" value="${escAttr(o.text)}" oninput="JOB.options[${i}].text=this.value">
