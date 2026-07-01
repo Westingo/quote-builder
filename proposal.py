@@ -328,9 +328,13 @@ def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False,
         _run(p, text, size=10)
         return p
     if atqty:
+        # dash at the label column (aligns with Install:/Supply:), text at the qty
+        # column (aligns with the '1)' markers), wrapping at the description column
         pf.left_indent = DESC_TAB
-        pf.first_line_indent = QTY_TAB - DESC_TAB   # first line at qty col, wrap at desc
+        pf.first_line_indent = -DESC_TAB
         pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
+        pf.tab_stops.add_tab_stop(QTY_TAB)
+        _run(p, "—\t", size=10)
         _run(p, text, size=10)
         return p
     pf.left_indent = DESC_TAB
