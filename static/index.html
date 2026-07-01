@@ -158,7 +158,10 @@
         <button class="btn sm" onclick="addLowVoltage()">+ Low-Voltage block</button>
         <button class="btn sm" onclick="addCleanup()">+ Clean-up block</button>
         <button class="btn sm" onclick="addOption()">+ one-line option</button></h2>
-      <div class="pad" id="options"><div class="muted">Detailed options take codes + free-text lines (like a location) plus a price; one-line options are just text + price. Prices show in the AMOUNT column.</div></div></section>
+      <div class="pad">
+        <label>Options section heading (leave blank to drop the heading row entirely)</label>
+        <input type="text" id="f-optionstitle" value="OPTIONS – Circle options chosen to be added to totals:" style="margin-bottom:8px">
+        <div id="options"><div class="muted">Detailed options take codes + free-text lines (like a location) plus a price; one-line options are just text + price. Prices show in the AMOUNT column.</div></div></div></section>
 
     <!-- NOTES / WARRANTIES / EXCLUSIONS -->
     <section class="sheet"><h2>Notes · Warranties · Exclusions</h2>
@@ -565,6 +568,7 @@ function collect(){
       submitted_by:$('#f-subby').value, ccb:$('#f-ccb').value, cc:$('#f-cc').value,
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
+    options_title:$('#f-optionstitle').value,
     gates:JOB.gates.map(g=>({title:titleFor(g), lines:g.lines.map(cleanLine)})),
     options:JOB.options.map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
@@ -630,6 +634,7 @@ function loadJobObject(j){
   $('#f-phone').value=p.phone||''; $('#f-email').value=p.email||''; $('#f-date').value=p.date||'';
   $('#f-terms').value=p.terms||''; $('#f-jobaddr').value=p.job_address||''; $('#f-bid').value=p.bid_number||'';
   $('#f-subby').value=p.submitted_by||''; $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
+  $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'',
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));

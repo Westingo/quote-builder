@@ -240,6 +240,7 @@ def build_doc(job, data, index):
         "intro": intro,
         "gate_summary": job.get("gate_summary", []),
         "gates": gates,
+        "options_title": job.get("options_title", proposal.DEFAULT_OPTIONS_TITLE),
         "options": process_options(index, job.get("options")),
         "notes": resolve_codes(index, job.get("notes"), "note"),
         "warranties": resolve_codes(index, job.get("warranties"), "warranty"),

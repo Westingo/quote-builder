@@ -446,7 +446,8 @@ def render_body(body, doc):
     # options — flow right after the gates; only spill to a new page if there
     # isn't room (no forced page break)
     if doc.get("options"):
-        render_options(body, doc["options"])
+        render_options(body, doc["options"],
+                       doc.get("options_title", DEFAULT_OPTIONS_TITLE))
 
     # notes / warranties / exclusions — likewise flow after options and only
     # break to a new page when out of space
@@ -485,11 +486,16 @@ def _detail_option(body, opt):
     _para(body, after=8)   # spacer between options
 
 
-def render_options(body, options):
-    head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=14, after=6)
-    head.paragraph_format.keep_with_next = True
-    _run(head, "OPTIONS – Circle options chosen to be added to totals:",
-         bold=True, underline=True, size=10.5)
+DEFAULT_OPTIONS_TITLE = "OPTIONS – Circle options chosen to be added to totals:"
+
+
+def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
+    if title:
+        head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=14, after=6)
+        head.paragraph_format.keep_with_next = True
+        _run(head, title, bold=True, underline=True, size=10.5)
+    else:
+        _para(body, before=10, after=0)   # just a gap before the options
 
     def amount_para(cell, amount, deduct=False):
         p = cell.paragraphs[0]
