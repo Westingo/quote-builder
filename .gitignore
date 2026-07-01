@@ -25,3 +25,9 @@ jobs/*/_p1.pdf
 
 # Anthropic key for scan import (never commit)
 api_key.txt
+
+# Per-machine customer quotes stay local — only the template and Hoodland demo
+# ship in the repo. New job folders won't be committed on any machine.
+/jobs/*
+!/jobs/_template
+!/jobs/hoodland-tc
