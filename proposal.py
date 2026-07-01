@@ -311,10 +311,19 @@ def _format_amount_text(val, deduct=False):
     return f"<{body}>" if deduct else body
 
 
-def _format_scope_para(p, qty, text, label="", reserve_amount=True):
-    """Format an existing paragraph as a 3-column scope line (label / qty / desc)."""
+def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False):
+    """Format an existing paragraph as a 3-column scope line (label / qty / desc).
+    With sub=True, render an indented '— text' sub-note that hangs under the item
+    above it (e.g. '— With drive rail, 208/230 1PH.')."""
     U.no_space(p, before=0, after=0, line=1.0)
     pf = p.paragraph_format
+    if sub:
+        pf.left_indent = Inches(1.5)          # dash under the description column
+        pf.first_line_indent = Inches(-0.25)
+        pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
+        _run(p, "—  ", size=10)
+        _run(p, text, size=10)
+        return p
     pf.left_indent = DESC_TAB
     pf.first_line_indent = -DESC_TAB
     # keep text clear of the AMOUNT divider (full body indent, or a small gap
@@ -389,6 +398,10 @@ def _gate_block(body, gate):
                 _run(lp, ln["amount_note"], bold=True, size=10)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"),
                          before=2, after=2)
+        elif ln.get("sub"):                # indented "— text" sub-note under the item
+            _format_scope_para(lp, None, ln.get("text", ""),
+                               reserve_amount=False, sub=True)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
         else:
             label = ln.get("label")        # explicit Install:/Supply:/Other: (or "")
             if label is None:              # no choice made -> default first counted line

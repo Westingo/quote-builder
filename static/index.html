@@ -316,6 +316,11 @@ function addFreeLine(id){
   findLines(id).lines.push({text:t, qty:q===''?null:Number(q)});
   inp.value=''; redraw();
 }
+function addSubnote(id){
+  const inp=$('#sn-'+id); const t=inp.value.trim(); if(!t)return;
+  findLines(id).lines.push({text:t, sub:true});   // renders "— text" under the item above
+  inp.value=''; redraw();
+}
 
 // shared line-editor markup used by gate cards and detailed-option cards
 function addRowHTML(id, withPriced){
@@ -326,6 +331,11 @@ function addRowHTML(id, withPriced){
     <input class="ftext" id="ft-${id}" placeholder="…or free-text line" onkeydown="if(event.key==='Enter')addFreeLine('${id}')">
     <input class="qty" type="number" id="fq-${id}" placeholder="qty" style="width:60px">
     <button class="btn sm" onclick="addFreeLine('${id}')">+ text</button>
+  </div>
+  <div class="addrow" style="border-top:none;padding-top:0">
+    <span class="muted" style="align-self:center;white-space:nowrap">sub-note →</span>
+    <input class="ftext" id="sn-${id}" placeholder="indented “— …” note under the item above, e.g. With drive rail, 208/230 1PH" onkeydown="if(event.key==='Enter')addSubnote('${id}')">
+    <button class="btn sm" onclick="addSubnote('${id}')">+ sub-note</button>
   </div>`;
   if(withPriced){
     h+=`<div class="addrow" style="border-top:none;padding-top:0">
@@ -362,6 +372,13 @@ function renderLineList(id, lines, ul, withLineAmount){
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
+    if(ln.sub){
+      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:34px">↳ —</span>
+        <input type="text" value="${escAttr(ln.text||'')}" title="sub-note under the item above"
+          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+      ul.appendChild(li); return;
+    }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
     const labelSel=`<select class="lblsel" title="row label" style="width:84px;flex:none"
         onchange="setLabel('${id}',${i},this.value)">`+
@@ -387,6 +404,7 @@ function renderLineList(id, lines, ul, withLineAmount){
   });
 }
 function setLabel(id,i,v){findLines(id).lines[i].label=v;}  // '' = no label
+function setSubText(id,i,v){findLines(id).lines[i].text=v;}
 function setLineAmount(id,i,v){const ln=findLines(id).lines[i]; v=v.trim();
   if(v) ln.amount=v; else delete ln.amount;}
 function setNoteLabel(id,i,v){findLines(id).lines[i].amount_note=v;}
@@ -582,13 +600,18 @@ function cleanLine(ln){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
     if(ln.deduct)r.deduct=true; return r;
   }
+  if(ln.sub){
+    const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return o;
+  }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
     if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;
+    if(ln.label!==undefined) o.label=ln.label;
     if(ln.amount) o.amount=ln.amount;
     return o;
   }
   const o={text:ln.text, qty:ln.qty};
+  if(ln.label!==undefined) o.label=ln.label;
   if(ln.amount) o.amount=ln.amount;
   return o;
 }

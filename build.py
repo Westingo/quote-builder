@@ -99,6 +99,8 @@ def resolve_line(index, line):
     if line.get("note"):
         text = _terminate(text) + " — " + str(line["note"])
     res = {"qty": qty, "text": _terminate(text)}
+    if line.get("sub"):                        # indented "— text" sub-note
+        res["sub"] = True
     if "label" in line:                        # explicit Install/Supply/Other (or "")
         res["label"] = _norm_label(line["label"])
     if line.get("amount") not in (None, ""):   # per-item price/note in AMOUNT col
