@@ -7,7 +7,7 @@ shape (resolving each shortcut code to its sheet). The result is a DRAFT for the
 salesman to review in the form — handwriting especially will need corrections.
 
 API key: ANTHROPIC_API_KEY env var, or an `api_key.txt` file next to this script.
-Model: claude-opus-4-8 by default (override with QUOTE_IMPORT_MODEL).
+Model: claude-fable-5 by default (override with QUOTE_IMPORT_MODEL).
 """
 import os
 import re
@@ -17,7 +17,7 @@ import base64
 import build
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-MODEL = os.environ.get("QUOTE_IMPORT_MODEL", "claude-opus-4-8")
+MODEL = os.environ.get("QUOTE_IMPORT_MODEL", "claude-fable-5")
 NWE_SECTION = {"note": "notes", "warranty": "warranties", "exclusion": "exclusions"}
 
 
@@ -187,12 +187,34 @@ def import_scan(file_bytes, content_type, filename=""):
         media = {"type": "image", "source": {"type": "base64", "media_type": mt, "data": b64}}
 
     client = anthropic.Anthropic(api_key=key)
-    msg = client.messages.create(
+
+    # Fable 5's always-on thinking accepts {"type": "adaptive"}; it also helps
+    # interpret messy handwriting. Fable 5's safety classifiers can occasionally
+    # decline a benign request — this is access-control / gate-security work,
+    # adjacent to the "cyber" category — so opt into a server-side fallback:
+    # a false-positive refusal is transparently re-served by Opus 4.8 inside the
+    # same call instead of failing the scan. (Skipped if MODEL is already 4.8.)
+    kwargs = dict(
         model=MODEL,
         max_tokens=8000,
-        thinking={"type": "adaptive"},   # helps interpret messy handwriting
+        thinking={"type": "adaptive"},
         messages=[{"role": "user", "content": [media, {"type": "text", "text": prompt}]}],
     )
+    if MODEL != "claude-opus-4-8":
+        msg = client.beta.messages.create(
+            betas=["server-side-fallback-2026-06-01"],
+            fallbacks=[{"model": "claude-opus-4-8"}],
+            **kwargs,
+        )
+    else:
+        msg = client.messages.create(**kwargs)
+
+    if msg.stop_reason == "refusal":
+        raise RuntimeError(
+            "Claude declined to read this document (a safety refusal). This is "
+            "usually a false positive on access-control content — try a cleaner "
+            "scan, or enter the codes by hand.")
+
     text = "".join(b.text for b in msg.content if b.type == "text")
     parsed = _extract_json(text)
     return _to_job(parsed, index), text

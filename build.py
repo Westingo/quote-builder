@@ -197,7 +197,8 @@ def process_options(index, options):
                     and lines[0].get("qty") not in (None, 0, "")):
                 lines[0]["label"] = "Install:"
             out.append({"title": opt.get("title", ""), "lines": lines,
-                        "amount": opt.get("amount"), "deduct": opt.get("deduct")})
+                        "amount": opt.get("amount"), "deduct": opt.get("deduct"),
+                        "note": opt.get("note")})
         else:
             out.append(opt)
     return out

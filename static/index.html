@@ -310,6 +310,23 @@ function addByCode(id){
   if(it.blanks) line.fills=[];
   findLines(id).lines.push(line); ci.value=''; redraw();
 }
+function findScopeItem(code){
+  // look up a scope (Copy_Paste) code across every sheet, ignoring the filter
+  const lc=code.toLowerCase();
+  for(const s of CODES.sheets){ if(s.section!=='scope') continue;
+    for(const c of s.categories) for(const it of c.items)
+      if(it.code.toLowerCase()===lc) return it; }
+  return null;
+}
+function fillOptionCode(i){
+  // pull a Copy_Paste code's description into a one-line option's text
+  const ci=$('#oc-'+i); const code=(ci?ci.value:'').trim(); if(!code) return;
+  const it=findScopeItem(code);
+  if(!it){ alert('Code '+code+' not found in the scope sheets — type the option text instead.'); return; }
+  const cur=(JOB.options[i].text||'').trim();
+  JOB.options[i].text = cur ? (cur+' '+it.description) : it.description;  // append if text already typed
+  renderOptions();
+}
 function addFreeLine(id){
   const inp=$('#ft-'+id); const t=inp.value.trim(); if(!t)return;
   const q=$('#fq-'+id).value;
@@ -530,9 +547,14 @@ function renderOptions(){
                  oninput="JOB.options[${i}].amount=this.value" style="width:100px">
           <label style="display:inline-flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0;margin:0;color:var(--ink)"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct</label>
           <button class="btn x sm" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
+        <div class="row" style="padding:4px 10px 0">
+          <label style="margin:0;align-self:center;white-space:nowrap">Price note →</label>
+          <input type="text" value="${escAttr(o.note||'')}" placeholder="right-side note by the block price — e.g. “Cost Per Gate”, “Each”, “per month”"
+                 oninput="JOB.options[${i}].note=this.value">
+        </div>
         <ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
       box.appendChild(el);
-      renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id), false);
+      renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id), true);
       return;
     }
     if(o.kind==='block'){
@@ -552,8 +574,12 @@ function renderOptions(){
         <label>Priced lines (device / $ — editable)</label>${priced}
         <button class="btn sm" style="margin-top:6px" onclick="addPriced(${i})">+ priced line</button>`;
     } else {
-      el.innerHTML=`<label>Option text</label>
-        <div class="row"><input type="text" value="${escAttr(o.text)}" oninput="JOB.options[${i}].text=this.value">
+      el.innerHTML=`<label>Option text (or pull a Copy_Paste code)</label>
+        <div class="row">
+          <input class="code" id="oc-${i}" placeholder="code" style="width:76px;flex:none"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();fillOptionCode(${i})}">
+          <button class="btn sm" style="flex:none" onclick="fillOptionCode(${i})">+ code</button>
+          <input type="text" value="${escAttr(o.text)}" placeholder="…or type option text" oninput="JOB.options[${i}].text=this.value">
           <input class="amt" type="text" placeholder="amount" value="${escAttr(o.amount)}" oninput="JOB.options[${i}].amount=this.value">
           <button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">✕</button></div>
         <label>Price note (right side, next to the price — e.g. “Cost Per Gate”, “Each”, “per month”)</label>
@@ -653,7 +679,8 @@ function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
   if(o.lines){   // detailed option
     const r={title:o.title, lines:dropEmptySubs(o.lines).map(cleanLine)};
-    if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true; return r;
+    if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true;
+    if(o.note && o.note.trim())r.note=o.note.trim(); return r;
   }
   const r={text:o.text}; if(o.amount)r.amount=o.amount;
   if(o.deduct)r.deduct=true;
@@ -708,7 +735,7 @@ function loadJobObject(j){
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
   JOB.options=(j.options||[]).map(o=>{
     if(o && o.lines && o.kind!=='block'){
-      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct,
+      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct, note:o.note||'',
         lines:(o.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};
     }
     return o;

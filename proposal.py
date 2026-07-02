@@ -486,33 +486,82 @@ def render_body(body, doc):
 
 
 def _detail_option(body, opt):
-    """A titled option block: bold-underlined title, coded/free-text scope lines
-    (Install: / qty / description), and one amount aligned in the AMOUNT column."""
-    t = body.add_table(rows=1, cols=2)
+    """A titled option block rendered like a gate block: bold-underlined title
+    plus coded/free-text scope lines, each with its own editable AMOUNT cell so
+    the salesman can price individual items. An optional price note and the
+    block-level amount (the circled option total) render together on a final row
+    at the bottom, under the items — the note bold and right-aligned in the
+    description column, the amount beside it in the AMOUNT column, aligned."""
+    lines = opt.get("lines", [])
+    note = opt.get("note")
+    block_amt = opt.get("amount")
+    has_footer = bool(note) or (block_amt not in (None, ""))
+    t = body.add_table(rows=1 + len(lines) + (1 if has_footer else 0), cols=2)
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
     U.clear_table_borders(t)
     U.set_col_widths(t, [CONTENT_W, AMOUNT_W])
-    left = t.cell(0, 0)
-    tp = left.paragraphs[0]
+    for row in t.rows:
+        U.cant_split_row(row)
+
+    tp = t.cell(0, 0).paragraphs[0]
     U.no_space(tp, before=2, after=2)
     if opt.get("title"):
         _run(tp, opt["title"], bold=True, underline=True, size=10.5)
-    for ln in opt.get("lines", []):
-        if ln.get("amount_note") is not None:
-            continue   # options carry a single block amount, not per-line notes
-        p = _scope_line(left, ln.get("qty"), ln["text"],
-                        label=ln.get("label", ""), reserve_amount=False)
-        if ln.get("bold"):
-            for r in p.runs:
-                r.bold = True
+    keepers = [tp]
 
-    rc = t.cell(0, 1)
-    rc.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    ap = rc.paragraphs[0]
-    ap.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    U.no_space(ap, after=0)
-    if opt.get("amount") not in (None, ""):
-        _run(ap, _format_amount_text(opt["amount"], opt.get("deduct")), size=10)
+    first_scope = True
+    for i, ln in enumerate(lines, start=1):
+        lp = t.cell(i, 0).paragraphs[0]
+        if ln.get("amount_note") is not None:
+            # custom priced note: bold, right-aligned against the AMOUNT column
+            lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            lp.paragraph_format.left_indent = Inches(1.5)
+            lp.paragraph_format.right_indent = TEXT_GAP
+            U.no_space(lp, before=2, after=2)
+            if ln.get("amount_note"):
+                _run(lp, ln["amount_note"], bold=True, size=10)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"),
+                         before=2, after=2)
+        elif ln.get("sub"):                # indented "— text" sub-note
+            _format_scope_para(lp, None, ln.get("text", ""),
+                               reserve_amount=False, sub=True)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        elif ln.get("atqty"):              # note starting at the qty/number column
+            _format_scope_para(lp, None, ln.get("text", ""),
+                               reserve_amount=False, atqty=True)
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        else:
+            label = ln.get("label")        # explicit Install:/Supply:/Other: (or "")
+            if label is None:
+                label = "Install:" if (first_scope and
+                                       ln.get("qty") not in (None, 0, "")) else ""
+            first_scope = False
+            p = _format_scope_para(lp, ln.get("qty"), ln["text"],
+                                   label=label, reserve_amount=False)
+            if ln.get("bold"):
+                for r in p.runs:
+                    r.bold = True
+            _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        keepers.append(lp)
+
+    # footer row: price note + block amount, under the items and aligned. The
+    # note is bold, right-aligned against the AMOUNT divider; the amount cell is
+    # bottom-aligned so the price sits level with the note.
+    if has_footer:
+        fr = 1 + len(lines)
+        fp = t.cell(fr, 0).paragraphs[0]
+        fp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        fp.paragraph_format.right_indent = TEXT_GAP
+        U.no_space(fp, before=2, after=2)
+        if note:
+            _run(fp, note, bold=True, size=9)
+        _amount_cell(t.cell(fr, 1), block_amt, opt.get("deduct"),
+                     before=2, after=2)
+        keepers.append(fp)
+
+    # keep the title glued to its first line so a heading never strands alone
+    if len(keepers) > 1:
+        keepers[0].paragraph_format.keep_with_next = True
     _para(body, after=8)   # spacer between options
 
 
