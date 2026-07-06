@@ -555,13 +555,24 @@ function addCleanup(){
     priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
   renderOptions();
 }
+function moveOption(i,dir){
+  const j=i+dir;
+  if(j<0||j>=JOB.options.length) return;
+  const [o]=JOB.options.splice(i,1); JOB.options.splice(j,0,o);
+  renderOptions();   // reorders the cards + the build order
+}
 function renderOptions(){
   const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
   JOB.options.forEach((o,i)=>{
     const el=document.createElement('div');el.className='opt';
+    const ord=`<span class="ord" title="reorder this option">`+
+      `<button class="btn sm" ${i===0?'disabled':''} title="move up" onclick="moveOption(${i},-1)">↑</button>`+
+      `<button class="btn sm" ${i===JOB.options.length-1?'disabled':''} title="move down" onclick="moveOption(${i},1)">↓</button>`+
+      `<b style="margin:0 6px">${i+1}.</b></span>`;
     if(o.lines && o.kind!=='block'){
       // detailed option: title + coded/free-text scope lines + amount
       el.innerHTML=`<div class="ghead" style="background:#eef0ff">
+          ${ord}
           <input type="text" value="${escAttr(o.title)}" placeholder="Option title — e.g. Residential Elevator:"
                  style="flex:1;font-weight:600" oninput="JOB.options[${i}].title=this.value">
           <span class="muted">$</span><input class="amt" type="text" placeholder="amount" value="${escAttr(o.amount||'')}"
@@ -588,14 +599,15 @@ function renderOptions(){
           <button class="btn x sm" style="flex:none" onclick="rmPriced(${i},${pi})">✕</button>
         </div>`).join('');
       const blockName=(o.title||'').includes('Low Voltage')?'Low-Voltage block':'Clean-up block';
-      el.innerHTML=`<div class="row"><b>${blockName}</b><button class="btn x sm" style="flex:none" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
+      el.innerHTML=`<div class="row" style="align-items:center">${ord}<b>${blockName}</b><button class="btn x sm" style="flex:none;margin-left:auto" onclick="JOB.options.splice(${i},1);renderOptions()">remove</button></div>
         <label>Heading (bold, left — leave blank for a plain “•” line)</label>
         <input type="text" value="${escAttr(o.title||'')}" placeholder="e.g. Clean-Up Option:" oninput="JOB.options[${i}].title=this.value">
         <label>Bullets (one per line)</label><textarea oninput="JOB.options[${i}].bullets=this.value.split('\\n').filter(x=>x.trim())">${esc(o.bullets.join('\n'))}</textarea>
         <label>Priced lines (device / $ — editable)</label>${priced}
         <button class="btn sm" style="margin-top:6px" onclick="addPriced(${i})">+ priced line</button>`;
     } else {
-      el.innerHTML=`<label>Option text (or pull a Copy_Paste code)</label>
+      el.innerHTML=`<div class="row" style="align-items:center;gap:6px;margin-bottom:2px">${ord}<span class="muted" style="text-transform:none;letter-spacing:0">One-line option</span></div>
+        <label>Option text (or pull a Copy_Paste code)</label>
         <div class="row">
           <input class="code" id="oc-${i}" placeholder="code" style="width:76px;flex:none"
                  onkeydown="if(event.key==='Enter'){event.preventDefault();fillOptionCode(${i})}">

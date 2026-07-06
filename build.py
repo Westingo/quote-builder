@@ -258,11 +258,22 @@ def build_doc(job, data, index):
 
 
 def _slug_outfile(jobdir, job):
+    """Consistent output name every time: '<customer> <bid #> <date>.docx'
+    (job name = the 'For' customer field). Empty parts are skipped; characters
+    illegal in Windows filenames are replaced with '-'."""
     p = job.get("proposal", {})
-    cust = (p.get("for") or "proposal").replace("/", "-")
-    date = (p.get("date") or "").replace("/", ".")
-    name = f"Proposal - {cust}" + (f" - {date}" if date else "") + ".docx"
-    return os.path.join(jobdir, name)
+
+    def safe(v):
+        v = str(v or "").strip()
+        for ch in '\\/:*?"<>|':
+            v = v.replace(ch, "-")
+        return v.strip()
+
+    name = safe(p.get("for")) or "Proposal"
+    bid = safe(p.get("bid_number"))
+    date = safe(str(p.get("date") or "").replace("/", "."))
+    parts = [name] + [x for x in (bid, date) if x]
+    return os.path.join(jobdir, " ".join(parts) + ".docx")
 
 
 def main(jobdir):

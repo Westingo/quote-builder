@@ -532,11 +532,8 @@ Access:
   notes: Cost $20.12 | 501+ Residents Cost $29.29 | Charge $41
   section: scope
   sheet: Access
-- code: 'CAPXLV
-
-    (Use with CAPXLV2)'
-  description: CAPXLV2 surface mount VoIP/cloud based telephone entry system with 10” HD color touch screen, integrated 1080P camera (picture in picture capability), easy browser-based programming via web
-    port login, real time alerting, and access control device capability
+- code: CAPXLV
+  description: CAPXLV2 surface mount VoIP/cloud based telephone entry system with 10” HD color touch screen, integrated 1080P camera (picture in picture capability), easy browser-based programming via web port login, real time alerting, and access control device capability. Uses customer-supplied high speed internet connection (Requires Wi-Fi/hardwire network connection with at least 5MB/S upload/download speed) with option for live streaming video to resident smartphone (Monthly fees apply)
   cost: 2729
   labor: 10
   category: LIFTMASTER
@@ -544,8 +541,7 @@ Access:
   section: scope
   sheet: Access
 - code: CAPXLV2
-  description: Uses customer-supplied high speed internet connection (Requires Wi-Fi/hardwire network connection with at least 5MB/S upload/download speed) with option for live streaming video to resident
-    smartphone (Monthly fees apply)
+  description: CAPXLV2 surface mount VoIP/cloud based telephone entry system with 10” HD color touch screen, integrated 1080P camera (picture in picture capability), easy browser-based programming via web port login, real time alerting, and access control device capability. Uses customer-supplied high speed internet connection (Requires Wi-Fi/hardwire network connection with at least 5MB/S upload/download speed) with option for live streaming video to resident smartphone (Monthly fees apply)
   cost: 2729
   labor: 10
   category: LIFTMASTER

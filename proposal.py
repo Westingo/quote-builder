@@ -682,7 +682,7 @@ def render_nwe(body, doc):
             _run(p, f"{bullet}  ", size=9.5)
             _run(p, it, size=9.5)
 
-    section("Notes (Cont.):", doc.get("notes", []))
+    section("Notes:", doc.get("notes", []))
     section("Warranties:", doc.get("warranties", []))
     section("Exclusions:", doc.get("exclusions", []))
 
