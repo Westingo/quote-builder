@@ -103,6 +103,8 @@ def resolve_line(index, line):
         res["sub"] = True
     if line.get("atqty"):                      # note starting at the qty/number column
         res["atqty"] = True
+    if line.get("leftnote"):                   # note starting at the far-left label column
+        res["leftnote"] = True
     if "label" in line:                        # explicit Install/Supply/Other (or "")
         res["label"] = _norm_label(line["label"])
     if line.get("amount") not in (None, ""):   # per-item price/note in AMOUNT col

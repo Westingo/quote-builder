@@ -343,6 +343,11 @@ function addQtyNote(id){
   findLines(id).lines.push({text:t, atqty:true});   // text lines up with the qty column
   inp.value=''; redraw();
 }
+function addLeftNote(id){
+  const inp=$('#lnote-'+id); const t=inp.value.trim(); if(!t)return;
+  findLines(id).lines.push({text:t, leftnote:true});   // text starts at the far-left label column
+  inp.value=''; redraw();
+}
 function addSubBelow(id,i){
   // insert a blank sub-note right after this item and any sub-notes it already
   // has, so multiple sub-notes stack in order under the item
@@ -374,6 +379,11 @@ function addRowHTML(id, withPriced){
     <span class="muted" style="align-self:center;white-space:nowrap">note →</span>
     <input class="ftext" id="nt-${id}" placeholder="note lined up with the 1)/qty column, e.g. Brivo B-BSPSF-B reader…" onkeydown="if(event.key==='Enter')addQtyNote('${id}')">
     <button class="btn sm" onclick="addQtyNote('${id}')">+ note</button>
+  </div>
+  <div class="addrow" style="border-top:none;padding-top:0">
+    <span class="muted" style="align-self:center;white-space:nowrap">left note →</span>
+    <input class="ftext" id="lnote-${id}" placeholder="note starting at the far-left, level with “Install:” (full width), e.g. All devices listed above are…" onkeydown="if(event.key==='Enter')addLeftNote('${id}')">
+    <button class="btn sm" onclick="addLeftNote('${id}')">+ left note</button>
   </div>`;
   if(withPriced){
     h+=`<div class="addrow" style="border-top:none;padding-top:0">
@@ -422,6 +432,17 @@ function renderLineList(id, lines, ul, withLineAmount){
         <input type="text" value="${escAttr(ln.text||'')}" title="note aligned with the qty column"
           style="flex:1" onchange="setSubText('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+      ul.appendChild(li); return;
+    }
+    if(ln.leftnote){
+      const amtL=withLineAmount
+        ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
+             title="price or note shown in the AMOUNT column" style="width:96px;flex:none"
+             onchange="setLineAmount('${id}',${i},this.value)">` : '';
+      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center" title="note starting at the far-left, level with the Install label">⇤ note</span>
+        <input type="text" value="${escAttr(ln.text||'')}" title="left-aligned note, full width, level with “Install:”"
+          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+        ${amtL}<button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
@@ -651,7 +672,7 @@ function collect(){
   };
   return j;
 }
-function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty) && !String(l.text||'').trim()));}
+function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty||l.leftnote) && !String(l.text||'').trim()));}
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
@@ -662,6 +683,9 @@ function cleanLine(ln){
   }
   if(ln.atqty){
     const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return o;
+  }
+  if(ln.leftnote){
+    const o={text:ln.text, leftnote:true}; if(ln.amount)o.amount=ln.amount; return o;
   }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
