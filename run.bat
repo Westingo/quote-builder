@@ -9,6 +9,17 @@ setlocal
 cd /d "%~dp0"
 title Metro Quote Builder
 
+rem --- auto-update products + app from GitHub (quiet; skips if offline) ---
+if exist ".git" (
+  echo   Checking for product/app updates...
+  git pull --ff-only >nul 2>&1
+  if errorlevel 1 (
+    echo   No update applied - using the version already on this machine.
+  ) else (
+    echo   Up to date.
+  )
+)
+
 rem --- locate Python -------------------------------------------------
 set "PY="
 where py >nul 2>&1 && set "PY=py -3"

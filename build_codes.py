@@ -7,6 +7,7 @@ Reads the 14 dictionary sheets, skips the reference sheets (MyQ Price Tool,
 Labor Rates, Do not change), and emits codes.yaml keyed by sheet. Cost/labor are
 carried for reference only — they are often freeform text, never assume numbers.
 """
+import re
 import sys
 from openpyxl import load_workbook
 import yaml
@@ -22,11 +23,18 @@ KNOWN = {'CODE', 'DESCRIPTION', 'MODEL', 'COST', 'LABOR', 'MISC.'}
 
 
 def coerce_code(v):
+    """Normalize a code cell into a clean single-token key. Some workbook cells
+    carry an annotation, e.g. 'CAPXLV\\n(Use with CAPXLV2)' — strip parenthetical
+    notes and keep only the first line so the lookup key is just the code
+    (otherwise the code imports un-findable, like the old CAPXLV entry)."""
     if v is None:
         return None
     if isinstance(v, float):
         return str(int(v)) if v.is_integer() else str(v)
-    return str(v).strip()
+    s = re.sub(r"\([^)]*\)", " ", str(v))   # drop (…) annotations
+    s = s.split("\n")[0]                     # keep the first line only
+    s = " ".join(s.split()).strip()          # collapse whitespace / newlines
+    return s or None
 
 
 def coerce_val(v):

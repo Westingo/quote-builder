@@ -6,103 +6,141 @@
 <title>Quote Builder — Metro Access Control</title>
 <style>
   :root{
-    --ink:#15171a; --navy:#1b254b; --accent:#1b254b; --line:#15171a;
-    --bench:#e9eaec; --sheet:#fff; --faint:#8a8d93; --good:#1d7a3a; --bad:#b3261e;
-    --serif:Cambria, Georgia, "Times New Roman", serif;
-    --sans:system-ui, "Segoe UI", sans-serif; --mono:ui-monospace, Consolas, monospace;
+    /* light theme */
+    --bg:#f4f5f8; --surface:#ffffff; --surface-2:#f7f8fb; --inset:#eef0f4;
+    --border:#e6e8ee; --border-strong:#d3d7e0;
+    --text:#1a1d24; --muted:#6a7180; --faint:#9199a6;
+    --accent:#3b5bdb; --accent-2:#2f49b8; --accent-soft:#edf1fe; --on-accent:#ffffff;
+    --brand:#1b254b;
+    --good:#158a45; --bad:#dc2b2b; --bad-soft:#fdecec;
+    --chip:#edf1fe; --chip-ink:#2f49b8;
+    --code-bg:#0f1115; --code-ink:#d7dae0;
+    --r:16px; --r-sm:10px; --r-xs:6px;
+    --shadow:0 1px 2px rgba(20,24,40,.04), 0 6px 20px rgba(20,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(20,24,40,.06);
+    --ring:0 0 0 3px rgba(59,91,219,.20);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Consolas,monospace;
+    /* back-compat aliases for inline styles */
+    --ink:var(--text); --navy:var(--accent); --line:var(--border); --bench:var(--bg); --sheet:var(--surface); --soft:var(--border);
+  }
+  [data-theme="dark"]{
+    --bg:#0f1218; --surface:#181b22; --surface-2:#1e222b; --inset:#232833;
+    --border:#2b303b; --border-strong:#3a4150;
+    --text:#e7e9ef; --muted:#98a1b0; --faint:#79828f;
+    --accent:#6d8bff; --accent-2:#84a0ff; --accent-soft:#1f2740; --on-accent:#0f1218;
+    --brand:#a9b8ff;
+    --good:#48d178; --bad:#ff6b6b; --bad-soft:#3a1f22;
+    --chip:#20283f; --chip-ink:#9db2ff;
+    --code-bg:#0b0d11; --code-ink:#ccd2dc;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.45);
+    --ring:0 0 0 3px rgba(109,139,255,.30);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bench);color:var(--ink);font-family:var(--sans);font-size:14px}
+  html{color-scheme:light}
+  [data-theme="dark"]{color-scheme:dark}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
   [hidden]{display:none!important}
-  header{background:var(--sheet);border-bottom:2px solid var(--line)}
-  .tb{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 16px;gap:14px}
-  .tb .brand{font-family:var(--serif);font-weight:bold;font-size:19px;letter-spacing:.03em}
-  .tb .brand span{color:var(--navy)}
-  .tb .role{font-family:var(--serif);font-variant:small-caps;letter-spacing:.18em;color:var(--faint);margin-left:auto}
-  main{max-width:1180px;margin:0 auto 90px;padding:16px 14px}
-  .grid2{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+
+  header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+  .tb{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:12px 18px;gap:14px}
+  .tb .brand{font-weight:700;font-size:17px;letter-spacing:-.01em}
+  .tb .brand span{color:var(--brand)}
+  .tb .role{font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-left:auto}
+  #themebtn{padding:5px 10px;font-size:15px;line-height:1}
+  main{max-width:1180px;margin:0 auto 96px;padding:20px 16px}
+  .grid2{display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start}
   @media(max-width:980px){.grid2{grid-template-columns:1fr}}
 
-  .sheet{background:var(--sheet);border:1.5px solid var(--line);margin-bottom:18px}
-  .sheet>h2{margin:0;border-bottom:1px solid var(--line);padding:9px 14px;
-    font-family:var(--serif);font-variant:small-caps;letter-spacing:.16em;font-size:15px;font-weight:600;
+  .sheet{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+  .sheet>h2{margin:0;border-bottom:1px solid var(--border);padding:13px 16px;background:var(--surface-2);
+    font-size:14px;font-weight:600;letter-spacing:0;color:var(--text);
     display:flex;align-items:center;gap:10px}
   .sheet>h2 button{margin-left:auto}
-  .pad{padding:14px}
-  label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:9px 0 3px}
+  .pad{padding:16px}
+  label{display:block;font-size:11px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin:11px 0 4px}
   input[type=text],input[type=date],input[type=search],input[type=number],select,textarea{
-    width:100%;border:1px solid #b9bcc2;background:#fff;padding:7px 8px;font:inherit;border-radius:0}
-  textarea{resize:vertical;min-height:54px}
-  input:focus,select:focus,textarea:focus,button:focus{outline:2px solid var(--navy);outline-offset:1px}
+    width:100%;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);padding:8px 10px;font:inherit;border-radius:var(--r-sm);transition:border-color .12s,box-shadow .12s}
+  textarea{resize:vertical;min-height:56px}
+  input::placeholder,textarea::placeholder{color:var(--faint)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--ring)}
+  button:focus-visible{outline:none;box-shadow:var(--ring)}
   .row{display:flex;gap:12px}.row>*{flex:1}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
   button{font:inherit;cursor:pointer}
-  .btn{border:1.5px solid var(--line);background:#fff;padding:6px 12px;font-family:var(--serif);
-    font-variant:small-caps;letter-spacing:.08em}
-  .btn:hover{background:#eef0ff}
-  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .btn.primary:hover{background:#2a3666}
-  .btn.sm{padding:3px 8px;font-size:12px}
-  .btn.x{border-color:#c9a;color:var(--bad);padding:2px 8px}
-  .muted{color:var(--faint);font-size:12px}
-  input.ro{background:#eceef1;color:#555;cursor:not-allowed}
+  .btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);padding:7px 13px;
+    font-weight:600;font-size:13px;border-radius:var(--r-sm);transition:background .12s,border-color .12s,box-shadow .12s}
+  .btn:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:var(--shadow-sm)}
+  .btn.primary:hover{background:var(--accent-2);border-color:var(--accent-2)}
+  .btn.sm{padding:4px 9px;font-size:12px}
+  .btn.x{border-color:var(--border-strong);color:var(--bad);padding:3px 9px;font-weight:700}
+  .btn.x:hover{background:var(--bad-soft);border-color:var(--bad)}
+  .muted{color:var(--muted);font-size:12px}
+  input.ro{background:var(--inset);color:var(--muted);cursor:not-allowed}
 
   /* gates */
-  .gate{border:1px solid #c9ccd2;margin:12px 0;background:#fafbfc}
-  .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e3e4e7;background:#f1f2f5}
+  .gate{border:1px solid var(--border);margin:14px 0;background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--shadow-sm);overflow:hidden}
+  .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border);background:var(--surface-2)}
   .ord{display:flex;align-items:center;gap:2px}
-  .ord .btn.sm{padding:2px 7px;line-height:1}
+  .ord .btn.sm{padding:2px 8px;line-height:1}
   .ord .btn.sm:disabled{opacity:.35;cursor:default}
   .ghead input[type=text]{width:auto}
   .gate .ghead>input{font-weight:600}
-  .lines{list-style:none;margin:0;padding:6px 8px}
-  .lines li{display:flex;gap:8px;align-items:flex-start;padding:3px 0;border-bottom:1px dotted #e3e4e7}
+  .lines{list-style:none;margin:0;padding:8px 10px}
+  .lines li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
+  .lines li:last-child{border-bottom:none}
   .lines li .qty{width:54px;flex:none}
-  .lines li .txt{flex:1;font-size:13px;line-height:1.35}
-  .lines li .txt .code{font-family:var(--mono);font-size:11px;color:var(--navy);background:#eef0ff;padding:0 4px;margin-right:6px}
-  .lines li .free{font-style:italic;color:#444}
-  .addrow{display:flex;gap:6px;padding:6px 8px;border-top:1px solid #e3e4e7;flex-wrap:wrap}
+  .lines li .txt{flex:1;font-size:13px;line-height:1.4}
+  .lines li .txt .code{font-family:var(--mono);font-size:11px;color:var(--chip-ink);background:var(--chip);padding:1px 6px;margin-right:6px;border-radius:var(--r-xs)}
+  .lines li .free{font-style:italic;color:var(--muted)}
+  .addrow{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border);flex-wrap:wrap}
   .addrow input.code{width:90px;flex:none}
   .addrow input.ftext{flex:1;min-width:160px}
 
   /* picker */
-  aside{position:sticky;top:12px}
-  .picker .pad{padding:10px}
-  .picker select,.picker input{margin-bottom:6px}
-  .results{max-height:48vh;overflow:auto;border:1px solid #e3e4e7;background:#fff}
-  .res{padding:5px 8px;border-bottom:1px solid #f0f1f3;cursor:pointer;font-size:12.5px;line-height:1.3}
-  .res:hover{background:#eef0ff}
-  .res .code{font-family:var(--mono);font-size:11px;color:var(--navy);font-weight:bold;margin-right:6px}
+  aside{position:sticky;top:70px}
+  .picker .pad{padding:12px}
+  .picker select,.picker input{margin-bottom:8px}
+  .results{max-height:52vh;overflow:auto;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm)}
+  .res{padding:7px 10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12.5px;line-height:1.35}
+  .res:last-child{border-bottom:none}
+  .res:hover{background:var(--accent-soft)}
+  .res .code{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;margin-right:6px}
   .res .blank{color:var(--bad);font-size:10px;margin-left:4px}
-  .catlabel{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--faint);background:#f1f2f5;padding:3px 8px;position:sticky;top:0}
+  .catlabel{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--muted);background:var(--inset);padding:5px 10px;position:sticky;top:0}
 
   /* nwe checklists */
-  .nwe{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .nwe{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
   @media(max-width:900px){.nwe{grid-template-columns:1fr}}
-  .nwe .col h3{font-family:var(--serif);font-variant:small-caps;letter-spacing:.1em;font-size:13px;margin:0 0 6px}
-  .checklist{max-height:240px;overflow:auto;border:1px solid #e3e4e7;background:#fff;padding:4px}
-  .checklist label{display:flex;gap:6px;text-transform:none;letter-spacing:0;font-family:var(--sans);
-    font-size:12px;color:var(--ink);margin:0;padding:2px;cursor:pointer;align-items:flex-start}
-  .checklist label:hover{background:#eef0ff}
+  .nwe .col h3{font-size:12.5px;font-weight:700;letter-spacing:0;margin:0 0 8px;color:var(--text)}
+  .checklist{max-height:240px;overflow:auto;border:1px solid var(--border);background:var(--surface);padding:5px;border-radius:var(--r-sm)}
+  .checklist label{display:flex;gap:7px;text-transform:none;letter-spacing:0;font-weight:400;
+    font-size:12px;color:var(--text);margin:0;padding:4px 5px;cursor:pointer;align-items:flex-start;border-radius:var(--r-xs)}
+  .checklist label:hover{background:var(--accent-soft)}
   .checklist input{width:auto;margin-top:2px}
-  .pill{font-family:var(--mono);font-size:10px;color:var(--navy)}
+  .pill{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700}
 
   /* options */
-  .opt{border:1px solid #d4d5d8;padding:8px;margin:8px 0;background:#fafbfc}
+  .opt{border:1px solid var(--border);padding:10px;margin:10px 0;background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--shadow-sm)}
   .opt .row{align-items:center}
   .opt .amt{width:120px;flex:none}
-  #log{font-family:var(--mono);font-size:12px;white-space:pre-wrap;background:#0f1115;color:#d7dae0;padding:10px;margin-top:10px}
+  #log{font-family:var(--mono);font-size:12px;white-space:pre-wrap;background:var(--code-bg);color:var(--code-ink);padding:12px;margin-top:10px;border-radius:var(--r-sm)}
   .ok{color:var(--good)} .err{color:var(--bad)}
-  .buildbar{position:fixed;bottom:0;left:0;right:0;background:var(--sheet);border-top:2px solid var(--line);
-    padding:10px 14px;display:flex;gap:12px;align-items:center;z-index:5}
+  .buildbar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
+    box-shadow:0 -2px 14px rgba(20,24,40,.10);padding:12px 16px;display:flex;gap:12px;align-items:center;z-index:5}
   .buildbar .sp{margin-left:auto}
 </style>
+<script>/* set theme before paint to avoid a flash */
+(function(){try{var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
 <header><div class="tb">
   <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
   <div class="role">Quote Builder</div>
+  <button class="btn sm" id="themebtn" title="Toggle light / dark" onclick="toggleTheme()">☾</button>
 </div></header>
 
 <main>
@@ -210,6 +248,20 @@
 
 <script>
 const $ = s => document.querySelector(s);
+
+// ---------- theme (light / dark) ----------
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  try{ localStorage.setItem('theme', t); }catch(e){}
+  const b=document.getElementById('themebtn'); if(b) b.textContent=(t==='dark')?'☀':'☾';
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  applyTheme(cur==='dark'?'light':'dark');
+}
+// sync the toggle button with the theme the <head> script already applied
+applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
+
 let CODES = null;            // {sheets:[...]}
 let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclusions:[],
            free:{N:[],W:[],E:[]}};
@@ -446,9 +498,9 @@ function renderLineList(id, lines, ul, withLineAmount){
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
-    const labelSel=`<select class="lblsel" title="row label" style="width:84px;flex:none"
+    const labelSel=`<select class="lblsel" title="row label" style="width:94px;flex:none"
         onchange="setLabel('${id}',${i},this.value)">`+
-      ['','Install','Supply','Other'].map(o=>
+      ['','Install','Supply','Automate','Other'].map(o=>
         `<option value="${o}"${o===effLabel?' selected':''}>${o||'—'}</option>`).join('')+
       `</select>`;
     const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
@@ -571,7 +623,7 @@ function renderOptions(){
       `<b style="margin:0 6px">${i+1}.</b></span>`;
     if(o.lines && o.kind!=='block'){
       // detailed option: title + coded/free-text scope lines + amount
-      el.innerHTML=`<div class="ghead" style="background:#eef0ff">
+      el.innerHTML=`<div class="ghead" style="background:var(--accent-soft)">
           ${ord}
           <input type="text" value="${escAttr(o.title)}" placeholder="Option title — e.g. Residential Elevator:"
                  style="flex:1;font-weight:600" oninput="JOB.options[${i}].title=this.value">
