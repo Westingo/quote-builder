@@ -92,7 +92,9 @@
   .lines li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
   .lines li:last-child{border-bottom:none}
   .lines li .qty{width:54px;flex:none}
-  .lines li .txt{flex:1;font-size:13px;line-height:1.4}
+  .lines li .txt{flex:1;font-size:13px;line-height:1.4;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .lines li .txt .itemtext{flex:1;min-width:220px;font-size:13px;padding:4px 8px}
+  .lines li .txt .fills{width:150px;flex:none;font-size:12px;padding:4px 7px}
   .lines li .txt .code{font-family:var(--mono);font-size:11px;color:var(--chip-ink);background:var(--chip);padding:1px 6px;margin-right:6px;border-radius:var(--r-xs)}
   .lines li .free{font-style:italic;color:var(--muted)}
   .addrow{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border);flex-wrap:wrap}
@@ -507,10 +509,17 @@ function renderLineList(id, lines, ul, withLineAmount){
                    onchange="setQty('${id}',${i},this.value)">`;
     let body;
     if(ln.code!==undefined){
-      body=`<span class="code">${ln.code}</span>${esc(applyFills(ln))}`+
-           (ln._blanks?` <input type="text" placeholder="fill blanks: a | b" style="width:160px"
+      const shown=(ln.text!==undefined && ln.text!=='')?ln.text:applyFills(ln);
+      body=`<span class="code">${ln.code}</span>`+
+           `<input type="text" class="itemtext" value="${escAttr(shown)}"
+              title="edit this item's wording — the code stays as a reference; what you type is what prints"
+              onchange="setItemText('${id}',${i},this.value)">`+
+           ((ln._blanks && !(ln.text!==undefined && ln.text!==''))?`<input type="text" class="fills" placeholder="fill blanks: a | b"
                value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${id}',${i},this.value)">`:'');
-    } else { body=`<span class="free">${esc(ln.text)}</span>`; }
+    } else {
+      body=`<input type="text" class="itemtext" value="${escAttr(ln.text||'')}"
+              placeholder="item text" onchange="setItemText('${id}',${i},this.value)">`;
+    }
     const amt=withLineAmount
       ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
            title="price or note shown in the AMOUNT column for this item"
@@ -524,6 +533,9 @@ function renderLineList(id, lines, ul, withLineAmount){
 }
 function setLabel(id,i,v){findLines(id).lines[i].label=v;}  // '' = no label
 function setSubText(id,i,v){findLines(id).lines[i].text=v;}
+// edit an item's wording after it's added; on a code line this overrides the
+// code's dictionary text at build time (build.py prefers `text` over `code`)
+function setItemText(id,i,v){findLines(id).lines[i].text=v;}
 function setLineAmount(id,i,v){const ln=findLines(id).lines[i]; v=v.trim();
   if(v) ln.amount=v; else delete ln.amount;}
 function setNoteLabel(id,i,v){findLines(id).lines[i].amount_note=v;}
@@ -754,6 +766,7 @@ function cleanLine(ln){
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
     if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;
+    if(ln.text!==undefined && String(ln.text).trim()!=='') o.text=ln.text;  // edited wording wins over the code lookup
     if(ln.label!==undefined) o.label=ln.label;
     if(ln.amount) o.amount=ln.amount;
     return o;
