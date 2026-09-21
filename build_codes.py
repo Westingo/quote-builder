@@ -12,9 +12,6 @@ import sys
 from openpyxl import load_workbook
 import yaml
 
-SRC = sys.argv[1] if len(sys.argv) > 1 else "Copy_Paste.xlsx"
-OUT = "codes.yaml"
-
 DICT_SHEETS = ['Brivo', 'Access', 'Gate Accessories', 'Operators', 'Ironwork',
                'CCTV', 'Remotes', 'Other', 'Readers', 'Door Hardware', 'Storage',
                'N', 'W', 'E']
@@ -48,8 +45,15 @@ def coerce_val(v):
     return v
 
 
-def main():
-    wb = load_workbook(SRC, read_only=True, data_only=True)
+def read_workbook(source, strict=False):
+    wb = load_workbook(source, read_only=True, data_only=True)
+    try:
+        return parse_workbook(wb, strict)
+    finally:
+        wb.close()
+
+
+def parse_workbook(wb, strict=False):
     out = {}
     for name in DICT_SHEETS:
         ws = wb[name]
@@ -64,6 +68,8 @@ def main():
                 hidx, header = i, up
                 break
         if hidx is None:
+            if strict:
+                raise ValueError(f"Missing CODE / DESCRIPTION headers on {name}")
             print(f"  WARNING: no header found on sheet {name!r}, skipping")
             continue
 
@@ -92,7 +98,8 @@ def main():
                 continue
             # ALL-CAPS separator row: only the code cell populated
             if code and desc in (None, '') and model in (None, '') \
-                    and cost in (None, '') and labor in (None, '') and not notes:
+                    and cost in (None, '') and labor in (None, '') \
+                    and (not notes or re.fullmatch(r'[A-Z]+(?: [A-Z]+)+', code)):
                 category = code
                 continue
             # continuation/variant row: data but no code
@@ -123,11 +130,29 @@ def main():
             item['sheet'] = name
             items.append(item)
         out[name] = items
+        if strict:
+            if not items:
+                raise ValueError(f"No codes found on {name}")
+            seen = set()
+            for item in items:
+                code = item['code'].casefold()
+                if code in seen:
+                    raise ValueError(f"Duplicate code {item['code']} on {name}")
+                seen.add(code)
+                if not isinstance(item.get('description'), str) or not item['description'].strip():
+                    raise ValueError(f"Missing description for {item['code']} on {name}")
+    return out
+
+
+def main():
+    source = sys.argv[1] if len(sys.argv) > 1 else "Copy_Paste.xlsx"
+    out = read_workbook(source)
+    for name, items in out.items():
         print(f"  {name:18} {len(items)} items")
 
-    with open(OUT, 'w', encoding='utf-8') as f:
+    with open('codes.yaml', 'w', encoding='utf-8') as f:
         yaml.safe_dump(out, f, allow_unicode=True, sort_keys=False, width=200)
-    print(f"\nWrote {OUT}: {sum(len(v) for v in out.values())} codes total")
+    print(f"\nWrote codes.yaml: {sum(len(v) for v in out.values())} codes total")
 
 
 if __name__ == "__main__":

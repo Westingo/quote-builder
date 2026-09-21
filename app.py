@@ -21,6 +21,7 @@ from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 import build as builder
 import scan_import
+import product_sync
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -42,9 +43,9 @@ def index():
 
 
 @app.get("/api/codes")
-def api_codes():
+def api_codes(refresh: bool = False):
     """The dictionary, grouped sheet -> category -> items, for the picker UI."""
-    data = yaml.safe_load(open(CODES, encoding="utf-8"))
+    data, sync = product_sync.get_products(force=refresh)
     sheets = []
     for sheet, items in data.items():
         cats = {}
@@ -63,7 +64,7 @@ def api_codes():
             "section": items[0].get("section", "scope") if items else "scope",
             "categories": [{"name": k, "items": v} for k, v in cats.items()],
         })
-    return {"sheets": sheets}
+    return {"sheets": sheets, "sync": sync}
 
 
 @app.get("/api/jobs")

@@ -20,6 +20,7 @@ import sys
 import yaml
 
 import proposal
+import product_sync
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CODES = os.path.join(HERE, "codes.yaml")
@@ -32,8 +33,7 @@ NWE_SHEET = {"note": "N", "warranty": "W", "exclusion": "E"}
 # dictionary
 # ----------------------------------------------------------------------------
 def load_codes():
-    with open(CODES, encoding="utf-8") as f:
-        data = yaml.safe_load(f)
+    data = product_sync.cached_codes()
     index = {}            # code -> list of (sheet, item)
     for sheet, items in data.items():
         for it in items:

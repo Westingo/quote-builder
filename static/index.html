@@ -189,7 +189,7 @@
       <ul class="lines" id="summary"></ul></div></section>
 
     <!-- GATES -->
-    <section class="sheet"><h2>Work Locations <button class="btn sm" onclick="addGate()">+ location</button></h2>
+    <section class="sheet"><h2>Work Locations <button class="btn sm" onclick="addGate(true)">+ location</button></h2>
       <div class="pad" id="gates"></div></section>
 
     <!-- OPTIONS -->
@@ -227,6 +227,11 @@
 
   <!-- CODE PICKER -->
   <aside><section class="sheet picker"><h2>Code Picker</h2><div class="pad">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <button id="refresh-products" class="btn sm" onclick="refreshProducts(true)">Refresh products</button>
+      <a href="https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit" target="_blank" rel="noopener">Open Copy Paste</a>
+    </div>
+    <div id="product-status" class="muted" role="status" style="margin-bottom:8px">Loading products…</div>
     <label>Add picked code to location</label>
     <select id="pick-gate"></select>
     <input type="search" id="search" placeholder="search code or description…">
@@ -281,6 +286,8 @@ async function init(){
   $('#search').oninput = renderResults;
   renderResults();
   buildChecklists();
+  showProductStatus(CODES.sync);
+  setInterval(()=>refreshProducts(), 60000);
   addGate();           // start with one gate
   refreshJobs();
   // free-text N/W/E enter handlers
@@ -290,6 +297,39 @@ async function init(){
         JOB.free[k].push(e.target.value.trim()); e.target.value=''; renderFree();
       }
     });
+  }
+}
+
+let productsRefreshing=false;
+function showProductStatus(sync){
+  const el=$('#product-status');
+  const when=sync.last_synced?new Date(sync.last_synced).toLocaleString():'';
+  el.textContent=sync.state==='live'
+    ? 'Google Sheet synced · '+when
+    : 'Could not sync · '+(when?'using saved products from '+when:'using bundled products');
+  el.title=sync.error||'Checks for changes every minute while the app is open.';
+}
+async function refreshProducts(force=false){
+  if(productsRefreshing)return;
+  productsRefreshing=true;
+  $('#refresh-products').disabled=true;
+  if(force)$('#product-status').textContent='Checking Google Sheet…';
+  try{
+    const response=await fetch('/api/codes'+(force?'?refresh=true':''),{cache:'no-store'});
+    if(!response.ok)throw new Error('Product refresh failed');
+    const updated=await response.json();
+    if(updated.sync.version!==CODES.sync.version){
+      CODES=updated;
+      renderResults();
+      buildChecklists();
+    }
+    showProductStatus(updated.sync);
+  }catch(e){
+    $('#product-status').textContent='Could not sync · keeping current products';
+    $('#product-status').title=String(e);
+  }finally{
+    productsRefreshing=false;
+    $('#refresh-products').disabled=false;
   }
 }
 
@@ -325,10 +365,20 @@ function renderResults(){
 
 // ---------- gates ----------
 function titleFor(g){ return (g.title||'').trim(); }   // fully custom, verbatim
-function addGate(){
+function addGate(scrollToNew=false){
   const id='g'+(++gateSeq);
   JOB.gates.push({id, title:'', lines:[]});
   renderGates();
+  if(scrollToNew){
+    const card=$('#ls-'+id).closest('.gate');
+    card.querySelector('.ghead input').focus({preventScroll:true});
+    // Keep the new location's title below the sticky toolbar.
+    card.style.scrollMarginTop=($('header').getBoundingClientRect().height+16)+'px';
+    card.scrollIntoView({
+      behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',
+      block:'start'
+    });
+  }
 }
 function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); redraw(); }
 
@@ -691,15 +741,32 @@ function renderOptions(){
 // ---------- N/W/E checklists ----------
 function buildChecklists(){
   const map={N:'cl-N',W:'cl-W',E:'cl-E'};
+  // Keep selected wording (even if its source code was removed) in this quote.
+  const selected={};
+  for(const [key,id] of Object.entries(map)){
+    const box=$('#'+id);
+    selected[key]=new Map([...box.querySelectorAll('input:checked')]
+      .map(cb=>[cb.value,cb.closest('label')]));
+    box.replaceChildren();
+  }
   for(const sh of CODES.sheets){
     const key={note:'N',warranty:'W',exclusion:'E'}[sh.section]; if(!key)continue;
     const box=$('#'+map[key]);
     for(const c of sh.categories) for(const it of c.items){
+      if(selected[key].has(it.code)){
+        box.appendChild(selected[key].get(it.code));
+        selected[key].delete(it.code);
+        continue;
+      }
       const lab=document.createElement('label');
-      lab.innerHTML=`<input type="checkbox" value="${it.code}"><span><span class="pill">${it.code}</span> ${esc(it.description)}</span>`;
+      lab.innerHTML=`<input type="checkbox" value="${escAttr(it.code)}"><span><span class="pill">${esc(it.code)}</span> ${esc(it.description)}</span>`;
+      lab.querySelector('input').dataset.description=it.description;
+      lab.querySelector('input').onchange=e=>{if(!e.target.checked)buildChecklists();};
       box.appendChild(lab);
     }
   }
+  for(const [key,id] of Object.entries(map))
+    for(const label of selected[key].values())$('#'+id).appendChild(label);
 }
 function addNWECodes(key){
   // paste bare or prefixed codes ("34 36 4a") -> tick the matching checkboxes
@@ -718,7 +785,8 @@ function addNWECodes(key){
 }
 function collectNWE(key,sheetSection){
   const map={N:'cl-N',W:'cl-W',E:'cl-E'};
-  const picked=[...$('#'+map[key]).querySelectorAll('input:checked')].map(i=>i.value);
+  const picked=[...$('#'+map[key]).querySelectorAll('input:checked')]
+    .map(i=>({code:i.value,text:i.dataset.description}));
   const free=JOB.free[key].map(t=>({text:t}));
   return [...picked, ...free];
 }
@@ -767,6 +835,7 @@ function cleanLine(ln){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
     if(ln.fills && ln.fills.some(x=>x!=='')) o.fills=ln.fills;
     if(ln.text!==undefined && String(ln.text).trim()!=='') o.text=ln.text;  // edited wording wins over the code lookup
+    else o.text=applyFills(ln);  // snapshot the displayed wording before later sheet changes
     if(ln.label!==undefined) o.label=ln.label;
     if(ln.amount) o.amount=ln.amount;
     return o;
@@ -843,6 +912,7 @@ function loadJobObject(j){
   });
   // reset and re-apply N/W/E checkboxes
   document.querySelectorAll('.checklist input:checked').forEach(cb=>cb.checked=false);
+  buildChecklists();
   JOB.free={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
@@ -870,6 +940,10 @@ function descOf(code,sheet){
 function applyNWE(key,arr){
   const map={N:'cl-N',W:'cl-W',E:'cl-E'};
   (arr||[]).forEach(v=>{
+    if(v && typeof v==='object' && v.code!==undefined){
+      const cb=[...$('#'+map[key]).querySelectorAll('input')].find(i=>i.value===String(v.code));
+      if(cb && cb.dataset.description===v.text){cb.checked=true;return;}
+    }
     if(typeof v==='object'){JOB.free[key].push(v.text);return;}
     const cb=$('#'+map[key]).querySelector(`input[value="${v}"]`); if(cb)cb.checked=true;
   });

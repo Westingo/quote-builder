@@ -25,6 +25,25 @@ No server, no PM2. It runs locally on `127.0.0.1:8485` inside the app window.
 
 ## Use it
 
+The Code Picker reads products from the live [Copy Paste Google Sheet](https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit).
+It checks on startup and every minute while the app is open. Use **Refresh
+products** to check immediately; the status below it shows the last successful
+sync. Google's export may take a little time to reflect a just-saved edit.
+
+Add products to the existing tabs with a unique CODE and a DESCRIPTION, keeping
+the tab names and header columns. The 14 dictionary tabs are imported; calculator
+and reference tabs remain excluded. The app reads the sheet without changing it
+or its sharing settings. The sheet currently permits downloading without a
+Google sign-in; if that access changes, sync will show a warning.
+
+Products are validated before replacing the local offline cache. If the sheet
+is unavailable or malformed, the app keeps the last successful copy (or the
+bundled list on a first offline run). No GitHub update is needed for product
+changes. Items already added to a quote keep their wording, including custom
+edits; remove and re-add an item to use its latest description. Newly saved
+quotes preserve the displayed wording when reopened. Older quotes without
+saved wording still resolve their codes from the current list when loaded.
+
 In the window:
 1. Fill the **proposal header** (customer, address, date, job address, bid #, …).
 2. Add the **Install summary** lines (the centered list up top).
