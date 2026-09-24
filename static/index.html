@@ -135,17 +135,81 @@
     box-shadow:0 -2px 14px rgba(20,24,40,.10);padding:12px 16px;display:flex;gap:12px;align-items:center;z-index:5}
   .buildbar .sp{margin-left:auto}
 </style>
-<script>/* set theme before paint to avoid a flash */
-(function(){try{var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style>
+  /* Moonlit: a local, original nocturnal theme. No external fonts or assets. */
+  [data-theme="moonlit"]{
+    color-scheme:dark;
+    --bg:#100e16; --surface:#1b1722; --surface-2:#231c2b; --inset:#2b2333;
+    --border:#3b3045; --border-strong:#65516e;
+    --text:#eee5da; --muted:#c0b1c7; --faint:#ab98b4;
+    --accent:#dea4aa; --accent-2:#efbbc0; --accent-soft:#392432; --on-accent:#25121f;
+    --brand:#dec49c; --good:#a9d6ba; --bad:#ffa6a6; --bad-soft:#45232e;
+    --chip:#352638; --chip-ink:#edc2cb; --code-bg:#100c16; --code-ink:#e5d9e9;
+    --r:12px; --r-sm:7px; --r-xs:4px;
+    --shadow:0 8px 24px #07050b40; --shadow-sm:0 2px 6px #07050b30;
+    --ring:0 0 0 3px #dea4aa50;
+  }
+  [data-theme="moonlit"] body{
+    background:radial-gradient(ellipse at 95% 12%,#43203950,transparent 45%),var(--bg);
+  }
+  a{color:var(--accent)}
+  input[type=checkbox]{accent-color:var(--accent)}
+  #themebtn{font-size:12px;line-height:1.4;white-space:nowrap}
+  .moonlit-intro{display:none}
+  [data-theme="moonlit"] .moonlit-intro{
+    display:flex;align-items:center;gap:24px;position:relative;
+    padding:12px 24px 25px;margin-bottom:22px;border-bottom:1px solid var(--border-strong);
+  }
+  .moonlit-intro::after{content:"✧";position:absolute;bottom:-11px;left:50%;background:var(--bg);padding:0 12px;color:var(--brand)}
+  .familiar{width:112px;height:136px;flex:none;color:var(--brand)}
+  .moonlit-intro h1{font:normal 34px/1.15 Georgia,"Times New Roman",serif;margin:0 0 8px;color:var(--text)}
+  .moonlit-intro p{margin:0;color:var(--muted);max-width:55ch}
+  .moonlit-intro .intro-note{margin-top:9px;color:var(--brand);font:italic 14px/1.5 Georgia,serif}
+  [data-theme="moonlit"] .tb .brand{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:.04em;font-size:16px}
+  [data-theme="moonlit"] .tb .role{text-transform:none;letter-spacing:0;color:var(--muted)}
+  [data-theme="moonlit"] .sheet>h2{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:400}
+  [data-theme="moonlit"] .sheet>h2::before{content:"";width:4px;height:16px;background:var(--brand);border-radius:3px;flex:none}
+  [data-theme="moonlit"] label{text-transform:none;letter-spacing:0;font-size:12px}
+  [data-theme="moonlit"] .sheet>h2 button{font-family:var(--sans)}
+  [data-theme="moonlit"] .picker{border-top:2px solid var(--brand)}
+  [data-theme="moonlit"] .btn.primary{background:#854450;color:#fff3e8;border-color:#bb7782}
+  [data-theme="moonlit"] .btn.primary:hover{background:#9b5260}
+  [data-theme="moonlit"] .buildbar{border-top-color:var(--border-strong)}
+  .sheet>h2{flex-wrap:wrap}
+  @media(max-width:600px){
+    .tb{flex-wrap:wrap;gap:8px;padding:10px 14px}.tb .brand{flex:1}.tb .role{display:none}
+    main{padding:16px 10px;margin-bottom:190px}.row{flex-wrap:wrap}.row>*{min-width:130px}
+    .row3{grid-template-columns:1fr}.grid2{gap:4px}aside{position:static}
+    .buildbar{flex-wrap:wrap;gap:8px;padding:10px}.buildbar .sp{display:none}
+    .buildbar #jobs{max-width:100%;flex:1}.buildbar #status{width:100%}
+    [data-theme="moonlit"] .moonlit-intro{gap:14px;padding:0 4px 22px}
+    .familiar{width:76px;height:104px}.moonlit-intro h1{font-size:27px}
+    .moonlit-intro p{font-size:12px}.moonlit-intro .intro-note{font-size:12px}
+    .lines li .txt .itemtext{min-width:100px}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+</style>
+<script>/* Apply the personal theme before paint; keep its preference separate. */
+(function(){var t='moonlit';try{var saved=localStorage.getItem('quote-builder-theme');if(['moonlit','dark','light'].includes(saved))t=saved;}catch(e){}document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 <header><div class="tb">
   <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
   <div class="role">Quote Builder</div>
-  <button class="btn sm" id="themebtn" title="Toggle light / dark" onclick="toggleTheme()">☾</button>
+  <button class="btn sm" id="themebtn" title="Change color theme" onclick="toggleTheme()">☾ Moonlit</button>
 </div></header>
 
 <main>
+<section class="moonlit-intro" aria-labelledby="workspace-title">
+  <svg class="familiar" viewBox="0 0 112 136" fill="none" aria-hidden="true">
+    <path d="M9 127V57C9 32 32 11 56 3c24 8 47 29 47 54v70M16 127V58c0-22 19-40 40-48 21 8 40 26 40 48v69" stroke="currentColor" opacity=".45"/>
+    <path d="M66 24a20 20 0 1 0 15 30A17 17 0 0 1 66 24Z" fill="currentColor" opacity=".85"/>
+    <path d="M36 83 33 61 47 72q9-4 18 0l14-11-3 22q8 11 0 23l5 16H31l5-16q-8-12 0-23Z" fill="var(--bg)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="m40 87 9 3m23-3-9 3M53 97l3 3 3-3m-3 3v5m-22-8-12-2m13 7-13 3m56-8 12-2m-13 7 13 3M44 119v-9m24 9v-9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M80 119c17-2 19-18 9-21M56 48v10m-5-5h10M22 43v6m-3-3h6M86 33v6m-3-3h6M5 128h102" stroke="currentColor" stroke-linecap="round"/>
+  </svg>
+  <div><h1>The moonlit workshop</h1><p>A quiet place to bring your next proposal to life.</p><p class="intro-note">A little ritual. A little magic. A familiar keeping watch.</p></div>
+</section>
 <div class="grid2">
   <div>
     <!-- IMPORT FROM SCAN -->
@@ -256,18 +320,21 @@
 <script>
 const $ = s => document.querySelector(s);
 
-// ---------- theme (light / dark) ----------
+// ---------- personal theme; classic dark / light remain available ----------
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme', t);
-  try{ localStorage.setItem('theme', t); }catch(e){}
-  const b=document.getElementById('themebtn'); if(b) b.textContent=(t==='dark')?'☀':'☾';
+  try{ localStorage.setItem('quote-builder-theme', t); }catch(e){}
+  const themes={moonlit:'☾ Moonlit',dark:'◐ Dark',light:'☀ Light'};
+  const next={moonlit:'dark',dark:'light',light:'moonlit'};
+  const b=document.getElementById('themebtn');
+  if(b){b.textContent=themes[t];b.title='Switch to '+next[t]+' theme';b.setAttribute('aria-label',themes[t]+'. Switch to '+next[t]+' theme');}
 }
 function toggleTheme(){
-  const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
-  applyTheme(cur==='dark'?'light':'dark');
+  const cur=document.documentElement.getAttribute('data-theme');
+  applyTheme(({moonlit:'dark',dark:'light',light:'moonlit'})[cur]||'moonlit');
 }
 // sync the toggle button with the theme the <head> script already applied
-applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
+applyTheme(document.documentElement.getAttribute('data-theme')||'moonlit');
 
 let CODES = null;            // {sheets:[...]}
 let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclusions:[],
