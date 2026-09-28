@@ -10,7 +10,7 @@ function schedulePreview(){
   clearTimeout(previewTimer);
   document.getElementById('preview-status').textContent='Changes pending — rendering Word pages…';
   document.getElementById('preview-paper').classList.add('pv-stale');
-  previewTimer=setTimeout(updatePreview,900);
+  previewTimer=setTimeout(updatePreview,250);
 }
 async function updatePreview(){
   if(previewBusy)return; // The in-flight request will start the latest draft next.
@@ -47,7 +47,7 @@ async function updatePreview(){
     document.getElementById('preview-retry').hidden=false;
   }finally{
     previewBusy=false;
-    if(version!==previewVersion){clearTimeout(previewTimer);previewTimer=setTimeout(updatePreview,300);}
+    if(version!==previewVersion){clearTimeout(previewTimer);previewTimer=setTimeout(updatePreview,0);}
   }
 }
 function openPreview(){

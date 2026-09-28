@@ -66,6 +66,10 @@ Return ONLY a JSON object (no markdown fences, no prose) with this exact shape:
 }}
 
 Rules:
+- Preserve the exact written order within notes, warranties, and exclusions.
+  Never sort these codes numerically or by dictionary order. For example,
+  warranties written W2, W1, W6 must remain ["W2", "W1", "W6"]. Keep written-out
+  clauses in their original position among the codes, too.
 - Each work location has a header like "Work to be Done at <X> Gate Location:". \
 Group its lines under that gate. If there are no headers, use one gate with a \
 sensible title.
@@ -110,8 +114,9 @@ def _nwe_items(values, index, section):
         s = str(v).strip()
         if not s:
             continue
-        if build.find_nwe(index, s, section) is not None:
-            out.append(s)
+        item = build.find_nwe(index, s, section)
+        if item is not None:
+            out.append(str(item['code']))
         else:
             out.append({"text": s})
     return out

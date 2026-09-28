@@ -1,0 +1,15 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const html=fs.readFileSync('static/index.html','utf8');
+const start=html.indexOf('function replaceLineCode('),end=html.indexOf('\nfunction ',start+1);
+const line={code:'OLD',sheet:'Access',qty:3,amount:'250',label:'Supply',text:'Edited old text',fills:['old']};
+const sub={sub:true,text:'Keep subnote'};
+const context={CODES:{sheets:[{sheet:'Readers',section:'scope',categories:[{items:[{code:'NEW',description:'New reader _',blanks:1}]}]}]},findLines:()=>({lines:[line,sub]}),redraw(){}};
+vm.createContext(context);vm.runInContext(html.slice(start,end),context);
+const input={value:' new ',setCustomValidity(v){this.error=v},reportValidity(){}};
+context.replaceLineCode('gate',0,input);
+assert.equal(line.code,'NEW');assert.equal(line.sheet,'Readers');assert.equal(line._desc,'New reader _');
+assert.equal(line.qty,3);assert.equal(line.amount,'250');assert.equal(line.label,'Supply');assert.equal(line.text,undefined);assert.equal(line.fills.length,0);assert.equal(sub.text,'Keep subnote');
+const saved=JSON.stringify(line);input.value='INVALID';context.replaceLineCode('gate',0,input);
+assert.ok(input.error);assert.equal(JSON.stringify(line),saved);
+input.value='new';context.replaceLineCode('gate',0,input);assert.equal(input.error,'');assert.equal(JSON.stringify(line),saved);
+console.log('Passed replacement, retained fields/subnotes, cleared old wording/fills, invalid and unchanged codes.');

@@ -42,6 +42,13 @@
   [data-theme="dark"]{color-scheme:dark}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
   [hidden]{display:none!important}
+  .nwe-order{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .nwe-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:var(--r-xs);background:var(--surface);max-width:100%;cursor:grab}
+  .nwe-chip>span{overflow-wrap:anywhere}
+  .nwe-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .nwe-chip.dragging{opacity:.45}
+  .nwe-chip.drop-before{box-shadow:-3px 0 0 var(--accent)}
+  .nwe-chip.drop-after{box-shadow:3px 0 0 var(--accent)}
 
   header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
   .tb{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:12px 18px;gap:14px}
@@ -96,6 +103,8 @@
   .lines li .txt .itemtext{flex:1;min-width:220px;font-size:13px;padding:4px 8px}
   .lines li .txt .fills{width:150px;flex:none;font-size:12px;padding:4px 7px}
   .lines li .txt .code{font-family:var(--mono);font-size:11px;color:var(--chip-ink);background:var(--chip);padding:1px 6px;margin-right:6px;border-radius:var(--r-xs)}
+  .lines li .txt input.code{width:105px;flex:none;padding:5px 7px}
+  .lines li .txt input.code:invalid{border-color:var(--bad)}
   .lines li .free{font-style:italic;color:var(--muted)}
   .addrow{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border);flex-wrap:wrap}
   .addrow input.code{width:90px;flex:none}
@@ -355,9 +364,10 @@ function toggleTheme(){
 applyTheme(document.documentElement.getAttribute('data-theme')||'moonlit');
 
 let CODES = null;            // {sheets:[...]}
-let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclusions:[],
-           free:{N:[],W:[],E:[]}};
+let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclusions:[]};
 let gateSeq = 0;
+let NWE_ORDER = {N:[],W:[],E:[]};
+let NWE_DRAG = null;
 
 // ---------- load dictionary ----------
 let initialization=null;
@@ -393,7 +403,7 @@ async function initializeEditor(){
   for(const k of ['N','W','E']){
     $('#free-'+k).addEventListener('keydown',e=>{
       if(e.key==='Enter' && e.target.value.trim()){
-        JOB.free[k].push(e.target.value.trim()); e.target.value=''; renderFree();
+        NWE_ORDER[k].push({text:e.target.value.trim()}); e.target.value=''; renderFree();
       }
     });
   }
@@ -616,39 +626,20 @@ function renderLineList(id, lines, ul, withLineAmount){
     const mv=`<span class="ord ln">`+
       `<button class="btn sm" ${i===0?'disabled':''} title="move up" onclick="moveLine('${id}',${i},-1)">↑</button>`+
       `<button class="btn sm" ${i===lines.length-1?'disabled':''} title="move down" onclick="moveLine('${id}',${i},1)">↓</button></span>`;
-    if(ln.amount_note!==undefined){
-      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center">$ note</span>
-        <input type="text" value="${escAttr(ln.amount_note)}" placeholder="label e.g. Not-To-Exceed Total:"
-          style="flex:1" oninput="setNoteLabel('${id}',${i},this.value)">
-        <input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / %"
-          title="amount shown in the AMOUNT column" style="width:96px;flex:none"
-          oninput="setNoteAmount('${id}',${i},this.value)">
-        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
-      ul.appendChild(li); return;
-    }
-    if(ln.sub){
-      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:34px">↳ —</span>
-        <input type="text" value="${escAttr(ln.text||'')}" title="sub-note under the item above"
-          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
-        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
-      ul.appendChild(li); return;
-    }
-    if(ln.atqty){
-      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:14px" title="lines up with the qty/number column">note</span>
-        <input type="text" value="${escAttr(ln.text||'')}" title="note aligned with the qty column"
-          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
-        <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
-      ul.appendChild(li); return;
-    }
-    if(ln.leftnote){
-      const amtL=withLineAmount
+    const noteType=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':null;
+    if(noteType){
+      const typeSelect=`<select aria-label="Note type" title="Change note type without retyping" style="width:125px;flex:none" onchange="changeNoteType('${id}',${i},this.value)">`+
+        [['sub','Sub-note'],['atqty','Note'],['leftnote','Left note'],['priced','Priced note']].map(([value,label])=>
+          `<option value="${value}"${value===noteType?' selected':''}>${label}</option>`).join('')+'</select>';
+      const text=noteType==='priced'?ln.amount_note:ln.text;
+      const amount=(withLineAmount||noteType==='priced')
         ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
-             title="price or note shown in the AMOUNT column" style="width:96px;flex:none"
+             title="Amount shown in the AMOUNT column" style="width:96px;flex:none"
              oninput="setLineAmount('${id}',${i},this.value)">` : '';
-      li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center" title="note starting at the far-left, level with the Install label">⇤ note</span>
-        <input type="text" value="${escAttr(ln.text||'')}" title="left-aligned note, full width, level with “Install:”"
-          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
-        ${amtL}<button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+      li.innerHTML=`${mv}${typeSelect}
+        <input type="text" value="${escAttr(text||'')}" aria-label="Note text" style="flex:1"
+          oninput="${noteType==='priced'?'setNoteLabel':'setSubText'}('${id}',${i},this.value)">
+        ${amount}<button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
@@ -662,7 +653,7 @@ function renderLineList(id, lines, ul, withLineAmount){
     let body;
     if(ln.code!==undefined){
       const shown=(ln.text!==undefined && ln.text!=='')?ln.text:applyFills(ln);
-      body=`<span class="code">${ln.code}</span>`+
+      body=`<input type="text" class="code" value="${escAttr(String(ln.code))}" aria-label="Item code" title="Change code, then press Enter or Tab to replace the description" oninput="this.setCustomValidity('')" onchange="replaceLineCode('${id}',${i},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();replaceLineCode('${id}',${i},this);}else if(event.key==='Escape'){this.value=findLines('${id}').lines[${i}].code;this.setCustomValidity('');}">`+
            `<input type="text" class="itemtext" value="${escAttr(shown)}"
               title="edit this item's wording — the code stays as a reference; what you type is what prints"
               oninput="setItemText('${id}',${i},this.value)">`+
@@ -682,6 +673,39 @@ function renderLineList(id, lines, ul, withLineAmount){
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
+}
+function changeNoteType(id,i,type){
+  if(!['sub','atqty','leftnote','priced'].includes(type))return;
+  const ln=findLines(id).lines[i];
+  if(ln.amount_note===undefined&&!ln.sub&&!ln.atqty&&!ln.leftnote)return;
+  const text=ln.amount_note!==undefined?ln.amount_note:(ln.text||'');
+  for(const key of ['sub','atqty','leftnote','amount_note','text'])delete ln[key];
+  if(type==='priced')ln.amount_note=text;
+  else{ln.text=text;ln[type]=true;}
+  redraw();
+}
+function replaceLineCode(id,i,input){
+  const ln=findLines(id).lines[i], code=input.value.trim().toLowerCase();
+  if(code===String(ln.code).toLowerCase()){
+    input.value=ln.code;input.setCustomValidity('');return;
+  }
+  const matches=[];
+  for(const sheet of CODES.sheets){
+    if(sheet.section!=='scope')continue;
+    for(const category of sheet.categories)for(const item of category.items)
+      if(String(item.code).toLowerCase()===code)matches.push({...item,sheet:sheet.sheet});
+  }
+  const item=matches.find(it=>it.sheet===ln.sheet)||(matches.length===1?matches[0]:null);
+  if(!item){
+    input.setCustomValidity(matches.length?'That code exists in multiple sheets. Use the Code Picker to choose the product.':'Code not found. Enter a valid scope code, or press Escape to keep the current item.');
+    input.reportValidity();return;
+  }
+  Object.assign(ln,{code:item.code,sheet:item.sheet,_desc:item.description,_blanks:item.blanks});
+  delete ln.text; // Replace previous custom wording with the new code's description.
+  delete ln.fills; // Fill-in answers belong to the old product.
+  if(item.blanks)ln.fills=[];
+  input.setCustomValidity('');
+  redraw();
 }
 function setLabel(id,i,v){findLines(id).lines[i].label=v;}  // '' = no label
 function setSubText(id,i,v){findLines(id).lines[i].text=v;}
@@ -868,7 +892,10 @@ function buildChecklists(){
       const lab=document.createElement('label');
       lab.innerHTML=`<input type="checkbox" value="${escAttr(it.code)}"><span><span class="pill">${esc(it.code)}</span> ${esc(it.description)}</span>`;
       lab.querySelector('input').dataset.description=it.description;
-      lab.querySelector('input').onchange=e=>{if(!e.target.checked)buildChecklists();};
+      lab.querySelector('input').onchange=e=>{
+        selectNWE(key,e.target);
+        if(!e.target.checked)buildChecklists();
+      };
       box.appendChild(lab);
     }
   }
@@ -884,25 +911,82 @@ function addNWECodes(key){
     const cands=[t, t.toUpperCase(), pre+t, pre+t.toUpperCase()];
     let cb=null;
     for(const c of cands){ cb=box.querySelector('input[value="'+CSS.escape(c)+'"]'); if(cb)break; }
-    if(cb){ cb.checked=true; cb.closest('label').scrollIntoView({block:'nearest'}); }
+    if(cb){ cb.checked=true; selectNWE(key,cb); cb.closest('label').scrollIntoView({block:'nearest'}); }
     else miss.push(t);
   });
   inp.value=miss.join(' ');   // leave any that didn't match so you can see them
   if(miss.length) inp.placeholder='not found: '+miss.join(' ');
 }
-function collectNWE(key,sheetSection){
-  const map={N:'cl-N',W:'cl-W',E:'cl-E'};
-  const picked=[...$('#'+map[key]).querySelectorAll('input:checked')]
-    .map(i=>({code:i.value,text:i.dataset.description}));
-  const free=JOB.free[key].map(t=>({text:t}));
-  return [...picked, ...free];
+function selectNWE(key,cb){
+  if(cb.checked){
+    if(!NWE_ORDER[key].some(item=>item.code===cb.value))
+      NWE_ORDER[key].push({code:cb.value,text:cb.dataset.description});
+  }else NWE_ORDER[key]=NWE_ORDER[key].filter(item=>item.code!==cb.value);
+  renderFree();
+}
+function collectNWE(key){
+  return NWE_ORDER[key].map(item=>({...item}));
+}
+function removeNWE(key,index){
+  const [item]=NWE_ORDER[key].splice(index,1);
+  if(item.code){
+    const cb=[...$('#cl-'+key).querySelectorAll('input')].find(cb=>cb.value===item.code);
+    if(cb)cb.checked=false;
+    buildChecklists();
+  }
+  renderFree();
+}
+function moveNWE(key,from,slot){
+  const items=NWE_ORDER[key];
+  if(!items||!Number.isInteger(from)||!Number.isInteger(slot)||from<0||from>=items.length||slot<0||slot>items.length)return;
+  const to=slot>from?slot-1:slot;
+  if(to===from)return;
+  const [item]=items.splice(from,1);
+  items.splice(to,0,item);
+  renderFree();
+}
+function startNWEDrag(event,key,index){
+  NWE_DRAG={key,index};
+  event.dataTransfer.effectAllowed='move';
+  event.dataTransfer.setData('text/plain',key+':'+index);
+  event.currentTarget.classList.add('dragging');
+}
+function endNWEDrag(){
+  NWE_DRAG=null;
+  document.querySelectorAll('.nwe-chip').forEach(el=>el.classList.remove('dragging','drop-before','drop-after'));
+}
+function overNWEDrag(event,key){
+  if(!NWE_DRAG||NWE_DRAG.key!==key)return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.nwe-chip').forEach(el=>el.classList.remove('drop-before','drop-after'));
+  const rect=event.currentTarget.getBoundingClientRect();
+  event.currentTarget.classList.add(event.clientX<rect.left+rect.width/2?'drop-before':'drop-after');
+}
+function dropNWE(event,key,index){
+  if(!NWE_DRAG||NWE_DRAG.key!==key)return;
+  event.preventDefault();
+  const rect=event.currentTarget.getBoundingClientRect();
+  const slot=index+(event.clientX<rect.left+rect.width/2?0:1);
+  const from=NWE_DRAG.index;
+  endNWEDrag();
+  moveNWE(key,from,slot);
+}
+function keyNWE(event,key,index){
+  if(event.target!==event.currentTarget||!event.altKey||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+  event.preventDefault();
+  const to=index+(event.key==='ArrowLeft'?-1:1);
+  if(to<0||to>=NWE_ORDER[key].length)return;
+  moveNWE(key,index,to>index?to+1:to);
+  document.querySelector(`[data-nwe-key="${key}"][data-nwe-index="${to}"]`).focus();
 }
 function renderFree(){
   const parts=[];
-  for(const k of ['N','W','E']) if(JOB.free[k].length)
-    parts.push(`<b>${k} free-text:</b> `+JOB.free[k].map((t,i)=>
-      `${esc(t)} <a href="#" onclick="JOB.free['${k}'].splice(${i},1);renderFree();return false">✕</a>`).join(' · '));
-  $('#free-list').innerHTML=parts.join('<br>');
+  const names={N:'Notes',W:'Warranties',E:'Exclusions'};
+  for(const k of ['N','W','E']) if(NWE_ORDER[k].length)
+    parts.push(`<div class="nwe-order" role="group" aria-label="${names[k]} order"><b>${names[k]} order:</b> `+NWE_ORDER[k].map((item,i)=>
+      `<span class="nwe-chip" draggable="true" tabindex="0" data-nwe-key="${k}" data-nwe-index="${i}" title="Drag to reorder. Keyboard: Alt + Left / Right." ondragstart="startNWEDrag(event,'${k}',${i})" ondragend="endNWEDrag()" ondragover="overNWEDrag(event,'${k}')" ondragleave="this.classList.remove('drop-before','drop-after')" ondrop="dropNWE(event,'${k}',${i})" onkeydown="keyNWE(event,'${k}',${i})"><span aria-hidden="true">⠿</span><span>${esc(item.code||item.text)}</span><button type="button" class="btn sm" draggable="false" aria-label="Remove ${names[k]} item ${i+1}" onclick="removeNWE('${k}',${i})">✕</button></span>`).join('<span aria-hidden="true">→</span>')+'</div>');
+  $('#free-list').innerHTML=(parts.length?'<div>Drag items to change their order, or focus an item and use Alt + ← / →.</div>':'')+parts.join('');
 }
 
 // ---------- collect + build ----------
@@ -1020,7 +1104,7 @@ function loadJobObject(j){
   // reset and re-apply N/W/E checkboxes
   document.querySelectorAll('.checklist input:checked').forEach(cb=>cb.checked=false);
   buildChecklists();
-  JOB.free={N:[],W:[],E:[]};
+  NWE_ORDER={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
   schedulePreview();
@@ -1049,12 +1133,16 @@ function descOf(code,sheet){
 function applyNWE(key,arr){
   const map={N:'cl-N',W:'cl-W',E:'cl-E'};
   (arr||[]).forEach(v=>{
-    if(v && typeof v==='object' && v.code!==undefined){
-      const cb=[...$('#'+map[key]).querySelectorAll('input')].find(i=>i.value===String(v.code));
-      if(cb && cb.dataset.description===v.text){cb.checked=true;return;}
+    if(v===null||v===undefined)return;
+    const code=typeof v==='object'?v.code:String(v);
+    const cb=[...$('#'+map[key]).querySelectorAll('input')].find(i=>i.value===String(code));
+    if(cb && (typeof v!=='object'||v.text===undefined||cb.dataset.description===v.text)){
+      cb.checked=true;
+      NWE_ORDER[key].push({code:cb.value,text:cb.dataset.description});
+    }else{
+      // Preserve saved/imported wording and its position, even for retired codes.
+      NWE_ORDER[key].push({text:String(typeof v==='object'?(v.text??v.code??''):v)});
     }
-    if(typeof v==='object'){JOB.free[key].push(v.text);return;}
-    const cb=$('#'+map[key]).querySelector(`input[value="${v}"]`); if(cb)cb.checked=true;
   });
 }
 
