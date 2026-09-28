@@ -92,7 +92,11 @@
   .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border);background:var(--surface-2)}
   .ord{display:flex;align-items:center;gap:2px}
   .ord .btn.sm{padding:2px 8px;line-height:1}
-  .ord .btn.sm:disabled{opacity:.35;cursor:default}
+  .drag-handle{cursor:grab;flex:none;touch-action:none;font-size:18px!important}
+  .drag-handle:active{cursor:grabbing}
+  .reorder-before{box-shadow:0 -3px 0 var(--accent)!important}
+  .reorder-after{box-shadow:0 3px 0 var(--accent)!important}
+  .reorder-source{opacity:.5}
   .ghead input[type=text]{width:auto}
   .gate .ghead>input{font-weight:600}
   .lines{list-style:none;margin:0;padding:8px 10px}
@@ -623,9 +627,8 @@ function renderLineList(id, lines, ul, withLineAmount){
         && l.qty!=null && l.qty!=='' && Number(l.qty)!==0);
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
-    const mv=`<span class="ord ln">`+
-      `<button class="btn sm" ${i===0?'disabled':''} title="move up" onclick="moveLine('${id}',${i},-1)">↑</button>`+
-      `<button class="btn sm" ${i===lines.length-1?'disabled':''} title="move down" onclick="moveLine('${id}',${i},1)">↓</button></span>`;
+    bindReorder(li,'lines:'+id,i);
+    const mv=dragHandle('lines:'+id,i,'line item');
     const noteType=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':null;
     if(noteType){
       const typeSelect=`<select aria-label="Note type" title="Change note type without retyping" style="width:125px;flex:none" onchange="changeNoteType('${id}',${i},this.value)">`+
@@ -720,12 +723,9 @@ function renderGates(){
   const box=$('#gates'); box.innerHTML='';
   JOB.gates.forEach((g,gi)=>{
     const el=document.createElement('div'); el.className='gate';
+    bindReorder(el,'gates',gi);
     el.innerHTML=`<div class="ghead">
-        <span class="ord" title="reorder this location">
-          <button class="btn sm" ${gi===0?'disabled':''} title="move up" onclick="moveGate('${g.id}',-1)">↑</button>
-          <button class="btn sm" ${gi===JOB.gates.length-1?'disabled':''} title="move down" onclick="moveGate('${g.id}',1)">↓</button>
-          <b style="margin:0 6px">${gi+1}.</b>
-        </span>
+        <span class="ord">${dragHandle('gates',gi,'location')}<b style="margin:0 6px">${gi+1}.</b></span>
         <input type="text" value="${escAttr(g.title||'')}" style="flex:1;font-weight:600"
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
@@ -739,6 +739,67 @@ function renderGates(){
 function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
   let i=0; return t.replace(/_+/g, m => (i<fills.length && fills[i]!=='')?fills[i++]:(i++,m));
+}
+let rowDrag=null;
+function reorderList(group){
+  if(group==='gates')return JOB.gates;
+  if(group==='options')return JOB.options;
+  if(group.startsWith('lines:'))return findLines(group.slice(6))?.lines;
+}
+function reorderAt(group,from,slot){
+  const items=reorderList(group);
+  if(!items||!Number.isInteger(from)||!Number.isInteger(slot)||from<0||from>=items.length||slot<0||slot>items.length)return;
+  const to=slot>from?slot-1:slot;
+  if(to===from)return;
+  const [item]=items.splice(from,1);items.splice(to,0,item);
+  redraw();
+}
+function dragHandle(group,index,label){
+  return `<button type="button" class="btn sm drag-handle" draggable="true" aria-label="Reorder ${label} ${index+1}" title="Drag to reorder. Keyboard: Alt + Up / Down." ondragstart="startRowDrag(event,'${group}',${index})" ondragend="endRowDrag()" onkeydown="keyRowDrag(event,'${group}',${index})">⠿</button>`;
+}
+function startRowDrag(event,group,index){
+  event.stopPropagation();
+  rowDrag={group,index};
+  event.dataTransfer.effectAllowed='move';
+  event.dataTransfer.setData('text/plain',group+':'+index);
+  const row=event.currentTarget.closest('[data-reorder-group]');
+  row.classList.add('reorder-source');
+  event.dataTransfer.setDragImage(row,20,15);
+}
+function clearRowMarkers(){
+  document.querySelectorAll('.reorder-before,.reorder-after').forEach(el=>el.classList.remove('reorder-before','reorder-after'));
+}
+function endRowDrag(){
+  rowDrag=null;clearRowMarkers();
+  document.querySelectorAll('.reorder-source').forEach(el=>el.classList.remove('reorder-source'));
+}
+function bindReorder(el,group,index){
+  el.dataset.reorderGroup=group;el.dataset.reorderIndex=index;
+  el.ondragover=event=>{
+    if(!rowDrag||rowDrag.group!==group)return;
+    event.preventDefault();event.stopPropagation();event.dataTransfer.dropEffect='move';
+    clearRowMarkers();
+    const rect=el.getBoundingClientRect();
+    el.classList.add(event.clientY<rect.top+rect.height/2?'reorder-before':'reorder-after');
+  };
+  el.ondragleave=event=>{
+    if(!el.contains(event.relatedTarget))el.classList.remove('reorder-before','reorder-after');
+  };
+  el.ondrop=event=>{
+    if(!rowDrag||rowDrag.group!==group)return;
+    event.preventDefault();event.stopPropagation();
+    const rect=el.getBoundingClientRect(),slot=index+(event.clientY<rect.top+rect.height/2?0:1);
+    const from=rowDrag.index;endRowDrag();reorderAt(group,from,slot);
+  };
+}
+function keyRowDrag(event,group,index){
+  if(!event.altKey||!['ArrowUp','ArrowDown'].includes(event.key))return;
+  event.preventDefault();event.stopPropagation();
+  const to=index+(event.key==='ArrowUp'?-1:1),items=reorderList(group);
+  if(to<0||to>=items.length)return;
+  reorderAt(group,index,to>index?to+1:to);
+  const row=[...document.querySelectorAll('[data-reorder-group]')].find(el=>el.dataset.reorderGroup===group&&Number(el.dataset.reorderIndex)===to);
+  row?.querySelector('.drag-handle').focus();
 }
 function moveGate(id,dir){
   const i=JOB.gates.findIndex(g=>g.id===id), j=i+dir;
@@ -810,10 +871,8 @@ function renderOptions(){
   const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
   JOB.options.forEach((o,i)=>{
     const el=document.createElement('div');el.className='opt';
-    const ord=`<span class="ord" title="reorder this option">`+
-      `<button class="btn sm" ${i===0?'disabled':''} title="move up" onclick="moveOption(${i},-1)">↑</button>`+
-      `<button class="btn sm" ${i===JOB.options.length-1?'disabled':''} title="move down" onclick="moveOption(${i},1)">↓</button>`+
-      `<b style="margin:0 6px">${i+1}.</b></span>`;
+    bindReorder(el,'options',i);
+    const ord=`<span class="ord">${dragHandle('options',i,'option')}<b style="margin:0 6px">${i+1}.</b></span>`;
     if(o.lines && o.kind!=='block'){
       // detailed option: title + coded/free-text scope lines + amount
       el.innerHTML=`<div class="ghead" style="background:var(--accent-soft)">
