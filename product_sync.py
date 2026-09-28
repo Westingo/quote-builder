@@ -78,11 +78,11 @@ def _save(data, synced_at):
             os.unlink(filename)
 
 
-def get_products(force=False):
+def get_products(force=False, local_only=False):
     global _data, _last_attempt, _synced_at, _error
     with _lock:
         _load_local()
-        if force or _last_attempt is None or time.monotonic() - _last_attempt >= INTERVAL:
+        if not local_only and (force or _last_attempt is None or time.monotonic() - _last_attempt >= INTERVAL):
             try:
                 data = read_workbook(io.BytesIO(_download()), strict=True)
                 synced_at = datetime.now(timezone.utc).isoformat()
@@ -94,6 +94,6 @@ def get_products(force=False):
                 _last_attempt = time.monotonic()
         version = hashlib.sha256(json.dumps(_data, sort_keys=True,
                                             ensure_ascii=False).encode('utf-8')).hexdigest()
-        return _data, {'state': 'cached' if _error else 'live',
+        return _data, {'state': 'local' if local_only else ('cached' if _error else 'live'),
                        'last_synced': _synced_at, 'error': _error,
                        'sheet_url': SHEET_URL, 'version': version}

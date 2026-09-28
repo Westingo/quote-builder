@@ -1,0 +1,27 @@
+main{max-width:1800px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(400px,.9fr);gap:24px;align-items:start}
+#quote-editor{min-width:0}
+#quote-editor .grid2{display:flex;flex-direction:column;gap:0}
+#quote-editor .grid2>div,#quote-editor aside{width:100%;min-width:0}
+#quote-editor aside{position:static;order:-1}
+#quote-editor .results{max-height:180px}
+#preview-home{position:sticky;top:74px;min-width:0}
+#preview-panel{display:flex;flex-direction:column;height:calc(100dvh - 160px);min-height:300px;background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden}
+.preview-toolbar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.preview-toolbar h2{font:normal 20px Georgia,serif;margin:0;flex:1}
+.preview-hint{font-size:12px;color:var(--muted);margin:10px 16px 4px}
+.preview-feedback{font-size:12px;color:var(--muted);padding:0 16px 10px;min-height:28px}
+#preview-retry{margin-left:10px}
+#preview-scroll{flex:1;min-height:0;overflow:auto;background:var(--inset);padding:18px;overscroll-behavior:contain}
+#preview-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+#preview-paper{max-width:1000px;margin:auto}
+.word-page{margin:0 0 24px}
+.word-page img{display:block;width:100%;height:auto;background:white;box-shadow:0 3px 16px #0003}
+.word-page figcaption{color:var(--muted);font:12px var(--sans);margin-bottom:8px;text-align:center}
+.pv-stale{opacity:.5}
+#preview-dialog{width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--text)}
+#preview-dialog::backdrop{background:#0009}
+#preview-dialog #preview-panel{height:100%;border:0;border-radius:0}
+#preview-dialog #preview-scroll{padding:24px}
+@media(max-width:1050px){.workspace{grid-template-columns:minmax(0,1fr) minmax(340px,.85fr);gap:14px}}
+@media(max-width:760px){.workspace{grid-template-columns:minmax(0,1fr)}#preview-home{position:static;grid-row:1}#preview-panel{height:430px}.preview-toolbar{padding:10px}#preview-dialog #preview-scroll{padding:8px}}

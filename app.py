@@ -18,10 +18,12 @@ import contextlib
 import yaml
 from fastapi import FastAPI, Body, UploadFile, File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 import build as builder
 import scan_import
 import product_sync
+import word_preview
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -31,6 +33,20 @@ CODES = os.path.join(HERE, "codes.yaml")
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 app = FastAPI(title="Metro Quote Builder")
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+
+@app.post("/api/preview")
+def api_preview(job: dict = Body(...)):
+    """Render a temporary copy of the actual DOCX through Microsoft Word."""
+    try:
+        data, index = builder.load_codes()
+        doc = builder.build_doc(job, data, index)
+        return word_preview.render(doc)
+    except (KeyError, TypeError, ValueError) as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=503)
 
 
 def slugify(name):
@@ -39,13 +55,14 @@ def slugify(name):
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return open(os.path.join(STATIC, "index.html"), encoding="utf-8").read()
+    return HTMLResponse(open(os.path.join(STATIC, "index.html"), encoding="utf-8").read(),
+                        headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/codes")
-def api_codes(refresh: bool = False):
+def api_codes(refresh: bool = False, local: bool = False):
     """The dictionary, grouped sheet -> category -> items, for the picker UI."""
-    data, sync = product_sync.get_products(force=refresh)
+    data, sync = product_sync.get_products(force=refresh, local_only=local)
     sheets = []
     for sheet, items in data.items():
         cats = {}

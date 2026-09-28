@@ -191,6 +191,7 @@
 </style>
 <script>/* Apply the personal theme before paint; keep its preference separate. */
 (function(){var t='moonlit';try{var saved=localStorage.getItem('quote-builder-theme');if(['moonlit','dark','light'].includes(saved))t=saved;}catch(e){}document.documentElement.setAttribute('data-theme',t);})();</script>
+<link rel="stylesheet" href="/static/preview.css">
 </head>
 <body>
 <header><div class="tb">
@@ -210,7 +211,8 @@
   </svg>
   <div><h1>The moonlit workshop</h1><p>A quiet place to bring your next proposal to life.</p><p class="intro-note">A little ritual. A little magic. A familiar keeping watch.</p></div>
 </section>
-<div class="grid2">
+<div class="workspace">
+<div id="quote-editor"><div class="grid2">
   <div>
     <!-- IMPORT FROM SCAN -->
     <section class="sheet"><h2>Start from a Scan <span class="muted" style="font-weight:400;letter-spacing:0;text-transform:none">optional</span></h2>
@@ -304,7 +306,23 @@
     <div class="muted" style="margin-top:6px">Click a result to add it (qty 1). Edit qty on the line. Lines with <span class="blank" style="color:var(--bad)">␣</span> have fill-in blanks.</div>
   </div></section></aside>
 </div>
+</div>
+<div id="preview-home">
+<section id="preview-panel" aria-labelledby="preview-title">
+  <div class="preview-toolbar"><h2 id="preview-title">Live preview</h2>
+    <button type="button" class="btn sm" id="preview-expand" onclick="openPreview()">Full screen</button>
+    <button type="button" class="btn sm" id="preview-close" onclick="closePreview()" hidden>Close preview (Esc)</button>
+  </div>
+  <p class="preview-hint">Actual Word pages, including page breaks. Updates shortly after you stop typing.</p>
+  <div class="preview-feedback"><span id="preview-status" role="status">Loading preview…</span>
+    <button class="btn sm" id="preview-retry" onclick="schedulePreview()" hidden>Retry</button>
+  </div>
+  <div id="preview-scroll" tabindex="0" aria-label="Scrollable quote preview"><article id="preview-paper" aria-label="Proposal content"></article></div>
+</section>
+</div>
+</div>
 </main>
+<dialog id="preview-dialog" aria-labelledby="preview-title"></dialog>
 
 <div class="buildbar">
   <button class="btn" onclick="newQuote()">Start new quote</button>
@@ -342,10 +360,24 @@ let JOB = {gate_summary:[], gates:[], options:[], notes:[], warranties:[], exclu
 let gateSeq = 0;
 
 // ---------- load dictionary ----------
-async function init(){
-  CODES = await (await fetch('/api/codes')).json();
+let initialization=null;
+function init(){
+  if(!initialization)initialization=initializeEditor().catch(error=>{
+    initialization=null; CODES=null;
+    $('#product-status').textContent='Products could not load. Click Refresh products to retry.';
+    throw error;
+  });
+  return initialization;
+}
+async function initializeEditor(){
+  const response=await fetch('/api/codes?local=true',{cache:'no-store'});
+  if(!response.ok)throw new Error('Products could not load. Click Refresh products and try again.');
+  const products=await response.json();
+  if(!Array.isArray(products.sheets))throw new Error('Invalid product list. Restart the app and retry.');
+  CODES=products;
   // sheet filter = scope sheets
   const sf = $('#sheetfilter');
+  sf.innerHTML='<option value="scope">All scope sheets</option>';
   CODES.sheets.filter(s=>s.section==='scope').forEach(s=>{
     const o=document.createElement('option'); o.value=s.sheet; o.textContent=s.sheet; sf.appendChild(o);
   });
@@ -355,7 +387,7 @@ async function init(){
   buildChecklists();
   showProductStatus(CODES.sync);
   setInterval(()=>refreshProducts(), 60000);
-  addGate();           // start with one gate
+  if(!JOB.gates.length)addGate();           // start with one gate
   refreshJobs();
   // free-text N/W/E enter handlers
   for(const k of ['N','W','E']){
@@ -365,18 +397,21 @@ async function init(){
       }
     });
   }
+  refreshProducts();
 }
 
 let productsRefreshing=false;
 function showProductStatus(sync){
   const el=$('#product-status');
   const when=sync.last_synced?new Date(sync.last_synced).toLocaleString():'';
+  if(sync.state==='local'){el.textContent='Local products ready · checking for updates…';return;}
   el.textContent=sync.state==='live'
     ? 'Google Sheet synced · '+when
     : 'Could not sync · '+(when?'using saved products from '+when:'using bundled products');
   el.title=sync.error||'Checks for changes every minute while the app is open.';
 }
 async function refreshProducts(force=false){
+  if(!CODES){try{await init();schedulePreview();}catch(e){$('#status').textContent=e.message;}return;}
   if(productsRefreshing)return;
   productsRefreshing=true;
   $('#refresh-products').disabled=true;
@@ -584,24 +619,24 @@ function renderLineList(id, lines, ul, withLineAmount){
     if(ln.amount_note!==undefined){
       li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center">$ note</span>
         <input type="text" value="${escAttr(ln.amount_note)}" placeholder="label e.g. Not-To-Exceed Total:"
-          style="flex:1" onchange="setNoteLabel('${id}',${i},this.value)">
+          style="flex:1" oninput="setNoteLabel('${id}',${i},this.value)">
         <input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / %"
           title="amount shown in the AMOUNT column" style="width:96px;flex:none"
-          onchange="setNoteAmount('${id}',${i},this.value)">
+          oninput="setNoteAmount('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     if(ln.sub){
       li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:34px">↳ —</span>
         <input type="text" value="${escAttr(ln.text||'')}" title="sub-note under the item above"
-          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     if(ln.atqty){
       li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center;margin-left:14px" title="lines up with the qty/number column">note</span>
         <input type="text" value="${escAttr(ln.text||'')}" title="note aligned with the qty column"
-          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
         <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
@@ -609,38 +644,38 @@ function renderLineList(id, lines, ul, withLineAmount){
       const amtL=withLineAmount
         ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
              title="price or note shown in the AMOUNT column" style="width:96px;flex:none"
-             onchange="setLineAmount('${id}',${i},this.value)">` : '';
+             oninput="setLineAmount('${id}',${i},this.value)">` : '';
       li.innerHTML=`${mv}<span class="pill" style="flex:none;align-self:center" title="note starting at the far-left, level with the Install label">⇤ note</span>
         <input type="text" value="${escAttr(ln.text||'')}" title="left-aligned note, full width, level with “Install:”"
-          style="flex:1" onchange="setSubText('${id}',${i},this.value)">
+          style="flex:1" oninput="setSubText('${id}',${i},this.value)">
         ${amtL}<button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
     const labelSel=`<select class="lblsel" title="row label" style="width:94px;flex:none"
-        onchange="setLabel('${id}',${i},this.value)">`+
+        oninput="setLabel('${id}',${i},this.value)">`+
       ['','Install','Supply','Automate','Other'].map(o=>
         `<option value="${o}"${o===effLabel?' selected':''}>${o||'—'}</option>`).join('')+
       `</select>`;
     const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
-                   onchange="setQty('${id}',${i},this.value)">`;
+                   oninput="setQty('${id}',${i},this.value)">`;
     let body;
     if(ln.code!==undefined){
       const shown=(ln.text!==undefined && ln.text!=='')?ln.text:applyFills(ln);
       body=`<span class="code">${ln.code}</span>`+
            `<input type="text" class="itemtext" value="${escAttr(shown)}"
               title="edit this item's wording — the code stays as a reference; what you type is what prints"
-              onchange="setItemText('${id}',${i},this.value)">`+
+              oninput="setItemText('${id}',${i},this.value)">`+
            ((ln._blanks && !(ln.text!==undefined && ln.text!==''))?`<input type="text" class="fills" placeholder="fill blanks: a | b"
-               value="${escAttr((ln.fills||[]).join(' | '))}" onchange="setFills('${id}',${i},this.value)">`:'');
+               value="${escAttr((ln.fills||[]).join(' | '))}" oninput="setFills('${id}',${i},this.value,this)">`:'');
     } else {
       body=`<input type="text" class="itemtext" value="${escAttr(ln.text||'')}"
-              placeholder="item text" onchange="setItemText('${id}',${i},this.value)">`;
+              placeholder="item text" oninput="setItemText('${id}',${i},this.value)">`;
     }
     const amt=withLineAmount
       ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
            title="price or note shown in the AMOUNT column for this item"
-           style="width:96px;flex:none" onchange="setLineAmount('${id}',${i},this.value)">`
+           style="width:96px;flex:none" oninput="setLineAmount('${id}',${i},this.value)">`
       : '';
     li.innerHTML=`${mv}${labelSel}${marker}<div class="txt">${body}</div>${amt}
       <button class="btn sm" title="add a sub-note under this item" onclick="addSubBelow('${id}',${i})">+sub</button>
@@ -696,7 +731,12 @@ function moveLine(id,i,dir){
 function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;
   const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g)||'(untitled location)';}
 function setQty(id,i,v){findLines(id).lines[i].qty=v===''?null:Number(v);}
-function setFills(id,i,v){findLines(id).lines[i].fills=v.split('|').map(s=>s.trim());redraw();}
+function setFills(id,i,v,input){
+  const ln=findLines(id).lines[i];ln.fills=v.split('|').map(s=>s.trim());
+  // Update the displayed wording without replacing the focused fills field.
+  if(input)input.closest('.txt').querySelector('.itemtext').value=applyFills(ln);
+  else redraw();
+}
 function rmLine(id,i){findLines(id).lines.splice(i,1);redraw();}
 
 // ---------- install summary ----------
@@ -983,19 +1023,21 @@ function loadJobObject(j){
   JOB.free={N:[],W:[],E:[]};
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
+  schedulePreview();
 }
 async function importScan(input){
   const f=input.files&&input.files[0]; if(!f)return;
   $('#status').innerHTML='<span class="muted">Reading scan with AI… (a few seconds)</span>';
   $('#log').hidden=true;
   try{
+    await init();  // Do not send a paid scan until the editor can display it.
     const fd=new FormData(); fd.append('file', f);
     const r=await fetch('/api/import',{method:'POST',body:fd});
     const d=await r.json();
     if(d.ok){ loadJobObject(d.job);
       $('#status').innerHTML='<span class="ok">Imported a draft — review &amp; fix every line, then Build.</span>'; }
     else { $('#log').hidden=false; $('#log').textContent=d.log||'Import failed';
-      $('#status').innerHTML='<span class="err">Import failed</span>'; }
+      $('#status').textContent=d.log||'Import failed. Please retry.'; }
   }catch(e){ $('#status').innerHTML='<span class="err">Import failed: '+esc(''+e)+'</span>'; }
   input.value='';
 }
@@ -1019,7 +1061,7 @@ function applyNWE(key,arr){
 // ---------- util ----------
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
-init();
 </script>
+<script src="/static/preview.js"></script>
 </body>
 </html>

@@ -6,3 +6,5 @@ python-multipart
 openpyxl
 pywebview
 anthropic
+pywin32; sys_platform == "win32"
+pymupdf

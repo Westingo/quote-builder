@@ -59,6 +59,17 @@ In the window:
 Quotes get revised, so the output is an **editable Word doc**, not a flat PDF.
 *Load saved…* re-opens a prior job to revise it.
 
+The **Live preview** on the right shows the actual proposal pages rendered by
+**Microsoft Word**, including the logo, borders, headers, footers, spacing,
+and page breaks. Desktop Microsoft Word must be installed and activated on
+that machine. After updating, run **run.bat** once to install preview components.
+
+The preview updates a few seconds after you pause editing. While it renders,
+the previous pages are dimmed and marked as pending. Click **Full screen** to
+expand the pages; **Close preview** or **Esc** returns to editing. Preview
+copies are temporary and do not save or overwrite customer jobs. Pages show
+Word's printed appearance (white paper), regardless of Word's dark display mode.
+
 ---
 
 ## Import from a scan (AI)

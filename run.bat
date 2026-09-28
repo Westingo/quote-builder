@@ -53,7 +53,11 @@ set "VENV_PY=.venv\Scripts\python.exe"
 set "VENV_PYW=.venv\Scripts\pythonw.exe"
 
 rem --- install dependencies on first run -----------------------------
-if not exist ".venv\.deps-installed" (
+set "INSTALL_DEPS="
+if not exist ".venv\.deps-installed" set "INSTALL_DEPS=1"
+"%VENV_PY%" -c "import win32com.client, pymupdf" >nul 2>&1
+if errorlevel 1 set "INSTALL_DEPS=1"
+if defined INSTALL_DEPS (
   echo Installing components - this only happens once, about a minute...
   "%VENV_PY%" -m pip install --upgrade pip -q
   "%VENV_PY%" -m pip install -r requirements.txt -q
