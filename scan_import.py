@@ -103,7 +103,22 @@ DICTIONARY (code | sheet | description):
 
 def _extract_json(text):
     m = re.search(r"\{.*\}", text.strip(), re.S)
-    return json.loads(m.group(0) if m else text)
+    parsed = json.loads(m.group(0) if m else text)
+    if not isinstance(parsed, dict):
+        raise ValueError("Expected a quote object")
+    if not isinstance(parsed.get("proposal") or {}, dict):
+        raise ValueError("Expected proposal fields")
+    for field in ("gates", "gate_summary", "notes", "warranties", "exclusions"):
+        if parsed.get(field) is not None and not isinstance(parsed[field], list):
+            raise ValueError("Expected a list for " + field)
+    for gate in parsed.get("gates") or []:
+        if not isinstance(gate, dict) or not isinstance(gate.get("lines") or [], list):
+            raise ValueError("Expected a location with line items")
+        if any(not isinstance(line, dict) for line in gate.get("lines") or []):
+            raise ValueError("Expected line item objects")
+    if not any(field in parsed for field in ("proposal", "gates")):
+        raise ValueError("Response did not contain a quote")
+    return parsed
 
 
 def _nwe_items(values, index, section):
@@ -205,21 +220,43 @@ def import_scan(file_bytes, content_type, filename=""):
         thinking={"type": "adaptive"},
         messages=[{"role": "user", "content": [media, {"type": "text", "text": prompt}]}],
     )
-    if MODEL != "claude-opus-4-8":
-        msg = client.beta.messages.create(
-            betas=["server-side-fallback-2026-06-01"],
-            fallbacks=[{"model": "claude-opus-4-8"}],
-            **kwargs,
-        )
-    else:
-        msg = client.messages.create(**kwargs)
+    try:
+        for attempt in range(2):
+            if MODEL != "claude-opus-4-8":
+                msg = client.beta.messages.create(
+                    betas=["server-side-fallback-2026-06-01"],
+                    fallbacks=[{"model": "claude-opus-4-8"}],
+                    **kwargs,
+                )
+            else:
+                msg = client.messages.create(**kwargs)
 
-    if msg.stop_reason == "refusal":
-        raise RuntimeError(
-            "Claude declined to read this document (a safety refusal). This is "
-            "usually a false positive on access-control content — try a cleaner "
-            "scan, or enter the codes by hand.")
+            if msg.stop_reason == "refusal":
+                raise RuntimeError(
+                    "Claude declined to read this document. Try a clearer scan, "
+                    "or enter the codes by hand.")
 
-    text = "".join(b.text for b in msg.content if b.type == "text")
-    parsed = _extract_json(text)
-    return _to_job(parsed, index), text
+            text = "".join(b.text for b in msg.content if b.type == "text")
+            try:
+                # Even syntactically valid partial output must not become a quote.
+                if msg.stop_reason == "max_tokens":
+                    raise ValueError("Scan response was cut off")
+                parsed = _extract_json(text)
+                return _to_job(parsed, index), text
+            except (ValueError, TypeError, AttributeError) as exc:
+                if attempt:
+                    raise RuntimeError(
+                        "The scan reader returned incomplete or incorrectly formatted data "
+                        "after an automatic retry. Your current quote has not been changed. "
+                        "Try scanning fewer pages at a time, or upload a clearer image/PDF."
+                    ) from exc
+                kwargs["max_tokens"] = 16000
+                kwargs["messages"] = [{"role": "user", "content": [media, {
+                    "type": "text", "text": prompt + "\nThe previous extraction could not be "
+                    "parsed. Read the original document again and return one complete, valid "
+                    "JSON object. Escape quotation marks inside descriptions (including inch "
+                    "marks) as \\\". Check commas between fields and items. Preserve all items "
+                    "and their original order. No commentary or markdown."
+                }]}]
+    finally:
+        client.close()

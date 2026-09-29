@@ -21,6 +21,20 @@ fills the TOTAL and option amounts.
 
 No server, no PM2. It runs locally on `127.0.0.1:8485` inside the app window.
 
+### Updates on other machines
+
+`run.bat` checks GitHub for updates before opening the app. The desktop shortcut
+created by `Create Desktop Shortcut.bat` runs this launcher minimized as well.
+For an existing installation, run `git pull` once, then double-click
+`Create Desktop Shortcut.bat` to replace the old shortcut that bypassed updates.
+
+Each machine needs Git installed and a Git clone of this repository (a downloaded
+ZIP cannot update through Git). GitHub access must already work on that machine.
+Save your work and close the app before relaunching to load an update. Running
+apps do not restart themselves when changes are pushed. If the update fails,
+the launcher uses the installed version. Updates use `git pull --ff-only` and
+do not reset local changes. Personal quotes and the local API key stay local.
+
 ---
 
 ## Use it
