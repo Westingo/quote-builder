@@ -19,7 +19,7 @@ with everything already resolved to display text:
 
 The top info box and the footer (signature / address / fine print) live in the
 Word page header & footer so they repeat on every page automatically. The
-"WE PROPOSE ... | AMOUNT" band repeats via tblHeader. Body content flows
+"WE PROPOSE ... | AMOUNT" band appears only at the start of page one. Body content flows
 between, with page breaks at section boundaries.
 """
 import os
@@ -30,6 +30,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.enum.section import WD_SECTION
 
 import docx_utils as U
+import quote_format
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LOGO = os.path.join(HERE, "assets", "metro-logo.png")
@@ -272,7 +273,7 @@ def _build_footer(section, h, total=None):
 # body content
 # ----------------------------------------------------------------------------
 def _band(body):
-    """The 'WE PROPOSE TO FURNISH THE FOLLOWING | AMOUNT' header band."""
+    """Opening band, rendered once in the body, never as a repeating header."""
     t = body.add_table(rows=1, cols=2)
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
     U.clear_table_borders(t)
@@ -288,7 +289,7 @@ def _band(body):
     rp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     U.no_space(rp, before=1, after=1)
     _run(rp, "AMOUNT", bold=True, size=10, smallcaps=True)
-    U.repeat_row_as_header(t.rows[0])
+    # This band belongs only on page one; continuation pages start with scope.
     return t
 
 
@@ -389,6 +390,9 @@ def _gate_block(body, gate):
     are chained keep-with-next so the whole gate holds together on one page
     (one-gate-per-page when it won't fit the remaining space, like the sample).
     """
+    fmt = quote_format.validate(gate.get("format", {}))
+    if fmt.get("page_break"):
+        _page_break(body)
     lines = gate.get("lines", [])
     t = body.add_table(rows=1 + len(lines), cols=2)
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -439,6 +443,7 @@ def _gate_block(body, gate):
             _format_scope_para(lp, ln.get("qty"), ln["text"],
                                label=label, reserve_amount=False)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
+        _format_row(t.rows[i], ln, fmt)
         keepers.append(lp)
 
     # Keep only the title glued to its first line (so a heading never strands at
@@ -447,7 +452,67 @@ def _gate_block(body, gate):
     # the next page and leaving the first one empty.
     if len(keepers) > 1:
         keepers[0].paragraph_format.keep_with_next = True
+    _format_section(t, fmt)
     return t
+
+
+def _format_section(table, fmt):
+    heading = table.cell(0, 0).paragraphs[0]
+    if "space_before" in fmt:
+        heading.paragraph_format.space_before = Pt(fmt["space_before"])
+    if fmt.get("keep_together"):
+        for row in table.rows[:-1]:
+            for cell in row.cells:
+                for p in cell.paragraphs:
+                    p.paragraph_format.keep_with_next = True
+
+
+def _format_row(row, line, section):
+    # Section typography supplies defaults; per-line choices take precedence.
+    fmt = {k: v for k, v in section.items()
+           if k in ("font_size", "space_after", "line_spacing")}
+    fmt.update(quote_format.validate(line.get("format", {})))
+    p = row.cells[0].paragraphs[0]
+    pf = p.paragraph_format
+    start = fmt.get("start", "auto")
+    if start != "auto":
+        # Explicit text-only layout intentionally hides the label/quantity marker.
+        p.clear()
+        _run(p, line.get("amount_note", line.get("text", "")), size=10)
+        pos = {"left": 0, "quantity": QTY_TAB, "description": DESC_TAB}[start]
+        pf.left_indent = pos
+        pf.first_line_indent = 0
+    if fmt.get("wrap") in ("start", "description"):
+        first = (pf.left_indent or 0) + (pf.first_line_indent or 0)
+        if start == "auto":
+            first = (0 if line.get("leftnote") or "amount_note" in line else
+                     Inches(1.5) if line.get("sub") else QTY_TAB if line.get("atqty") else DESC_TAB)
+        target = DESC_TAB if fmt["wrap"] == "description" else first
+        origin = (pf.left_indent or 0) + (pf.first_line_indent or 0)
+        pf.left_indent = target
+        pf.first_line_indent = origin - target
+    if "align" in fmt:
+        p.alignment = {"left": WD_ALIGN_PARAGRAPH.LEFT, "center": WD_ALIGN_PARAGRAPH.CENTER,
+                       "right": WD_ALIGN_PARAGRAPH.RIGHT}[fmt["align"]]
+    for cell in row.cells:
+        for para in cell.paragraphs:
+            for key in ("space_before", "space_after"):
+                if key in fmt:
+                    setattr(para.paragraph_format, key, Pt(fmt[key]))
+            if "line_spacing" in fmt:
+                para.paragraph_format.line_spacing = fmt["line_spacing"]
+            if "keep_next" in fmt:
+                para.paragraph_format.keep_with_next = fmt["keep_next"]
+            for run in para.runs:
+                if "font_size" in fmt:
+                    run.font.size = Pt(fmt["font_size"])
+    for run in p.runs:
+        if "bold" in fmt:
+            run.bold = fmt["bold"]
+        if "underline" in fmt:
+            run.underline = fmt["underline"]
+    row.cells[1].vertical_alignment = {"top": WD_ALIGN_VERTICAL.TOP,
+        "center": WD_ALIGN_VERTICAL.CENTER, "bottom": WD_ALIGN_VERTICAL.BOTTOM}[fmt.get("amount_align", "bottom")]
 
 
 def _page_break(body):
@@ -457,6 +522,7 @@ def _page_break(body):
 
 
 def render_body(body, doc):
+    # Keep the opening band outside the repeating page header and scope tables.
     _band(body)
 
     # tariff notes (italic, * bullet)
@@ -503,6 +569,9 @@ def _detail_option(body, opt):
     block-level amount (the circled option total) render together on a final row
     at the bottom, under the items — the note bold and right-aligned in the
     description column, the amount beside it in the AMOUNT column, aligned."""
+    fmt = quote_format.validate(opt.get("format", {}))
+    if fmt.get("page_break"):
+        _page_break(body)
     lines = opt.get("lines", [])
     note = opt.get("note")
     block_amt = opt.get("amount")
@@ -558,6 +627,10 @@ def _detail_option(body, opt):
                     r.bold = True
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
         keepers.append(lp)
+
+    for i, ln in enumerate(lines, start=1):
+        _format_row(t.rows[i], ln, fmt)
+    _format_section(t, fmt)
 
     # footer row: price note + block amount, under the items and aligned. The
     # note is bold, right-aligned against the AMOUNT divider; the amount cell is

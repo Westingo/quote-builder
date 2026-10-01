@@ -6,6 +6,8 @@ venv/
 
 # Generated proposals (job inputs are tracked; built .docx are not)
 jobs/*/*.docx
+jobs/*/*.pdf
+jobs/*/*.metroquote
 jobs/*/~$*.docx
 jobs/*/_preview.pdf
 

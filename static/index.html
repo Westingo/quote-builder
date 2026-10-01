@@ -100,7 +100,7 @@
   .ghead input[type=text]{width:auto}
   .gate .ghead>input{font-weight:600}
   .lines{list-style:none;margin:0;padding:8px 10px}
-  .lines li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
+  .lines li{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
   .lines li:last-child{border-bottom:none}
   .lines li .qty{width:54px;flex:none}
   .lines li .txt{flex:1;font-size:13px;line-height:1.4;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -227,6 +227,15 @@
 <div class="workspace">
 <div id="quote-editor"><div class="grid2">
   <div>
+    <section class="sheet"><h2>Move a quote between computers</h2><div class="pad">
+      <p class="muted">Use Build PDF to create one PDF with the editable quote attached. Send that PDF, then import it on another computer to keep editing. Every build also saves a dated backup automatically.</p>
+      <button class="btn" onclick="build(true)">Build PDF</button>
+      <button class="btn" onclick="exportQuote()">Export quote</button>
+      <button class="btn" onclick="$('#quote-file').click()">Import PDF / quote…</button>
+      <button class="btn" onclick="showBackups()">Backup folder</button>
+      <input id="quote-file" type="file" accept=".metroquote,.pdf,application/pdf" hidden onchange="importQuote(this)">
+      <p class="muted" id="backup-status" role="status"></p>
+    </div></section>
     <!-- IMPORT FROM SCAN -->
     <section class="sheet"><h2>Start from a Scan <span class="muted" style="font-weight:400;letter-spacing:0;text-transform:none">optional</span></h2>
       <div class="pad">
@@ -335,6 +344,7 @@
 </div>
 </div>
 </main>
+<dialog id="format-dialog" style="max-width:680px;width:90%;max-height:85vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:20px" aria-label="Quote formatting"></dialog>
 <dialog id="preview-dialog" aria-labelledby="preview-title"></dialog>
 
 <div class="buildbar">
@@ -350,6 +360,7 @@
 
 <script>
 const $ = s => document.querySelector(s);
+let activeSlug = '';
 
 // ---------- personal theme; classic dark / light remain available ----------
 function applyTheme(t){
@@ -630,10 +641,10 @@ function renderLineList(id, lines, ul, withLineAmount){
     bindReorder(li,'lines:'+id,i);
     const mv=dragHandle('lines:'+id,i,'line item');
     const noteType=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':null;
+    const typeSelect=`<select aria-label="Line type" title="Change item or note type without retyping" style="width:125px;flex:none" onchange="changeNoteType('${id}',${i},this.value)">`+
+      [['item','Item'],['sub','Sub-note'],['atqty','Note'],['leftnote','Left note'],['priced','Priced note']].map(([value,label])=>
+        `<option value="${value}"${value===(noteType||'item')?' selected':''}>${label}</option>`).join('')+'</select>';
     if(noteType){
-      const typeSelect=`<select aria-label="Note type" title="Change note type without retyping" style="width:125px;flex:none" onchange="changeNoteType('${id}',${i},this.value)">`+
-        [['sub','Sub-note'],['atqty','Note'],['leftnote','Left note'],['priced','Priced note']].map(([value,label])=>
-          `<option value="${value}"${value===noteType?' selected':''}>${label}</option>`).join('')+'</select>';
       const text=noteType==='priced'?ln.amount_note:ln.text;
       const amount=(withLineAmount||noteType==='priced')
         ? `<input type="text" value="${escAttr(ln.amount||'')}" placeholder="$ / note"
@@ -642,7 +653,7 @@ function renderLineList(id, lines, ul, withLineAmount){
       li.innerHTML=`${mv}${typeSelect}
         <input type="text" value="${escAttr(text||'')}" aria-label="Note text" style="flex:1"
           oninput="${noteType==='priced'?'setNoteLabel':'setSubText'}('${id}',${i},this.value)">
-        ${amount}<button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+        ${amount}<button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
@@ -671,20 +682,75 @@ function renderLineList(id, lines, ul, withLineAmount){
            title="price or note shown in the AMOUNT column for this item"
            style="width:96px;flex:none" oninput="setLineAmount('${id}',${i},this.value)">`
       : '';
-    li.innerHTML=`${mv}${labelSel}${marker}<div class="txt">${body}</div>${amt}
-      <button class="btn sm" title="add a sub-note under this item" onclick="addSubBelow('${id}',${i})">+sub</button>
+    li.innerHTML=`${mv}${typeSelect}${labelSel}${marker}<div class="txt">${body}</div>${amt}
+      <button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn sm" title="add a sub-note under this item" onclick="addSubBelow('${id}',${i})">+sub</button>
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
 }
+let formatTarget=null;
+function openFormatting(id,index=null){
+  const group=findLines(id);
+  const target=index===null?group:group.lines[index];
+  formatTarget={target,index};
+  const f=target.format||{};
+  const dialog=$('#format-dialog');
+  const select=(key,label,choices)=>`<label>${label}<select name="${key}"><option value="">Use default</option>${choices.map(([v,t])=>`<option value="${v}"${f[key]===v?' selected':''}>${t}</option>`).join('')}</select></label>`;
+  const number=(key,label,min,max,step=1)=>`<label>${label}<input name="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${f[key]??''}" placeholder="Default"></label>`;
+  const flag=(key,label)=>`<label><input style="width:auto" name="${key}" type="checkbox" ${f[key]?'checked':''}> ${label}</label>`;
+  const row=index!==null;
+  const text=row?(target.amount_note??target.text??applyFills(target)):'';
+  dialog.innerHTML=`<form id="format-form"><h2>${row?'Line formatting':'Section formatting'}</h2>
+    <p class="muted">Changes appear in the live preview and are saved with the quote. Blank fields use the existing layout.</p>
+    ${row?`<label>Text — press Enter for a line break<textarea name="wording" rows="4"></textarea></label>
+      ${select('start','Text position',[['auto','Keep label / quantity / note style'],['left','Text only: left edge'],['quantity','Text only: quantity column'],['description','Text only: description column']])}
+      <p class="muted">Text-only positions hide the label and quantity on this line. Choose the default position to show them again.</p>
+      ${select('wrap','Wrapped lines start at',[['auto','Original layout'],['start','Same column as the text'],['description','Description column']])}
+      ${select('align','Text alignment',[['left','Left'],['center','Center'],['right','Right']])}
+      ${select('amount_align','Price alignment beside this text',[['top','Top — beside first line'],['center','Middle'],['bottom','Bottom — beside last line']])}
+      ${flag('bold','Bold text')}${flag('underline','Underline text')}${flag('keep_next','Keep with the next line')}`:
+      `${flag('page_break','Start this section on a new page')}${flag('keep_together','Keep this section on one page when it fits')}`}
+    <div class="row">${number('font_size',row?'Font size (pt)':'Item font size (pt)',8,14,0.5)}${number('line_spacing','Line spacing',1,1.5,0.05)}</div>
+    <div class="row">${number('space_before',row?'Space above line (pt)':'Space above heading (pt)',0,36)}${number('space_after',row?'Space below line (pt)':'Space between items (pt)',0,24)}</div>
+    <p><button class="btn primary" type="submit">Apply</button> <button class="btn" type="button" onclick="resetFormatting()">Reset formatting</button> <button class="btn" type="button" onclick="$('#format-dialog').close()">Cancel</button></p>
+    </form>`;
+  if(row)dialog.querySelector('[name="wording"]').value=text;
+  dialog.querySelector('form').onsubmit=event=>{event.preventDefault();saveFormatting(event.currentTarget);};
+  dialog.showModal();
+}
+function saveFormatting(form){
+  const {target,index}=formatTarget, f={};
+  for(const el of form.elements){
+    if(!el.name||el.name==='wording')continue;
+    if(el.type==='checkbox'){if(el.checked)f[el.name]=true;}
+    else if(el.value!=='')f[el.name]=el.type==='number'?Number(el.value):el.value;
+  }
+  if(Object.keys(f).length)target.format=f;else delete target.format;
+  if(index!==null){
+    const key=target.amount_note!==undefined?'amount_note':'text';
+    target[key]=form.elements.wording.value;
+  }
+  $('#format-dialog').close();redraw();schedulePreview();
+}
+function resetFormatting(){
+  delete formatTarget.target.format;
+  $('#format-dialog').close();redraw();schedulePreview();
+}
 function changeNoteType(id,i,type){
-  if(!['sub','atqty','leftnote','priced'].includes(type))return;
+  if(!['item','sub','atqty','leftnote','priced'].includes(type))return;
   const ln=findLines(id).lines[i];
-  if(ln.amount_note===undefined&&!ln.sub&&!ln.atqty&&!ln.leftnote)return;
-  const text=ln.amount_note!==undefined?ln.amount_note:(ln.text||'');
+  const current=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':'item';
+  if(current===type)return;
+  const text=ln.amount_note!==undefined?ln.amount_note:
+    (ln.text!==undefined&&ln.text!==''?ln.text:ln.code!==undefined?applyFills(ln):(ln.text||''));
   for(const key of ['sub','atqty','leftnote','amount_note','text'])delete ln[key];
   if(type==='priced')ln.amount_note=text;
-  else{ln.text=text;ln[type]=true;}
+  else{ln.text=text;if(type!=='item')ln[type]=true;}
+  // The selected type controls indentation; keep typography and price settings.
+  if(ln.format){
+    for(const key of ['start','wrap','align'])delete ln.format[key];
+    if(!Object.keys(ln.format).length)delete ln.format;
+  }
   redraw();
 }
 function replaceLineCode(id,i,input){
@@ -730,7 +796,7 @@ function renderGates(){
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
-      <ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}`;
+      <button class="btn sm" onclick="openFormatting('${g.id}')">Section format</button><ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}`;
     box.appendChild(el);
     renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id), true);
   });
@@ -888,7 +954,7 @@ function renderOptions(){
           <input type="text" value="${escAttr(o.note||'')}" placeholder="right-side note by the block price — e.g. “Cost Per Gate”, “Each”, “per month”"
                  oninput="JOB.options[${i}].note=this.value">
         </div>
-        <ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
+        <button class="btn sm" onclick="openFormatting('${o.id}')">Section format</button><ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
       box.appendChild(el);
       renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id), true);
       return;
@@ -1051,6 +1117,7 @@ function renderFree(){
 // ---------- collect + build ----------
 function collect(){
   const j={
+    ...(activeSlug ? {slug:activeSlug} : {}),
     proposal:{
       for:$('#f-for').value, attention:$('#f-attention').value, address:$('#f-address').value,
       phone:$('#f-phone').value, email:$('#f-email').value, date:$('#f-date').value,
@@ -1059,7 +1126,7 @@ function collect(){
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
     options_title:$('#f-optionstitle').value,
-    gates:JOB.gates.map(g=>({title:titleFor(g), lines:dropEmptySubs(g.lines).map(cleanLine)})),
+    gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine)})),
     options:JOB.options.map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
@@ -1070,16 +1137,16 @@ function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty||l.leftno
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
-    if(ln.deduct)r.deduct=true; return r;
+    if(ln.deduct)r.deduct=true; return {...r,...(ln.format?{format:ln.format}:{})};
   }
   if(ln.sub){
-    const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return o;
+    const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
   }
   if(ln.atqty){
-    const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return o;
+    const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
   }
   if(ln.leftnote){
-    const o={text:ln.text, leftnote:true}; if(ln.amount)o.amount=ln.amount; return o;
+    const o={text:ln.text, leftnote:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
   }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
@@ -1088,39 +1155,51 @@ function cleanLine(ln){
     else o.text=applyFills(ln);  // snapshot the displayed wording before later sheet changes
     if(ln.label!==undefined) o.label=ln.label;
     if(ln.amount) o.amount=ln.amount;
-    return o;
+    return {...o,...(ln.format?{format:ln.format}:{})};
   }
   const o={text:ln.text, qty:ln.qty};
   if(ln.label!==undefined) o.label=ln.label;
   if(ln.amount) o.amount=ln.amount;
-  return o;
+  return {...o,...(ln.format?{format:ln.format}:{})};
 }
 function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
   if(o.lines){   // detailed option
     const r={title:o.title, lines:dropEmptySubs(o.lines).map(cleanLine)};
     if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true;
-    if(o.note && o.note.trim())r.note=o.note.trim(); return r;
+    if(o.note && o.note.trim())r.note=o.note.trim(); return {...r,...(o.format?{format:o.format}:{})};
   }
   const r={text:o.text}; if(o.amount)r.amount=o.amount;
   if(o.deduct)r.deduct=true;
   if(o.note && o.note.trim())r.note=o.note.trim();
-  if(o.cost_per_gate)r.cost_per_gate=true; return r;
+  if(o.cost_per_gate)r.cost_per_gate=true; return {...r,...(o.format?{format:o.format}:{})};
 }
-async function build(){
+async function build(asPdf=false){
   const job=collect();
   if(!job.proposal.for.trim()){$('#status').innerHTML='<span class="err">Customer (For:) is required.</span>';return;}
-  $('#status').textContent='Building…'; $('#dl').hidden=true; $('#log').hidden=true;
-  const r=await fetch('/api/build',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(job)});
+  $('#status').textContent=asPdf?'Building PDF with editable quote…':'Building…'; $('#dl').hidden=true; $('#log').hidden=true;
+  try{
+  const r=await fetch('/api/build'+(asPdf?'?pdf=true':''),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(job)});
   const d=await r.json();
-  $('#log').hidden=false; $('#log').textContent=d.log||'';
+  $('#log').hidden=false; $('#log').textContent=[d.log,...(d.warnings||[])].filter(Boolean).join('\n');
+  if(d.slug)activeSlug=d.slug;
+  $('#backup-status').textContent=d.backup?'Automatic backup saved: '+d.backup:(d.warnings||[]).join(' ');
   if(d.ok){
-    $('#status').innerHTML='<span class="ok">Built '+d.docx+'</span>';
-    const a=$('#dl'); a.hidden=false; a.textContent='Open '+d.docx;
-    a.href='/download/'+d.slug+'/'+encodeURIComponent(d.docx);
-    if(window.pywebview){a.onclick=e=>{e.preventDefault();window.pywebview.api.open_docx(d.slug,d.docx);};}
+    const filename=d.pdf||d.docx;
+    $('#status').textContent=(d.warnings||[]).length?d.warnings.join(' '):'Built '+filename;
+    const a=$('#dl'); a.hidden=false; a.textContent=d.pdf?'Open PDF':'Open Word proposal';
+    a.href='/download/'+d.slug+'/'+encodeURIComponent(filename);
+    if(window.pywebview){a.onclick=e=>{e.preventDefault();window.pywebview.api.open_docx(d.slug,filename);};}
     refreshJobs();
-  } else { $('#status').innerHTML='<span class="err">Build failed</span>'; }
+  } else { $('#status').textContent='Build failed — see details below.'; }
+  }catch(e){$('#status').textContent='Build failed: '+e.message;}
+}
+
+async function showBackups(){
+  try{
+    const path=window.pywebview?await window.pywebview.api.open_backups():(await (await fetch('/api/backup-folder')).json()).path;
+    $('#backup-status').textContent='Backups: '+path;
+  }catch(e){$('#backup-status').textContent='Could not open backups: '+e.message;}
 }
 
 // ---------- saved jobs ----------
@@ -1140,22 +1219,24 @@ function newQuote(){
 async function loadJob(){
   const slug=$('#jobs').value; if(!slug)return;
   const j=await (await fetch('/api/job/'+slug)).json();
-  loadJobObject(j);
+  loadJobObject({...j,slug});
   $('#status').textContent='Loaded '+slug;
 }
 function loadJobObject(j){
+  activeSlug=j.slug||'';
   const p=j.proposal||{};
   $('#f-for').value=p.for||''; $('#f-attention').value=p.attention||''; $('#f-address').value=p.address||'';
   $('#f-phone').value=p.phone||''; $('#f-email').value=p.email||''; $('#f-date').value=p.date||'';
   $('#f-terms').value=p.terms||''; $('#f-jobaddr').value=p.job_address||''; $('#f-bid').value=p.bid_number||'';
   $('#f-subby').value=p.submitted_by||''; $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
+  $('#f-ccb').value=p.ccb??'46091'; $('#f-cc').value=p.cc??'METROOD121MJ';
   $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
   JOB.gate_summary=(j.gate_summary||[]).slice();
-  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'',
+  gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'', ...(g.format?{format:g.format}:{}),
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
   JOB.options=(j.options||[]).map(o=>{
     if(o && o.lines && o.kind!=='block'){
-      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct, note:o.note||'',
+      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct, note:o.note||'', ...(o.format?{format:o.format}:{}),
         lines:(o.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};
     }
     return o;
@@ -1167,6 +1248,43 @@ function loadJobObject(j){
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
   schedulePreview();
+}
+async function exportQuote(){
+  try{
+    await init();
+    const job=collect();
+    if(!job.proposal.for.trim())throw new Error('Customer (For:) is required.');
+    if(window.pywebview){
+      const saved=await window.pywebview.api.save_quote(job);
+      $('#status').textContent=saved?'Quote exported — send the .metroquote file to the other computer.':'Export canceled.';
+      return;
+    }
+    const r=await fetch('/api/quote/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(job)});
+    if(!r.ok)throw new Error((await r.json()).error||'Export failed.');
+    const url=URL.createObjectURL(await r.blob());
+    const a=document.createElement('a'); a.href=url;
+    a.download=(r.headers.get('Content-Disposition')||'').match(/filename="([^"]+)"/)?.[1]||'quote.metroquote';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    $('#status').textContent='Quote exported — send the .metroquote file to the other computer.';
+  }catch(e){$('#status').textContent='Export failed: '+e.message;}
+}
+async function importQuote(input){
+  const file=input.files&&input.files[0]; if(!file)return;
+  try{
+    if(!confirm('Import this quote? It will replace the current form. Export any unsaved work first. Saved quotes will be kept.'))return;
+    await init();
+    const fd=new FormData(); fd.append('file',file);
+    const r=await fetch('/api/quote/import',{method:'POST',body:fd});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Import failed.');
+    loadJobObject({...d.job,slug:d.slug});
+    $('#dl').hidden=true; $('#log').hidden=true;
+    await refreshJobs(); $('#jobs').value=d.slug;
+    $('#status').textContent='Imported and saved as '+d.slug+' — edit, then Build Proposal.';
+    $('#backup-status').textContent=d.backup?'Automatic backup saved: '+d.backup:(d.warnings||[]).join(' ');
+  }catch(e){$('#status').textContent='Import failed: '+e.message;}
+  finally{input.value='';}
 }
 async function importScan(input){
   const f=input.files&&input.files[0]; if(!f)return;

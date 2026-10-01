@@ -21,6 +21,7 @@ import yaml
 
 import proposal
 import product_sync
+import quote_format
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CODES = os.path.join(HERE, "codes.yaml")
@@ -99,6 +100,8 @@ def resolve_line(index, line):
     if line.get("note"):
         text = _terminate(text) + " — " + str(line["note"])
     res = {"qty": qty, "text": _terminate(text)}
+    if "format" in line:
+        res["format"] = quote_format.validate(line["format"])
     if line.get("sub"):                        # indented "— text" sub-note
         res["sub"] = True
     if line.get("atqty"):                      # note starting at the qty/number column
@@ -121,6 +124,7 @@ def resolve_lines(index, lines):
     for ln in lines or []:
         if isinstance(ln, dict) and ln.get("amount_note") is not None:
             out.append({"amount_note": ln["amount_note"],
+                        "format": quote_format.validate(ln.get("format", {})),
                         "amount": ln.get("amount"), "deduct": ln.get("deduct")})
         else:
             out.append(resolve_line(index, ln))
@@ -187,6 +191,7 @@ def process_options(index, options):
             for orig in opt["lines"]:
                 if orig.get("amount_note") is not None:
                     lines.append({"amount_note": orig["amount_note"],
+                                  "format": quote_format.validate(orig.get("format", {})),
                                   "amount": orig.get("amount"), "deduct": orig.get("deduct")})
                     continue
                 res = resolve_line(index, orig)
@@ -199,6 +204,7 @@ def process_options(index, options):
                     and lines[0].get("qty") not in (None, 0, "")):
                 lines[0]["label"] = "Install:"
             out.append({"title": opt.get("title", ""), "lines": lines,
+                        "format": quote_format.validate(opt.get("format", {})),
                         "amount": opt.get("amount"), "deduct": opt.get("deduct"),
                         "note": opt.get("note")})
         else:
@@ -223,6 +229,7 @@ def build_doc(job, data, index):
     for g in job.get("gates", []):
         gates.append({
             "title": g["title"],
+            "format": quote_format.validate(g.get("format", {})),
             "lines": resolve_lines(index, g.get("lines", [])),
         })
 

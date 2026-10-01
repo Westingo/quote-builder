@@ -5,6 +5,7 @@ from collections import OrderedDict
 import hashlib
 import json
 import queue
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -101,6 +102,18 @@ def render(doc):
         while len(_cache) > 8:
             _cache.popitem(last=False)
         return result
+
+
+def export_pdf(source):
+    """Export a saved proposal without colliding with preview or user PDFs."""
+    with _lock:
+        if sys.platform != "win32":
+            raise RuntimeError("PDF export requires Microsoft Word on Windows.")
+        with tempfile.TemporaryDirectory(prefix="metro-pdf-") as folder:
+            staged = Path(folder) / "proposal.docx"
+            shutil.copyfile(source, staged)
+            _export(staged)
+            return staged.with_suffix(".pdf").read_bytes()
 
 
 def export_with_word(source, word):

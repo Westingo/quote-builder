@@ -39,6 +39,24 @@ class Api:
     proposal or its folder in the OS default app — the desktop equivalent of a
     browser download."""
 
+    def save_quote(self, job):
+        import webview
+        import quote_transfer
+        from app import slugify
+        data = quote_transfer.export_quote(job)
+        paths = webview.windows[0].create_file_dialog(
+            webview.FileDialog.SAVE,
+            save_filename=slugify(job["proposal"]["for"]) + ".metroquote",
+            file_types=("Metro quote (*.metroquote)",))
+        if not paths:
+            return False
+        path = paths if isinstance(paths, str) else paths[0]
+        if not path.lower().endswith(".metroquote"):
+            path += ".metroquote"
+        with open(path, "wb") as f:
+            f.write(data)
+        return True
+
     def open_docx(self, slug, fname):
         p = os.path.join(JOBS, os.path.basename(slug), os.path.basename(fname))
         if os.path.isfile(p):
@@ -52,6 +70,13 @@ class Api:
             os.startfile(p)
             return True
         return False
+
+    def open_backups(self):
+        import quote_backup
+        folder = quote_backup.directory()
+        folder.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(folder))
+        return str(folder)
 
 
 def _serve():

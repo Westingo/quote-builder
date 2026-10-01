@@ -17,13 +17,16 @@ import contextlib
 
 import yaml
 from fastapi import FastAPI, Body, UploadFile, File
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 import build as builder
 import scan_import
 import product_sync
 import word_preview
+import quote_transfer
+import quote_pdf
+import quote_backup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -121,7 +124,7 @@ def api_job(slug: str):
 
 
 @app.post("/api/build")
-def api_build(job: dict = Body(...)):
+def api_build(job: dict = Body(...), pdf: bool = False):
     customer = (job.get("proposal", {}) or {}).get("for", "").strip()
     if not customer:
         return JSONResponse({"ok": False, "log": "Customer (For:) is required."},
@@ -135,6 +138,7 @@ def api_build(job: dict = Body(...)):
         yaml.safe_dump(job, f, sort_keys=False, allow_unicode=True)
 
     buf = io.StringIO()
+    backup, warnings = backup_quote(job, slug)
     ok, out = True, None
     try:
         with contextlib.redirect_stdout(buf):
@@ -148,9 +152,42 @@ def api_build(job: dict = Body(...)):
         ok = False
 
     if not ok:
-        return JSONResponse({"ok": False, "log": buf.getvalue()}, status_code=500)
+        return JSONResponse({"ok": False, "log": buf.getvalue(), "slug": slug,
+                             "backup": backup, "warnings": warnings}, status_code=500)
+    pdf_name = None
+    if pdf:
+        try:
+            content = quote_pdf.embed(word_preview.export_pdf(out), job)
+            base = os.path.splitext(out)[0]
+            # Keep older PDFs intact, including files already open in a viewer.
+            for number in range(1, 10000):
+                target = base + (f" ({number})" if number > 1 else "") + ".pdf"
+                try:
+                    with open(target, "xb") as f:
+                        f.write(content)
+                    pdf_name = os.path.basename(target)
+                    break
+                except FileExistsError:
+                    continue
+            if pdf_name is None:
+                raise RuntimeError("Too many PDF copies in this quote folder.")
+        except Exception as exc:
+            warnings.append(f"Word quote saved, but PDF was not created: {exc}")
     return {"ok": True, "log": buf.getvalue(), "slug": slug,
-            "docx": os.path.basename(out)}
+            "docx": os.path.basename(out), "pdf": pdf_name,
+            "backup": backup, "warnings": warnings}
+
+
+def backup_quote(job, slug):
+    try:
+        return quote_backup.save(job, slug), []
+    except Exception as exc:
+        return None, [f"Quote saved locally, but automatic backup failed: {exc}"]
+
+
+@app.get("/api/backup-folder")
+def api_backup_folder():
+    return {"path": str(quote_backup.directory())}
 
 
 @app.post("/api/import")
@@ -165,12 +202,49 @@ def api_import(file: UploadFile = File(...)):
                             status_code=500)
 
 
+@app.post("/api/quote/export")
+def api_export_quote(job: dict = Body(...)):
+    try:
+        data = quote_transfer.export_quote(job)
+        filename = slugify(job["proposal"]["for"]) + ".metroquote"
+        return Response(data, media_type="application/json", headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'})
+    except ValueError as exc:
+        return JSONResponse({"error": str(exc)}, status_code=400)
+
+
+@app.post("/api/quote/import")
+def api_import_quote(file: UploadFile = File(...)):
+    try:
+        is_pdf = (file.filename or "").lower().endswith(".pdf")
+        limit = quote_pdf.MAX_PDF_BYTES if is_pdf else quote_transfer.MAX_BYTES
+        data = file.file.read(limit + 1)
+        job = quote_pdf.extract(data) if is_pdf else quote_transfer.import_quote(data)
+    except (ValueError, RecursionError) as exc:
+        return JSONResponse({"error": str(exc)}, status_code=400)
+    base = slugify(job["proposal"]["for"]) + "-imported"
+    slug, suffix = base, 2
+    os.makedirs(JOBS, exist_ok=True)
+    while True:
+        job_dir = os.path.join(JOBS, slug)
+        try:
+            os.mkdir(job_dir)
+            break
+        except FileExistsError:
+            slug, suffix = f"{base}-{suffix}", suffix + 1
+    with open(os.path.join(job_dir, "job.yaml"), "w", encoding="utf-8") as f:
+        yaml.safe_dump(job, f, sort_keys=False, allow_unicode=True)
+    backup, warnings = backup_quote(job, slug)
+    return {"ok": True, "job": job, "slug": slug, "backup": backup, "warnings": warnings}
+
+
 @app.get("/download/{slug}/{fname}")
 def download(slug: str, fname: str):
     path = os.path.join(JOBS, os.path.basename(slug), os.path.basename(fname))
     if not os.path.isfile(path):
         return JSONResponse({"error": "not found"}, status_code=404)
-    return FileResponse(path, media_type=DOCX_MIME, filename=fname)
+    mime = "application/pdf" if fname.lower().endswith(".pdf") else DOCX_MIME
+    return FileResponse(path, media_type=mime, filename=fname)
 
 
 if __name__ == "__main__":

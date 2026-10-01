@@ -84,7 +84,82 @@ expand the pages; **Close preview** or **Esc** returns to editing. Preview
 copies are temporary and do not save or overwrite customer jobs. Pages show
 Word's printed appearance (white paper), regardless of Word's dark display mode.
 
+The **WE PROPOSE TO FURNISH THE FOLLOWING / AMOUNT** band appears on the first
+page only. Later pages continue the quote beneath the customer header; the
+customer header and footer still repeat on every page.
+
 ---
+
+## Move an editable quote between computers
+
+### Adjust formatting before exporting
+
+Use **Format** beside a location item, note, or detailed-option item to edit
+multiline text, set bold/underline, adjust font size and spacing, or keep the
+line with the next item. **Price alignment** positions its amount at the top,
+middle, or bottom of the corresponding text.
+
+**Text position** keeps the existing label/quantity columns by default. The
+text-only choices start at the left edge, quantity column, or description
+column, hiding that line's label and quantity without deleting them. Choose
+where wrapped lines align independently. **Reset formatting** restores the
+default layout without changing the wording.
+
+Use **Section format** on a location or detailed option to start a new page,
+keep the section together when it fits, or adjust item typography and spacing
+for the whole section. Individual line settings override section defaults.
+All these settings appear in the live preview and survive PDF transfers and
+backups. Headers, footers, and the opening band keep the standard Metro style.
+
+### Transfer a finished quote
+
+The easiest way is **Build PDF** in the transfer panel. It saves the Word
+proposal and creates a PDF with the editable `.metroquote` data attached inside
+it. Send that single PDF, then choose **Import PDF / quote…** on the other
+computer. The visible PDF pages use the same Microsoft Word rendering as the
+preview. Desktop Microsoft Word must be installed and activated to build PDFs.
+
+Only PDFs made with **Build PDF** carry the editable quote. Printing to PDF,
+flattening, or processing a PDF with tools that remove attachments can discard
+that data. Changes made later in a PDF editor do not update the embedded quote.
+If the data is missing, import explains this; it does not silently run paid AI.
+Older PDFs can still use **Start from a Scan** for a draft requiring review.
+
+You can also transfer the editable file separately:
+
+1. On Liv's computer, open the quote (use **Load saved…** for an older quote)
+   and click **Export quote**. Save the `.metroquote` file.
+2. Send that file by email, shared folder, or USB.
+3. On your computer, click **Import PDF / quote…** and choose the file. It is saved as
+   a separate local copy and opens in the editor, ready for changes.
+4. Click **Build Proposal** after editing to save the changes and create Word output.
+
+Both computers need a version with these buttons. Export includes the current
+form, even before building: customer details, displayed product wording,
+quantities, options, amounts, notes, warranties, exclusions, and their order.
+Import uses the same proposal builder and layout as a locally created quote.
+Repeated imports create separate copies and do not overwrite existing jobs.
+This transfer runs locally and needs no AI key or internet connection.
+
+Send the `.metroquote` file for editing in Quote Builder. Edits made separately
+in Word or PDF are not included; make those changes in Quote Builder before
+exporting. Export any unsaved work before importing another quote.
+
+### Automatic backups
+
+Every **Build Proposal**, **Build PDF**, and successful quote import saves a new
+dated `.metroquote` copy in **Metro Quote Backups** under your Windows user folder
+(outside the app folder). Click **Backup folder** to open it in the desktop app;
+the browser version displays its path. Import any backup to recover a separate
+editable copy. Earlier backups are retained, including when a later Word/PDF
+build fails. If a backup cannot be written, the app displays a warning while
+keeping the local saved quote.
+
+These are local recovery copies, not automatic cross-computer sync. To use an
+existing shared or synced folder, set `QUOTE_BACKUP_DIR` to that folder's full
+path before launching the app. Backup filenames use UTC timestamps and unique
+suffixes so saves from different computers can coexist. Unsaved typing is not
+backed up until you build or import a quote.
 
 ## Import from a scan (AI)
 
