@@ -546,6 +546,11 @@ def render_body(body, doc):
             gp = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=0, after=0)
             _run(gp, g, bold=True, size=11)
 
+    # Optional free text between the centered summary and the work locations.
+    if (doc.get("summary_text") or "").strip():
+        p = _para(body, before=6, after=4)
+        _run(p, doc["summary_text"], size=10)
+
     # per-gate scope — one 2-column table per gate (description | editable AMOUNT)
     for gate in doc.get("gates", []):
         _gate_block(body, gate)

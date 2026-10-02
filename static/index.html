@@ -277,6 +277,10 @@
       <ul class="lines" id="summary"></ul></div></section>
 
     <!-- GATES -->
+    <section class="sheet"><h2>Text Below Install Summary</h2><div class="pad">
+      <label for="f-summary-text">Optional text — printed below the install summary, before work locations</label>
+      <textarea id="f-summary-text" rows="3" placeholder="Add project details or a note here…"></textarea>
+    </div></section>
     <section class="sheet"><h2>Work Locations <button class="btn sm" onclick="addGate(true)">+ location</button></h2>
       <div class="pad" id="gates"></div></section>
 
@@ -1125,6 +1129,7 @@ function collect(){
       submitted_by:$('#f-subby').value, ccb:$('#f-ccb').value, cc:$('#f-cc').value,
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
+    summary_text:$('#f-summary-text').value,
     options_title:$('#f-optionstitle').value,
     gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine)})),
     options:JOB.options.map(cleanOption),
@@ -1232,6 +1237,7 @@ function loadJobObject(j){
   $('#f-ccb').value=p.ccb??'46091'; $('#f-cc').value=p.cc??'METROOD121MJ';
   $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
   JOB.gate_summary=(j.gate_summary||[]).slice();
+  $('#f-summary-text').value=j.summary_text||'';
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'', ...(g.format?{format:g.format}:{}),
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
   JOB.options=(j.options||[]).map(o=>{

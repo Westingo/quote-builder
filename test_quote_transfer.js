@@ -29,16 +29,19 @@ const job={slug:'liv-imported-2',proposal:{for:'Liv customer',ccb:'CUSTOM',cc:'C
   options:[{kind:'block',title:'Option',bullets:['First','Second'],priced:[{label:'Single',amount:'50'}]}],
   notes:[{text:'Custom note'}],warranties:[],exclusions:[],total:'123'};
 job.gates[0].format={page_break:true,font_size:9};
+job.summary_text='Project detail\nSecond line';
 job.gates[0].lines[0].format={amount_align:'top',bold:true};
 job.gates[0].lines[1].format={start:'left',wrap:'start'};
 job.options.push({title:'Detailed',format:{keep_together:true},lines:[{text:'Multi\nline',qty:1,format:{underline:true}}]});
 context.loadJobObject(job);
 const exported=JSON.parse(JSON.stringify(context.collect()));
+assert.equal(exported.summary_text,job.summary_text);
 assert.equal(exported.slug,job.slug);
 assert.equal(exported.proposal.ccb,'CUSTOM');
 assert.equal(exported.proposal.cc,'CUSTOM-CC');
 for(const key of ['gates','gate_summary','options','notes','warranties','exclusions','total'])assert.deepEqual(exported[key],job[key]);
 context.loadJobObject({});
 assert.equal(context.activeSlug,'');
+assert.equal(context.collect().summary_text,'');
 assert.equal(context.collect().proposal.ccb,'46091');
 console.log('Passed: imported save identity, editor round-trip, custom wording, license fields and reset.');

@@ -40,6 +40,8 @@ def validate_job(job):
     if not job["proposal"].get("for", "").strip():
         raise ValueError("Customer (For:) is required.")
     strings(job.get("gate_summary", []), "gate_summary")
+    if "summary_text" in job:
+        check(job["summary_text"], str, "summary_text")
     for key in ("gates", "options", "notes", "warranties", "exclusions"):
         check(job.get(key, []), list, key)
     for gate in job.get("gates", []):

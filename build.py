@@ -253,6 +253,7 @@ def build_doc(job, data, index):
         "tariff_notes": tariff,
         "intro": intro,
         "gate_summary": job.get("gate_summary", []),
+        "summary_text": job.get("summary_text", ""),
         "gates": gates,
         "options_title": job.get("options_title", proposal.DEFAULT_OPTIONS_TITLE),
         "options": process_options(index, job.get("options")),
