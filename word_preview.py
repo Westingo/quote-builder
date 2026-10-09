@@ -141,7 +141,9 @@ def run_worker(sources):
         word.Visible = False
         word.DisplayAlerts = 0
         word.AutomationSecurity = 3
-        word.ScreenUpdating = False
+        # Windows may reuse this instance when opening a finished quote.
+        # Keep painting enabled so that first user-visible document is not blank.
+        word.ScreenUpdating = True
         for source in sources:
             try:
                 export_with_word(Path(source).resolve(), word)
