@@ -210,6 +210,7 @@
 <header><div class="tb">
   <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
   <div class="role">Quote Builder</div>
+  <button class="btn sm" id="undo-btn" onclick="undoQuote()" disabled title="Undo the last quote edit">↶ Undo</button>
   <button class="btn sm" id="themebtn" title="Change color theme" onclick="toggleTheme()">☾ Moonlit</button>
 </div></header>
 
@@ -427,6 +428,7 @@ async function initializeEditor(){
     });
   }
   refreshProducts();
+  resetQuoteHistory();
 }
 
 let productsRefreshing=false;
@@ -908,10 +910,17 @@ function renderSummary(){
 }
 
 // ---------- options ----------
-function addOption(){JOB.options.push({text:'',amount:'',deduct:false,note:''});renderOptions();}
+function scrollToOption(index){
+  const card=$('#options').children[index+1];
+  card.querySelector('input:not([type="checkbox"]), textarea')?.focus({preventScroll:true});
+  card.style.scrollMarginTop=($('header').getBoundingClientRect().height+16)+'px';
+  card.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+}
+function addOption(){JOB.options.push({text:'',amount:'',deduct:false,note:''});renderOptions();scrollToOption(JOB.options.length-1);}
 function addDetailOption(){
   JOB.options.push({id:'o'+(++gateSeq), title:'', lines:[], amount:'', deduct:false});
   renderOptions();
+  scrollToOption(JOB.options.length-1);
 }
 function addLowVoltage(){
   JOB.options.unshift({kind:'block',title:'Low Voltage Electrical Option:',
@@ -922,6 +931,7 @@ function addLowVoltage(){
       "Test system for functionality."],
     priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
   renderOptions();
+  scrollToOption(0);
 }
 function addPriced(i){ JOB.options[i].priced.push({label:'',amount:''}); renderOptions(); }
 function rmPriced(i,pi){ JOB.options[i].priced.splice(pi,1); renderOptions(); }
@@ -930,6 +940,7 @@ function addCleanup(){
     bullets:["Clean-up and removal of excavated materials from site. If Metro cannot spread or drop excavated dirt/asphalt/concrete on site within 40' of work area, add for pickup and removal of spoils from site."],
     priced:[{label:'Single Gate',amount:''},{label:'Double Gate',amount:''}]});
   renderOptions();
+  scrollToOption(0);
 }
 function moveOption(i,dir){
   const j=i+dir;
@@ -1254,6 +1265,7 @@ function loadJobObject(j){
   applyNWE('N',j.notes); applyNWE('W',j.warranties); applyNWE('E',j.exclusions);
   renderSummary();renderGates();renderOptions();renderFree();
   schedulePreview();
+  resetQuoteHistory();
 }
 async function exportQuote(){
   try{
@@ -1333,6 +1345,7 @@ function applyNWE(key,arr){
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 </script>
+<script src="/static/history.js"></script>
 <script src="/static/preview.js"></script>
 </body>
 </html>

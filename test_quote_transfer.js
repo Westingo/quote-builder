@@ -11,7 +11,7 @@ const context=vm.createContext({
   $:s=>fields[s]??=( {value:''} ),
   document:{querySelectorAll:()=>[]},
   descOf:()=> 'Different wording on this computer',
-  buildChecklists(){},renderSummary(){},renderGates(){},renderOptions(){},renderFree(){},schedulePreview(){},
+  buildChecklists(){},renderSummary(){},renderGates(){},renderOptions(){},renderFree(){},schedulePreview(){},resetQuoteHistory(){},
   applyNWE:(key,arr)=>context.NWE_ORDER[key]=arr||[],
   collectNWE:key=>context.NWE_ORDER[key],
   applyFills:line=>line._desc,
