@@ -198,19 +198,25 @@ backup files remain usable through the same import action.
 
 ## Import from a scan (AI)
 
-In the window, **Start from a Scan** lets you upload a scanned sales sheet,
-quote, or email (image or PDF). It sends the scan to Claude's vision API, which
-reads it — including handwriting — and pre-fills a **draft** quote you then
-review and fix before building. Great for typed docs/emails; messy handwriting
-will need corrections.
+In the window, **Start from a Scan** lets you upload a handwritten sales sheet,
+quote, or email (image or PDF). **Luna (OpenAI)** is the default reader and fills
+an editable draft. Review every line, especially codes, quantities, and prices.
 
-This needs an **Anthropic API key** and internet. Each scan costs roughly
-$0.05–0.15. Set the key one of two ways:
-- environment variable `ANTHROPIC_API_KEY`, or
-- put the key in a file named **`api_key.txt`** next to the app (gitignored).
+On each scanning computer, configure an OpenAI API key using either:
+- the `OPENAI_API_KEY` environment variable, or
+- `openai_api_key.txt` in the same folder as `run.bat` (only the key, no quotes).
 
-Model defaults to `claude-opus-4-8`; override with `QUOTE_IMPORT_MODEL`
-(e.g. `claude-haiku-4-5` for lower cost). The scan is sent to Anthropic to be read.
+The key file is ignored by Git and is never included in quote documents. API
+billing is separate from a ChatGPT subscription. An Anthropic key will not work
+for Luna. The model is `gpt-6-luna`, with low reasoning effort. Each extraction
+allows at most one retry for incomplete or malformed output. Actual cost varies
+with page count and token usage.
+
+The scan reader selector also offers **Claude** for explicit use with the existing
+`ANTHROPIC_API_KEY` or `api_key.txt`. Its model defaults to `claude-fable-5`,
+overridable with `QUOTE_IMPORT_MODEL`. Luna never falls back to Claude automatically.
+Scans are sent to the selected provider. Existing editable Word/PDF imports under
+**Files > Open quote file** do not use either API.
 
 ---
 

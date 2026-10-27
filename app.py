@@ -16,7 +16,7 @@ import json
 import contextlib
 
 import yaml
-from fastapi import FastAPI, Body, UploadFile, File
+from fastapi import FastAPI, Body, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -179,11 +179,11 @@ def api_build(job: dict = Body(...), pdf: bool = False):
 
 
 @app.post("/api/import")
-def api_import(file: UploadFile = File(...)):
-    """Read a scanned sheet/quote/email with Claude vision -> draft job dict."""
+def api_import(file: UploadFile = File(...), provider: str = Form("luna")):
+    """Read a scanned sheet/quote/email with the selected reader -> draft job dict."""
     try:
         data = file.file.read()
-        job, raw = scan_import.import_scan(data, file.content_type, file.filename or "")
+        job, raw = scan_import.import_scan(data, file.content_type, file.filename or "", provider=provider)
         return {"ok": True, "job": job}
     except Exception as e:
         return JSONResponse({"ok": False, "log": f"Import failed: {e}"},

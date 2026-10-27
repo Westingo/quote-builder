@@ -37,3 +37,6 @@ api_key.txt
 /jobs/*
 !/jobs/_template
 !/jobs/hoodland-tc
+
+# OpenAI scan key (local only)
+openai_api_key.txt

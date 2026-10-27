@@ -244,7 +244,13 @@
     <!-- IMPORT FROM SCAN -->
     <details class="sheet scan-section"><summary>Start from a scan <span class="muted">Optional</span></summary>
       <div class="pad">
-      <div class="muted" style="margin-bottom:6px">Upload a scanned sales sheet, quote, or email (image or PDF). Claude reads it and pre-fills a <b>draft</b> below — review and fix every line before building.</div>
+      <div class="muted" style="margin-bottom:6px">Upload a scanned sales sheet, quote, or email (image or PDF). The selected reader pre-fills a <b>draft</b> below — review and fix every line before building.</div>
+      <label for="scan-provider">Scan reader</label>
+      <select id="scan-provider" style="width:auto;margin-bottom:8px">
+        <option value="luna" selected>Luna (OpenAI) — default</option>
+        <option value="claude">Claude — optional</option>
+      </select>
+      <div class="muted" style="margin-bottom:8px">Luna requires an OpenAI API key on this computer. Scans are sent to the selected provider; there is no automatic switch to Claude.</div>
       <label class="btn" style="display:inline-block">Choose scan (image / PDF)…
         <input type="file" accept="image/*,application/pdf" style="display:none" onchange="importScan(this)"></label>
     </div></details>
@@ -1292,7 +1298,7 @@ async function importScan(input){
   $('#log').hidden=true;
   try{
     await init();  // Do not send a paid scan until the editor can display it.
-    const fd=new FormData(); fd.append('file', f);
+    const fd=new FormData(); fd.append('file', f); fd.append('provider', $('#scan-provider').value);
     const r=await fetch('/api/import',{method:'POST',body:fd});
     const d=await r.json();
     if(d.ok){ loadJobObject(d.job);

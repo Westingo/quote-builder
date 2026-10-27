@@ -13,7 +13,7 @@ class ScanRetryTests(unittest.TestCase):
         client = MagicMock()
         client.messages.create.side_effect = responses
         with patch('anthropic.Anthropic', return_value=client), patch.object(scan_import, 'api_key', return_value='test-only'), patch.object(scan_import.build, 'load_codes', return_value=({}, {})), patch.object(scan_import, 'MODEL', 'claude-opus-4-8'):
-            result = scan_import.import_scan(b'fake-image', 'image/png')
+            result = scan_import.import_scan(b'fake-image', 'image/png', provider='claude')
         return result, client
 
     def test_valid_response_needs_one_call(self):

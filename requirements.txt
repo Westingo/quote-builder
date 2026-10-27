@@ -8,3 +8,4 @@ pywebview
 anthropic
 pywin32; sys_platform == "win32"
 pymupdf
+openai>=2.0.0

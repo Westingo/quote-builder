@@ -1,13 +1,13 @@
 """
 scan_import.py — turn a scanned sheet / quote / email into a draft job.
 
-Sends the uploaded image or PDF to Claude's vision API along with the code
+Sends the uploaded image or PDF to the selected vision API (Luna by default) along with the code
 dictionary, gets back a structured extraction, and maps it into our job.yaml
 shape (resolving each shortcut code to its sheet). The result is a DRAFT for the
 salesman to review in the form — handwriting especially will need corrections.
 
-API key: ANTHROPIC_API_KEY env var, or an `api_key.txt` file next to this script.
-Model: claude-fable-5 by default (override with QUOTE_IMPORT_MODEL).
+Luna key: OPENAI_API_KEY or openai_api_key.txt.
+Optional Claude key: ANTHROPIC_API_KEY or api_key.txt.
 """
 import os
 import re
@@ -183,7 +183,7 @@ def _to_job(parsed, index):
     }
 
 
-def import_scan(file_bytes, content_type, filename=""):
+def _import_claude(file_bytes, content_type, filename=""):
     """Returns (job_dict, raw_text). Raises on API/parse errors."""
     import anthropic
 
@@ -258,5 +258,77 @@ def import_scan(file_bytes, content_type, filename=""):
                     "marks) as \\\". Check commas between fields and items. Preserve all items "
                     "and their original order. No commentary or markdown."
                 }]}]
+    finally:
+        client.close()
+
+
+def openai_api_key():
+    key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if key:
+        return key
+    path = os.path.join(HERE, "openai_api_key.txt")
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8-sig") as stream:
+            return stream.read().strip() or None
+    return None
+
+
+def import_scan(file_bytes, content_type, filename="", provider="luna"):
+    """Explicit provider selection; never fall back to a paid provider silently."""
+    if provider == "claude":
+        return _import_claude(file_bytes, content_type, filename)
+    if provider != "luna":
+        raise ValueError("Choose Luna or Claude as the scan reader.")
+    return _import_luna(file_bytes, content_type, filename)
+
+
+def _import_luna(file_bytes, content_type, filename):
+    key = openai_api_key()
+    if not key:
+        raise RuntimeError(
+            "Luna needs an OpenAI API key. Put it in openai_api_key.txt in the "
+            "Quote Builder folder on this computer, or set OPENAI_API_KEY. "
+            "Your Anthropic key cannot be used for Luna.")
+    from openai import OpenAI
+
+    data, index = build.load_codes()
+    prompt = PROMPT.format(dictionary=_dictionary_lines(data))
+    encoded = base64.b64encode(file_bytes).decode("ascii")
+    if content_type == "application/pdf" or filename.lower().endswith(".pdf"):
+        media = {"type": "input_file", "filename": "scan.pdf",
+                 "file_data": "data:application/pdf;base64," + encoded}
+    else:
+        mime = content_type if (content_type or "").startswith("image/") else "image/png"
+        media = {"type": "input_image", "image_url": f"data:{mime};base64,{encoded}",
+                 "detail": "high"}
+    # Bound the paid work: one request and at most one extraction retry.
+    client = OpenAI(api_key=key, max_retries=0, timeout=120.0)
+    try:
+        for attempt in range(2):
+            response = client.responses.create(
+                model="gpt-6-luna", reasoning={"effort": "low"}, store=False,
+                max_output_tokens=8000 if attempt == 0 else 16000,
+                text={"format": {"type": "json_object"}},
+                input=[{"role": "user", "content": [media,
+                       {"type": "input_text", "text": prompt}]}],
+            )
+            if any(getattr(part, "type", None) == "refusal"
+                   for item in response.output
+                   for part in (getattr(item, "content", None) or [])):
+                raise RuntimeError("Luna declined to read this document. Try a clearer scan or enter the codes by hand.")
+            try:
+                if response.status != "completed":
+                    raise ValueError("Scan response was not complete")
+                raw = response.output_text
+                job = _to_job(_extract_json(raw), index)
+                return job, raw
+            except (ValueError, TypeError, AttributeError) as exc:
+                if attempt:
+                    raise RuntimeError(
+                        "The scan reader returned incomplete or incorrectly formatted data "
+                        "after an automatic retry. Your current quote has not been changed. "
+                        "Try scanning fewer pages at a time, or upload a clearer image/PDF."
+                    ) from exc
+                prompt += "\nReturn one complete valid JSON object, preserving every item and its order."
     finally:
         client.close()
