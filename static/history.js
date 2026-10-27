@@ -3,7 +3,7 @@
 let quoteHistory=[], quoteSnapshot=null, quoteTypingTarget=null;
 function snapshotQuote(){
   const fields={};
-  document.querySelectorAll('#quote-editor [id^="f-"]').forEach(el=>fields[el.id]=el.value);
+  document.querySelectorAll('#quote-editor [id^="f-"], #f-formatting-profile').forEach(el=>fields[el.id]=el.value);
   return JSON.stringify({job:JOB,nwe:NWE_ORDER,fields,gateSeq});
 }
 function resetQuoteHistory(){

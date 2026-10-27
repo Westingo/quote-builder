@@ -45,3 +45,20 @@ assert.equal(context.activeSlug,'');
 assert.equal(context.collect().summary_text,'');
 assert.equal(context.collect().proposal.ccb,'46091');
 console.log('Passed: imported save identity, editor round-trip, custom wording, license fields and reset.');
+
+// Attach to an identity, reorder locations, save/reload, then remove the parent.
+context.redraw=()=>{};context.renderOptions=()=>{};context.scrollToOption=()=>{};
+for(const name of ['assignOption','removeGate','reorderList','reorderAt'])vm.runInContext(extract(name),context);
+context.loadJobObject({...job,gates:[...job.gates,{title:'Gate B',lines:[]}]});
+context.assignOption(0,context.JOB.gates[0].id);
+context.reorderAt('gates',0,2);
+let grouped=JSON.parse(JSON.stringify(context.collect()));
+assert.equal(grouped.gates[1].title,'Gate A');
+assert.deepEqual(grouped.gates[1].options,[job.options[0]]);
+assert.deepEqual(grouped.options,[job.options[1]]);
+context.loadJobObject(grouped);
+assert.deepEqual(JSON.parse(JSON.stringify(context.collect())).gates,grouped.gates);
+context.removeGate(context.JOB.gates[1].id);
+assert.equal(context.collect().options.length,2);
+assert.deepEqual(JSON.parse(JSON.stringify(context.collect().options[1])),job.options[0]);
+console.log('Passed: option association follows location reorder, survives reload, and returns to general when location is removed.');

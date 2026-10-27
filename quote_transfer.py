@@ -1,6 +1,7 @@
 """Versioned, local-only transfer of editable Quote Builder data."""
 import json
 import quote_format
+import formatting_profiles
 
 FORMAT = "metro-quote-builder"
 MAX_BYTES = 5 * 1024 * 1024
@@ -34,9 +35,14 @@ def validate_job(job):
             check(value, str, path)
 
     check(job, dict, "job")
+    formatting_profiles.validate(job.get("formatting_profile", "standard"))
     check(job.get("proposal"), dict, "proposal")
-    for value in job["proposal"].values():
-        check(value, str, "proposal field")
+    for key, value in job["proposal"].items():
+        if key == "tariff_notes":
+            if value is not None:
+                strings(value, "proposal.tariff_notes")
+        else:
+            check(value, str, "proposal field")
     if not job["proposal"].get("for", "").strip():
         raise ValueError("Customer (For:) is required.")
     strings(job.get("gate_summary", []), "gate_summary")
@@ -44,14 +50,17 @@ def validate_job(job):
         check(job["summary_text"], str, "summary_text")
     for key in ("gates", "options", "notes", "warranties", "exclusions"):
         check(job.get(key, []), list, key)
+    all_options = list(job.get("options", []))
     for gate in job.get("gates", []):
         check(gate, dict, "gate")
         quote_format.validate(gate.get("format", {}))
         check(gate.get("title", ""), str, "gate title")
         check(gate.get("lines", []), list, "gate lines")
+        check(gate.get("options", []), list, "location options")
+        all_options.extend(gate.get("options", []))
         for line in gate.get("lines", []):
             row(line, "gate line")
-    for option in job.get("options", []):
+    for option in all_options:
         check(option, dict, "option")
         quote_format.validate(option.get("format", {}))
         for key in ("title", "text", "note", "kind"):
@@ -85,7 +94,11 @@ def validate_job(job):
 
 
 def export_quote(job):
-    payload = {"format": FORMAT, "version": 1, "job": validate_job(job)}
+    job = validate_job(job)
+    version = 2 if any(g.get("options") for g in job.get("gates", [])) else 1
+    if job.get("formatting_profile", "standard") != "standard":
+        version = 3
+    payload = {"format": FORMAT, "version": version, "job": job}
     data = json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False).encode("utf-8")
     if len(data) > MAX_BYTES:
         raise ValueError("Quote file exceeds the 5 MB limit.")
@@ -101,7 +114,7 @@ def import_quote(data):
         raise ValueError("Choose a .metroquote file created with Export quote.") from exc
     if not isinstance(payload, dict) or payload.get("format") != FORMAT:
         raise ValueError("Choose a .metroquote file created with Export quote.")
-    if type(payload.get("version")) is not int or payload["version"] != 1:
+    if type(payload.get("version")) is not int or payload["version"] not in (1, 2, 3):
         raise ValueError("This quote uses a newer format. Update Quote Builder and try again.")
     job = validate_job(payload.get("job"))
     # Also reject non-finite numbers accepted by Python's JSON reader.

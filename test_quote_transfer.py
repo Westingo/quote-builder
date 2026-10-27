@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 import app
 import quote_backup
 import quote_pdf
+import quote_docx
 import quote_transfer as transfer
 import pymupdf
 
@@ -67,7 +68,7 @@ class TransferTests(unittest.TestCase):
         bad_shape["job"]["gates"][0]["lines"] = [None]
         bad_block = copy.deepcopy(valid)
         del bad_block["job"]["options"][1]["priced"]
-        for data in (b"not json", b"{}", b"%PDF-1.7", json.dumps(dict(valid, version=2)).encode(),
+        for data in (b"not json", b"{}", b"%PDF-1.7", json.dumps(dict(valid, version=4)).encode(),
                      json.dumps(bad_shape).encode(), json.dumps(bad_block).encode(), b"x" * (transfer.MAX_BYTES + 1)):
             with self.subTest(data=data[:80]):
                 self.assertEqual(self.upload(data).status_code, 400)
@@ -98,7 +99,7 @@ class TransferTests(unittest.TestCase):
         result = self.client.post("/api/quote/import", files={"file": ("Liv.pdf", embedded)})
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json()["job"], expected)
-        self.assertTrue(Path(result.json()["backup"]).is_file())
+        self.assertIsNone(result.json()["backup"])
 
     def test_plain_pdf_does_not_save_or_call_ai(self):
         with patch.object(app.scan_import, "import_scan") as scan:
@@ -108,19 +109,72 @@ class TransferTests(unittest.TestCase):
         scan.assert_not_called()
         self.assertEqual(list(Path(self.temp.name).iterdir()), [])
 
-    def test_backup_revisions_and_failed_backup_warning(self):
-        first = quote_backup.save(self.job, "liv")
-        updated = copy.deepcopy(self.job)
-        updated["total"] = "456"
-        second = quote_backup.save(updated, "liv")
-        self.assertNotEqual(first, second)
-        self.assertEqual(transfer.import_quote(Path(first).read_bytes())["total"], "1,234.50")
-        self.assertEqual(transfer.import_quote(Path(second).read_bytes())["total"], "456")
-        with patch.object(app.builder, "main", return_value="Proposal.docx"), patch.object(quote_backup, "save", side_effect=PermissionError("Folder unavailable")):
-            result = self.client.post("/api/build", json=self.job).json()
-        self.assertTrue(result["ok"])
-        self.assertIsNone(result["backup"])
-        self.assertIn("backup failed", result["warnings"][0])
+    def test_word_build_import_into_separate_install_and_rebuild(self):
+        original = self.client.post('/api/build', json=self.job)
+        self.assertEqual(original.status_code, 200, original.text)
+        built = original.json()
+        data = (Path(self.temp.name) / built['slug'] / built['docx']).read_bytes()
+        expected = transfer.import_quote(transfer.export_quote(self.job))
+        self.assertEqual(quote_docx.extract(data), expected)
+        from docx import Document
+        import io
+        self.assertTrue(Document(io.BytesIO(data)).tables)
+        with tempfile.TemporaryDirectory() as other, patch.object(app, 'JOBS', other):
+            imported = self.client.post('/api/quote/import', files={'file': ('quote.docx', data)})
+            self.assertEqual(imported.status_code, 200, imported.text)
+            self.assertEqual(imported.json()['job'], expected)
+            rebuilt = self.client.post('/api/build', json=imported.json()['job'])
+            self.assertTrue(rebuilt.json()['ok'], rebuilt.text)
+
+    def test_plain_or_corrupt_word_rejected_without_ai(self):
+        from docx import Document
+        import io
+        buf = io.BytesIO()
+        Document().save(buf)
+        with patch.object(app.scan_import, 'import_scan') as scan:
+            for data in (buf.getvalue(), b'not a Word document'):
+                result = self.client.post('/api/quote/import', files={'file': ('old.docx', data)})
+                self.assertEqual(result.status_code, 400)
+            scan.assert_not_called()
+        self.assertEqual(list(Path(self.temp.name).iterdir()), [])
+
+    def test_location_options_print_in_place_and_transfer(self):
+        import io
+        from docx import Document
+        job = copy.deepcopy(self.job)
+        job['gates'] = [
+            {'title': 'LOCATION ALPHA', 'lines': [{'text': 'Alpha scope'}],
+             'options': [{'title': 'ALPHA OPTION', 'lines': [{'text': 'Attached scope'}], 'amount': '55'},
+                         {'kind': 'block', 'title': 'ALPHA BLOCK', 'bullets': ['Attached block'], 'priced': []}]},
+            {'title': 'LOCATION BETA', 'lines': [{'text': 'Beta scope'}]}]
+        job['options'] = [{'text': 'GENERAL OPTION', 'amount': '99'}]
+        exported = transfer.export_quote(job)
+        self.assertEqual(json.loads(exported)['version'], 2)
+        built = self.client.post('/api/build', json=job).json()
+        self.assertTrue(built['ok'], built)
+        data = (Path(self.temp.name) / built['slug'] / built['docx']).read_bytes()
+        doc = Document(io.BytesIO(data))
+        text = ' '.join(doc.element.body.itertext())
+        labels = ['LOCATION ALPHA', 'ALPHA OPTION', 'ALPHA BLOCK', 'LOCATION BETA', 'GENERAL OPTION']
+        positions = [text.index(label) for label in labels]
+        self.assertEqual(positions, sorted(positions))
+        self.assertEqual(quote_docx.extract(data)['gates'], job['gates'])
+        self.assertEqual(quote_pdf.extract(quote_pdf.embed(self.pdf_bytes(),job))['gates'],job['gates'])
+        self.assertIsNone(built['backup'])
+        job['gates'][0]['options'][0]['amount'] = []
+        with self.assertRaises(ValueError):
+            transfer.export_quote(job)
+
+    def test_build_and_import_do_not_create_automatic_backups(self):
+        with patch.object(quote_backup, "save", side_effect=AssertionError("Backup must not run")) as backup:
+            built = self.client.post('/api/build', json=self.job).json()
+            self.assertTrue(built['ok'], built)
+            imported = self.client.post('/api/quote/import', files={'file': ('test.metroquote', transfer.export_quote(self.job))})
+            self.assertEqual(imported.status_code, 200)
+            self.assertIsNone(built['backup'])
+            self.assertIsNone(imported.json()['backup'])
+            backup.assert_not_called()
+        self.assertFalse((Path(self.temp.name) / 'backups').exists())
 
     def test_pdf_build_download_and_word_failure(self):
         with patch.object(app.builder, "main", side_effect=lambda folder: str(Path(folder) / "Proposal.docx")), patch.object(app.word_preview, "export_pdf", return_value=self.pdf_bytes()):
@@ -135,7 +189,7 @@ class TransferTests(unittest.TestCase):
         self.assertTrue(result["ok"])
         self.assertIsNone(result["pdf"])
         self.assertIn("PDF was not created", result["warnings"][0])
-        self.assertTrue(Path(result["backup"]).exists())
+        self.assertIsNone(result["backup"])
 
 
 if __name__ == "__main__":

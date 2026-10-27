@@ -231,6 +231,7 @@ def build_doc(job, data, index):
             "title": g["title"],
             "format": quote_format.validate(g.get("format", {})),
             "lines": resolve_lines(index, g.get("lines", [])),
+            "options": process_options(index, g.get("options", [])),
         })
 
     doc = {
@@ -262,6 +263,8 @@ def build_doc(job, data, index):
         "exclusions": resolve_codes(index, job.get("exclusions"), "exclusion"),
         "total": job.get("total"),
     }
+    import formatting_profiles
+    doc["formatting_profile"] = formatting_profiles.validate(job.get("formatting_profile", "standard"))
     return doc
 
 
@@ -299,6 +302,8 @@ def main(jobdir):
     for i, cand in enumerate(candidates):
         try:
             proposal.build_proposal(doc, cand)
+            import quote_docx
+            quote_docx.embed(cand, job)
             if i:
                 print(f"note: '{os.path.basename(out)}' was open in Word, "
                       f"so this was saved as '{os.path.basename(cand)}'. "

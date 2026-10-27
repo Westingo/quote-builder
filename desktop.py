@@ -15,6 +15,7 @@ import sys
 import threading
 import time
 import urllib.request
+import socket
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,17 +72,30 @@ class Api:
             return True
         return False
 
-    def open_backups(self):
-        import quote_backup
-        folder = quote_backup.directory()
-        folder.mkdir(parents=True, exist_ok=True)
-        os.startfile(str(folder))
-        return str(folder)
+
+def _reserve_server_socket():
+    """Reserve our own listener before opening a window, never borrow another."""
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            listener.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        try:
+            listener.bind((HOST, PORT))
+        except OSError as exc:
+            if exc.errno not in (98, 10048) and getattr(exc, "winerror", None) != 10048:
+                raise
+            listener.bind((HOST, 0))
+        listener.listen(128)
+        return listener
+    except Exception:
+        listener.close()
+        raise
 
 
-def _serve():
+def _serve(listener):
     # uvicorn skips signal-handler install off the main thread, so this is safe
-    uvicorn.run(app, host=HOST, port=PORT, log_level="warning")
+    server = uvicorn.Server(uvicorn.Config(app, host=HOST, port=PORT, log_level="warning"))
+    server.run(sockets=[listener])
 
 
 def _wait_until_up(timeout=40):
@@ -96,7 +110,10 @@ def _wait_until_up(timeout=40):
 
 
 def main(headless=False):
-    threading.Thread(target=_serve, daemon=True).start()
+    global URL
+    listener = _reserve_server_socket()
+    URL = f"http://{HOST}:{listener.getsockname()[1]}"
+    threading.Thread(target=_serve, args=(listener,), daemon=True).start()
     if not _wait_until_up():
         print("ERROR: server did not start", file=sys.stderr)
         sys.exit(1)

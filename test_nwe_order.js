@@ -41,13 +41,13 @@ for(const key of ['N','W','E']){
   assert.deepEqual(Array.from(context.collectNWE(key),x=>x.code||x.text),['second','custom','first']);
 }
 context.endNWEDrag=()=>{context.NWE_DRAG=null;};
-const dropEvent={clientX:75,preventDefault(){},currentTarget:{getBoundingClientRect:()=>({left:0,width:100})}};
+const dropEvent={clientY:75,preventDefault(){},currentTarget:{getBoundingClientRect:()=>({top:0,height:100})}};
 context.NWE_DRAG={key:'W',index:0};
 context.dropNWE(dropEvent,'N',2); // Other sections cannot accept this item.
 assert.equal(context.NWE_DRAG.key,'W');
 context.dropNWE(dropEvent,'W',2); // Right half inserts after the target.
 assert.deepEqual(Array.from(context.collectNWE('W'),x=>x.code||x.text),['custom','first','second']);
-context.NWE_DRAG={key:'W',index:2};dropEvent.clientX=25;
+context.NWE_DRAG={key:'W',index:2};dropEvent.clientY=25;
 context.dropNWE(dropEvent,'W',0); // Left half inserts before the target.
 assert.deepEqual(Array.from(context.collectNWE('W'),x=>x.code||x.text),['second','custom','first']);
 console.log('Passed: selection/import order, reorder both directions, drop placement, section boundaries, custom text, saved round-trip.');

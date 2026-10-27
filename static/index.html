@@ -47,14 +47,18 @@
   .nwe-chip>span{overflow-wrap:anywhere}
   .nwe-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .nwe-chip.dragging{opacity:.45}
-  .nwe-chip.drop-before{box-shadow:-3px 0 0 var(--accent)}
-  .nwe-chip.drop-after{box-shadow:3px 0 0 var(--accent)}
+  .nwe-chip.drop-before{box-shadow:0 -3px 0 var(--accent)}
+  .nwe-chip.drop-after{box-shadow:0 3px 0 var(--accent)}
 
   header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
-  .tb{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:12px 18px;gap:14px}
+  .tb{flex-wrap:wrap;max-width:1480px;margin:0 auto;display:flex;align-items:center;padding:12px 18px;gap:14px}
   .tb .brand{font-weight:700;font-size:17px;letter-spacing:-.01em}
   .tb .brand span{color:var(--brand)}
   .tb .role{font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-left:auto}
+  .tb .btn{white-space:nowrap}
+  .tb .toolbar-profile{display:flex;align-items:center;gap:6px;margin:0;text-transform:none;letter-spacing:0;white-space:nowrap}
+  .tb .toolbar-profile select{width:auto;max-width:220px;padding:5px 8px}
+  .toolbar-status{max-width:1480px;margin:0 auto;padding:0 18px 8px;font-size:11px}
   #themebtn{padding:5px 10px;font-size:15px;line-height:1}
   main{max-width:1180px;margin:0 auto 96px;padding:20px 16px}
   .grid2{display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start}
@@ -114,21 +118,8 @@
   .addrow input.code{width:90px;flex:none}
   .addrow input.ftext{flex:1;min-width:160px}
 
-  /* picker */
-  aside{position:sticky;top:70px}
-  .picker .pad{padding:12px}
-  .picker select,.picker input{margin-bottom:8px}
-  .results{max-height:52vh;overflow:auto;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm)}
-  .res{padding:7px 10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12.5px;line-height:1.35}
-  .res:last-child{border-bottom:none}
-  .res:hover{background:var(--accent-soft)}
-  .res .code{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;margin-right:6px}
-  .res .blank{color:var(--bad);font-size:10px;margin-left:4px}
-  .catlabel{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-    color:var(--muted);background:var(--inset);padding:5px 10px;position:sticky;top:0}
-
   /* nwe checklists */
-  .nwe{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .nwe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
   @media(max-width:900px){.nwe{grid-template-columns:1fr}}
   .nwe .col h3{font-size:12.5px;font-weight:700;letter-spacing:0;margin:0 0 8px;color:var(--text)}
   .checklist{max-height:240px;overflow:auto;border:1px solid var(--border);background:var(--surface);padding:5px;border-radius:var(--r-sm)}
@@ -138,6 +129,23 @@
   .checklist input{width:auto;margin-top:2px}
   .pill{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700}
 
+  .nwe .col{min-width:0}
+  .nwe .col>input{margin-bottom:8px}
+  .nwe-add{display:flex;gap:5px;margin-top:8px}
+  .nwe-add input{min-width:0;flex:1}
+  .nwe-selected{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
+  .selection-heading{font-size:12px;font-weight:600;display:flex;justify-content:space-between}
+  .selection-heading span{color:var(--muted)}
+  .nwe-order{display:flex;flex-direction:column;align-items:stretch;gap:7px}
+  .nwe-chip{display:flex;align-items:flex-start;padding:8px;gap:6px;font-size:12px;line-height:1.45;cursor:grab}
+  .nwe-wording{flex:1;min-width:0;overflow-wrap:anywhere}
+  .nwe-wording strong{display:block;margin-bottom:3px;color:var(--accent)}
+  .nwe-chip .btn{padding:2px 5px;flex:none}
+  .nwe-grip{color:var(--muted);flex:none}
+  .selection-empty,.reorder-hint{font-size:11px;line-height:1.4;margin:8px 0 0}
+  .scan-section>summary{padding:13px 16px;font-weight:600;cursor:pointer}
+  .scan-section>summary span{font-weight:400;font-size:12px;margin-left:10px}
+  .scan-section[open]>summary{border-bottom:1px solid var(--border)}
   /* options */
   .opt{border:1px solid var(--border);padding:10px;margin:10px 0;background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--shadow-sm)}
   .opt .row{align-items:center}
@@ -146,6 +154,13 @@
   .ok{color:var(--good)} .err{color:var(--bad)}
   .buildbar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
     box-shadow:0 -2px 14px rgba(20,24,40,.10);padding:12px 16px;display:flex;gap:12px;align-items:center;z-index:5}
+  .file-actions{position:relative}
+  .file-actions summary{cursor:pointer;list-style:none}
+  .file-actions summary::-webkit-details-marker{display:none}
+  .file-menu{position:absolute;bottom:calc(100% + 12px);right:0;width:250px;max-width:85vw;max-height:65vh;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-sm);box-shadow:var(--shadow)}
+  .file-menu .btn{text-align:left}
+  .file-menu p{margin:0;font-size:11px;overflow-wrap:anywhere}
+  .file-menu p:empty{display:none}
   .buildbar .sp{margin-left:auto}
 </style>
 <style>
@@ -211,39 +226,28 @@
   <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
   <div class="role">Quote Builder</div>
   <button class="btn sm" id="undo-btn" onclick="undoQuote()" disabled title="Undo the last quote edit">↶ Undo</button>
+  <button id="refresh-products" class="btn sm" onclick="refreshProducts(true)">Refresh products</button>
+  <a class="btn sm" href="https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit" target="_blank" rel="noopener">Open Copy Paste</a>
+  <label class="toolbar-profile" for="f-formatting-profile">Formatting
+    <select id="f-formatting-profile" aria-label="Layout for this quote" onchange="schedulePreview()">
+      <option value="standard">Metro standard</option>
+      <option value="john">John — test formatting</option>
+    </select>
+  </label>
   <button class="btn sm" id="themebtn" title="Change color theme" onclick="toggleTheme()">☾ Moonlit</button>
-</div></header>
+</div><div id="product-status" class="muted toolbar-status" role="status">Loading products…</div></header>
 
 <main>
-<section class="moonlit-intro" aria-labelledby="workspace-title">
-  <svg class="familiar" viewBox="0 0 112 136" fill="none" aria-hidden="true">
-    <path d="M9 127V57C9 32 32 11 56 3c24 8 47 29 47 54v70M16 127V58c0-22 19-40 40-48 21 8 40 26 40 48v69" stroke="currentColor" opacity=".45"/>
-    <path d="M66 24a20 20 0 1 0 15 30A17 17 0 0 1 66 24Z" fill="currentColor" opacity=".85"/>
-    <path d="M36 83 33 61 47 72q9-4 18 0l14-11-3 22q8 11 0 23l5 16H31l5-16q-8-12 0-23Z" fill="var(--bg)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-    <path d="m40 87 9 3m23-3-9 3M53 97l3 3 3-3m-3 3v5m-22-8-12-2m13 7-13 3m56-8 12-2m-13 7 13 3M44 119v-9m24 9v-9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M80 119c17-2 19-18 9-21M56 48v10m-5-5h10M22 43v6m-3-3h6M86 33v6m-3-3h6M5 128h102" stroke="currentColor" stroke-linecap="round"/>
-  </svg>
-  <div><h1>The moonlit workshop</h1><p>A quiet place to bring your next proposal to life.</p><p class="intro-note">A little ritual. A little magic. A familiar keeping watch.</p></div>
-</section>
 <div class="workspace">
 <div id="quote-editor"><div class="grid2">
   <div>
-    <section class="sheet"><h2>Move a quote between computers</h2><div class="pad">
-      <p class="muted">Use Build PDF to create one PDF with the editable quote attached. Send that PDF, then import it on another computer to keep editing. Every build also saves a dated backup automatically.</p>
-      <button class="btn" onclick="build(true)">Build PDF</button>
-      <button class="btn" onclick="exportQuote()">Export quote</button>
-      <button class="btn" onclick="$('#quote-file').click()">Import PDF / quote…</button>
-      <button class="btn" onclick="showBackups()">Backup folder</button>
-      <input id="quote-file" type="file" accept=".metroquote,.pdf,application/pdf" hidden onchange="importQuote(this)">
-      <p class="muted" id="backup-status" role="status"></p>
-    </div></section>
     <!-- IMPORT FROM SCAN -->
-    <section class="sheet"><h2>Start from a Scan <span class="muted" style="font-weight:400;letter-spacing:0;text-transform:none">optional</span></h2>
+    <details class="sheet scan-section"><summary>Start from a scan <span class="muted">Optional</span></summary>
       <div class="pad">
       <div class="muted" style="margin-bottom:6px">Upload a scanned sales sheet, quote, or email (image or PDF). Claude reads it and pre-fills a <b>draft</b> below — review and fix every line before building.</div>
       <label class="btn" style="display:inline-block">Choose scan (image / PDF)…
         <input type="file" accept="image/*,application/pdf" style="display:none" onchange="importScan(this)"></label>
-    </div></section>
+    </div></details>
 
     <!-- HEADER FIELDS -->
     <section class="sheet"><h2>Proposal Header</h2><div class="pad">
@@ -302,36 +306,23 @@
         <div class="col"><h3>Notes (N)</h3>
           <input type="text" id="codes-N" placeholder="paste codes e.g. 34 36 39, Enter" onkeydown="if(event.key==='Enter')addNWECodes('N')">
           <div class="checklist" id="cl-N"></div>
-          <input type="text" id="free-N" placeholder="+ free-text note, Enter"></div>
+          <div class="nwe-add"><input type="text" id="free-N" aria-label="Custom note" placeholder="Custom note…"><button type="button" class="btn sm" onclick="addFreeNWE('N')" aria-label="Add custom note">Add</button></div>
+          <div id="selected-N" class="nwe-selected"></div></div>
         <div class="col"><h3>Warranties (W)</h3>
           <input type="text" id="codes-W" placeholder="paste codes e.g. 2 3 15, Enter" onkeydown="if(event.key==='Enter')addNWECodes('W')">
           <div class="checklist" id="cl-W"></div>
-          <input type="text" id="free-W" placeholder="+ free-text warranty, Enter"></div>
+          <div class="nwe-add"><input type="text" id="free-W" aria-label="Custom warranty" placeholder="Custom warranty…"><button type="button" class="btn sm" onclick="addFreeNWE('W')" aria-label="Add custom warranty">Add</button></div>
+          <div id="selected-W" class="nwe-selected"></div></div>
         <div class="col"><h3>Exclusions (E)</h3>
           <input type="text" id="codes-E" placeholder="paste codes e.g. 4a 6 8c, Enter" onkeydown="if(event.key==='Enter')addNWECodes('E')">
           <div class="checklist" id="cl-E"></div>
-          <input type="text" id="free-E" placeholder="+ free-text exclusion, Enter"></div>
+          <div class="nwe-add"><input type="text" id="free-E" aria-label="Custom exclusion" placeholder="Custom exclusion…"><button type="button" class="btn sm" onclick="addFreeNWE('E')" aria-label="Add custom exclusion">Add</button></div>
+          <div id="selected-E" class="nwe-selected"></div></div>
       </div>
-      <div id="free-list" class="muted" style="margin-top:8px"></div>
-      <label style="margin-top:10px">Total (leave blank — salesman fills)</label>
-      <input type="text" id="f-total" style="max-width:200px">
+      <input type="hidden" id="f-total">
       </div></section>
   </div>
 
-  <!-- CODE PICKER -->
-  <aside><section class="sheet picker"><h2>Code Picker</h2><div class="pad">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <button id="refresh-products" class="btn sm" onclick="refreshProducts(true)">Refresh products</button>
-      <a href="https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit" target="_blank" rel="noopener">Open Copy Paste</a>
-    </div>
-    <div id="product-status" class="muted" role="status" style="margin-bottom:8px">Loading products…</div>
-    <label>Add picked code to location</label>
-    <select id="pick-gate"></select>
-    <input type="search" id="search" placeholder="search code or description…">
-    <select id="sheetfilter"><option value="scope">All scope sheets</option></select>
-    <div class="results" id="results"></div>
-    <div class="muted" style="margin-top:6px">Click a result to add it (qty 1). Edit qty on the line. Lines with <span class="blank" style="color:var(--bad)">␣</span> have fill-in blanks.</div>
-  </div></section></aside>
 </div>
 </div>
 <div id="preview-home">
@@ -354,11 +345,20 @@
 
 <div class="buildbar">
   <button class="btn" onclick="newQuote()">Start new quote</button>
-  <button class="btn" onclick="loadJob()">Load saved…</button>
+  <button class="btn" onclick="loadJob()">Open local quote</button>
   <select id="jobs" style="width:auto"></select>
   <span class="sp"></span>
   <span id="status" class="muted"></span>
-  <button class="btn primary" onclick="build()">Build Proposal</button>
+  <details class="file-actions" id="file-actions">
+    <summary class="btn">Files</summary>
+    <div class="file-menu">
+      <button class="btn" onclick="$('#quote-file').click()">Open quote file…</button>
+      <button class="btn" onclick="$('#file-actions').open=false;build(true)">Build PDF</button>
+      <button class="btn" onclick="$('#file-actions').open=false;exportQuote()">Save editable copy</button>
+    </div>
+  </details>
+  <input id="quote-file" type="file" accept=".metroquote,.docx,.pdf,application/pdf" hidden onchange="$('#file-actions').open=false;importQuote(this)">
+  <button class="btn primary" onclick="build()" title="Creates a Word document with the editable quote included">Build Word</button>
   <a id="dl" class="btn" hidden>Open .docx</a>
 </div>
 <div id="log" hidden></div>
@@ -366,6 +366,15 @@
 <script>
 const $ = s => document.querySelector(s);
 let activeSlug = '';
+new ResizeObserver(entries=>{
+  document.documentElement.style.setProperty('--toolbar-height',entries[0].target.offsetHeight+'px');
+}).observe(document.querySelector('header'));
+document.addEventListener('click',event=>{
+  const files=$('#file-actions');if(!files.contains(event.target))files.open=false;
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && $('#file-actions').open){$('#file-actions').open=false;$('#file-actions summary').focus();}
+});
 
 // ---------- personal theme; classic dark / light remain available ----------
 function applyTheme(t){
@@ -405,15 +414,6 @@ async function initializeEditor(){
   const products=await response.json();
   if(!Array.isArray(products.sheets))throw new Error('Invalid product list. Restart the app and retry.');
   CODES=products;
-  // sheet filter = scope sheets
-  const sf = $('#sheetfilter');
-  sf.innerHTML='<option value="scope">All scope sheets</option>';
-  CODES.sheets.filter(s=>s.section==='scope').forEach(s=>{
-    const o=document.createElement('option'); o.value=s.sheet; o.textContent=s.sheet; sf.appendChild(o);
-  });
-  sf.onchange = renderResults;
-  $('#search').oninput = renderResults;
-  renderResults();
   buildChecklists();
   showProductStatus(CODES.sync);
   setInterval(()=>refreshProducts(), 60000);
@@ -423,7 +423,7 @@ async function initializeEditor(){
   for(const k of ['N','W','E']){
     $('#free-'+k).addEventListener('keydown',e=>{
       if(e.key==='Enter' && e.target.value.trim()){
-        NWE_ORDER[k].push({text:e.target.value.trim()}); e.target.value=''; renderFree();
+        e.preventDefault();addFreeNWE(k);
       }
     });
   }
@@ -453,7 +453,6 @@ async function refreshProducts(force=false){
     const updated=await response.json();
     if(updated.sync.version!==CODES.sync.version){
       CODES=updated;
-      renderResults();
       buildChecklists();
     }
     showProductStatus(updated.sync);
@@ -468,32 +467,8 @@ async function refreshProducts(force=false){
 
 // ---------- code picker ----------
 function scopeItems(){
-  const out=[];
-  const want=$('#sheetfilter').value;
-  for(const s of CODES.sheets){
-    if(s.section!=='scope') continue;
-    if(want!=='scope' && s.sheet!==want) continue;
-    for(const c of s.categories) for(const it of c.items)
-      out.push({...it, sheet:s.sheet, cat:c.name});
-  }
-  return out;
-}
-function renderResults(){
-  const q=$('#search').value.toLowerCase().trim();
-  const items=scopeItems().filter(it=>!q ||
-      it.code.toLowerCase().includes(q) || it.description.toLowerCase().includes(q));
-  const box=$('#results'); box.innerHTML='';
-  let lastCat=null;
-  for(const it of items.slice(0,400)){
-    if(it.cat!==lastCat){lastCat=it.cat;
-      const h=document.createElement('div');h.className='catlabel';h.textContent=it.sheet+' · '+it.cat;box.appendChild(h);}
-    const d=document.createElement('div'); d.className='res';
-    d.innerHTML=`<span class="code">${it.code}</span>${esc(it.description)}`+
-      (it.blanks?` <span class="blank">␣ blanks</span>`:'');
-    d.onclick=()=>addCodeLine(it);
-    box.appendChild(d);
-  }
-  if(!items.length) box.innerHTML='<div class="res muted">no matches</div>';
+  return CODES.sheets.filter(s=>s.section==='scope').flatMap(s=>
+    s.categories.flatMap(c=>c.items.map(it=>({...it,sheet:s.sheet,cat:c.name}))));
 }
 
 // ---------- gates ----------
@@ -513,31 +488,15 @@ function addGate(scrollToNew=false){
     });
   }
 }
-function removeGate(id){ JOB.gates=JOB.gates.filter(g=>g.id!==id); redraw(); }
+function removeGate(id){ JOB.options.forEach(o=>{if(o.locationId===id)delete o.locationId;}); JOB.gates=JOB.gates.filter(g=>g.id!==id); redraw(); if(typeof recordQuoteChange==='function')recordQuoteChange(); }
 
 // a "lines container" is a gate OR a detailed option (both have id + lines[])
 function findLines(id){
   return JOB.gates.find(g=>g.id===id) || JOB.options.find(o=>o.id===id && o.lines);
 }
-function redraw(){ renderGates(); renderOptions(); }   // refreshPicker runs inside
+function redraw(){ renderGates(); renderOptions(); }
 
-function refreshPicker(){
-  const pg=$('#pick-gate'); const cur=pg.value; pg.innerHTML='';
-  JOB.gates.forEach(g=>{const o=document.createElement('option');
-    o.value=g.id; o.textContent=titleFor(g)||'(untitled location)'; pg.appendChild(o);});
-  JOB.options.filter(o=>o.lines && o.kind!=='block').forEach(o=>{
-    const op=document.createElement('option');
-    op.value=o.id; op.textContent='Option: '+(o.title||'(untitled)'); pg.appendChild(op);});
-  if([...pg.options].some(o=>o.value===cur)) pg.value=cur;
-}
 
-function addCodeLine(it){          // from the right-side picker -> selected target
-  const c=findLines($('#pick-gate').value);
-  if(!c){alert('Add a location or detailed option first');return;}
-  const line={code:it.code, sheet:it.sheet, qty:1, _desc:it.description, _blanks:it.blanks};
-  if(it.blanks) line.fills=[];
-  c.lines.push(line); redraw();
-}
 function addByCode(id){
   const ci=$('#cc-'+id); const code=ci.value.trim(); if(!code)return;
   const it=scopeItems().find(x=>x.code.toLowerCase()===code.toLowerCase());
@@ -802,11 +761,11 @@ function renderGates(){
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
-      <button class="btn sm" onclick="openFormatting('${g.id}')">Section format</button><ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}`;
+      <button class="btn sm" onclick="openFormatting('${g.id}')">Section format</button><ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}<button class="btn sm" style="margin-top:12px" onclick="addLocationOption('${g.id}')">+ option for this location</button><div class="location-options" id="options-${g.id}"></div>`;
     box.appendChild(el);
     renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id), true);
   });
-  refreshPicker();
+  renderOptions();
 }
 function applyFills(ln){
   let t=ln._desc||''; const fills=ln.fills||[];
@@ -825,6 +784,7 @@ function reorderAt(group,from,slot){
   if(to===from)return;
   const [item]=items.splice(from,1);items.splice(to,0,item);
   redraw();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
 function dragHandle(group,index,label){
   return `<button type="button" class="btn sm drag-handle" draggable="true" aria-label="Reorder ${label} ${index+1}" title="Drag to reorder. Keyboard: Alt + Up / Down." ondragstart="startRowDrag(event,'${group}',${index})" ondragend="endRowDrag()" onkeydown="keyRowDrag(event,'${group}',${index})">⠿</button>`;
@@ -885,8 +845,8 @@ function moveLine(id,i,dir){
   const [ln]=lines.splice(i,1); lines.splice(j,0,ln);
   redraw();
 }
-function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;
-  const pg=$('#pick-gate'); const o=[...pg.options].find(o=>o.value===id); if(o)o.textContent=titleFor(g)||'(untitled location)';}
+function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;renderOptions();}
+
 function setQty(id,i,v){findLines(id).lines[i].qty=v===''?null:Number(v);}
 function setFills(id,i,v,input){
   const ln=findLines(id).lines[i];ln.fills=v.split('|').map(s=>s.trim());
@@ -911,7 +871,8 @@ function renderSummary(){
 
 // ---------- options ----------
 function scrollToOption(index){
-  const card=$('#options').children[index+1];
+  const card=$('#option-card-'+index);
+  if(!card)return;
   card.querySelector('input:not([type="checkbox"]), textarea')?.focus({preventScroll:true});
   card.style.scrollMarginTop=($('header').getBoundingClientRect().height+16)+'px';
   card.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
@@ -948,10 +909,26 @@ function moveOption(i,dir){
   const [o]=JOB.options.splice(i,1); JOB.options.splice(j,0,o);
   renderOptions();   // reorders the cards + the build order
 }
+function assignOption(index,locationId){
+  if(locationId && !JOB.gates.some(g=>g.id===locationId))return;
+  if(locationId)JOB.options[index].locationId=locationId;else delete JOB.options[index].locationId;
+  renderOptions();scrollToOption(index);
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
+}
+function addLocationOption(locationId){
+  JOB.options.push({id:'o'+(++gateSeq),locationId,title:'',lines:[],amount:'',deduct:false});
+  renderOptions();scrollToOption(JOB.options.length-1);
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
+}
+function optionPlacement(o,i){
+  return `<label style="display:block;margin:8px 0">Belongs to<select aria-label="Option work location" onchange="assignOption(${i},this.value)"><option value="">General options</option>${JOB.gates.map(g=>`<option value="${g.id}" ${o.locationId===g.id?'selected':''}>${esc(titleFor(g)||'(untitled location)')}</option>`).join('')}</select></label>`;
+}
 function renderOptions(){
-  const box=$('#options');box.innerHTML='<div class="muted">Priced add/deduct lines that show in the AMOUNT column.</div>';
+  const general=$('#options');general.innerHTML='<div class="muted">General options apply to the whole quote. Use Belongs to to place an option under a work location.</div>';
+  JOB.gates.forEach(g=>{const host=$('#options-'+g.id);if(host)host.innerHTML='';});
   JOB.options.forEach((o,i)=>{
-    const el=document.createElement('div');el.className='opt';
+    const box=(o.locationId && $('#options-'+o.locationId))||general;
+    const el=document.createElement('div');el.className='opt';el.id='option-card-'+i;
     bindReorder(el,'options',i);
     const ord=`<span class="ord">${dragHandle('options',i,'option')}<b style="margin:0 6px">${i+1}.</b></span>`;
     if(o.lines && o.kind!=='block'){
@@ -970,6 +947,7 @@ function renderOptions(){
                  oninput="JOB.options[${i}].note=this.value">
         </div>
         <button class="btn sm" onclick="openFormatting('${o.id}')">Section format</button><ul class="lines" id="ls-${o.id}"></ul>${addRowHTML(o.id)}`;
+      el.insertAdjacentHTML('afterbegin',optionPlacement(o,i));
       box.appendChild(el);
       renderLineList(o.id, o.lines, el.querySelector('#ls-'+o.id), true);
       return;
@@ -1004,9 +982,9 @@ function renderOptions(){
         <input type="text" value="${escAttr(o.note||'')}" placeholder="optional note shown right-aligned by the price" oninput="JOB.options[${i}].note=this.value">
         <label style="display:inline-block;margin-right:14px;margin-top:6px"><input type="checkbox" style="width:auto" ${o.deduct?'checked':''} onchange="JOB.options[${i}].deduct=this.checked"> deduct &lt;$&gt;</label>`;
     }
+    el.insertAdjacentHTML('afterbegin',optionPlacement(o,i));
     box.appendChild(el);
   });
-  refreshPicker();
 }
 
 // ---------- N/W/E checklists ----------
@@ -1063,6 +1041,7 @@ function selectNWE(key,cb){
       NWE_ORDER[key].push({code:cb.value,text:cb.dataset.description});
   }else NWE_ORDER[key]=NWE_ORDER[key].filter(item=>item.code!==cb.value);
   renderFree();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
 function collectNWE(key){
   return NWE_ORDER[key].map(item=>({...item}));
@@ -1075,6 +1054,7 @@ function removeNWE(key,index){
     buildChecklists();
   }
   renderFree();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
 function moveNWE(key,from,slot){
   const items=NWE_ORDER[key];
@@ -1084,6 +1064,7 @@ function moveNWE(key,from,slot){
   const [item]=items.splice(from,1);
   items.splice(to,0,item);
   renderFree();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
 function startNWEDrag(event,key,index){
   NWE_DRAG={key,index};
@@ -1101,37 +1082,45 @@ function overNWEDrag(event,key){
   event.dataTransfer.dropEffect='move';
   document.querySelectorAll('.nwe-chip').forEach(el=>el.classList.remove('drop-before','drop-after'));
   const rect=event.currentTarget.getBoundingClientRect();
-  event.currentTarget.classList.add(event.clientX<rect.left+rect.width/2?'drop-before':'drop-after');
+  event.currentTarget.classList.add(event.clientY<rect.top+rect.height/2?'drop-before':'drop-after');
 }
 function dropNWE(event,key,index){
   if(!NWE_DRAG||NWE_DRAG.key!==key)return;
   event.preventDefault();
   const rect=event.currentTarget.getBoundingClientRect();
-  const slot=index+(event.clientX<rect.left+rect.width/2?0:1);
+  const slot=index+(event.clientY<rect.top+rect.height/2?0:1);
   const from=NWE_DRAG.index;
   endNWEDrag();
   moveNWE(key,from,slot);
 }
 function keyNWE(event,key,index){
-  if(event.target!==event.currentTarget||!event.altKey||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+  if(event.target!==event.currentTarget||!event.altKey||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
   event.preventDefault();
-  const to=index+(event.key==='ArrowLeft'?-1:1);
+  const to=index+(['ArrowLeft','ArrowUp'].includes(event.key)?-1:1);
   if(to<0||to>=NWE_ORDER[key].length)return;
   moveNWE(key,index,to>index?to+1:to);
   document.querySelector(`[data-nwe-key="${key}"][data-nwe-index="${to}"]`).focus();
 }
+function addFreeNWE(key){
+  const input=$('#free-'+key),text=input.value.trim();if(!text)return;
+  NWE_ORDER[key].push({text});input.value='';renderFree();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
+  input.focus();
+}
 function renderFree(){
-  const parts=[];
   const names={N:'Notes',W:'Warranties',E:'Exclusions'};
-  for(const k of ['N','W','E']) if(NWE_ORDER[k].length)
-    parts.push(`<div class="nwe-order" role="group" aria-label="${names[k]} order"><b>${names[k]} order:</b> `+NWE_ORDER[k].map((item,i)=>
-      `<span class="nwe-chip" draggable="true" tabindex="0" data-nwe-key="${k}" data-nwe-index="${i}" title="Drag to reorder. Keyboard: Alt + Left / Right." ondragstart="startNWEDrag(event,'${k}',${i})" ondragend="endNWEDrag()" ondragover="overNWEDrag(event,'${k}')" ondragleave="this.classList.remove('drop-before','drop-after')" ondrop="dropNWE(event,'${k}',${i})" onkeydown="keyNWE(event,'${k}',${i})"><span aria-hidden="true">⠿</span><span>${esc(item.code||item.text)}</span><button type="button" class="btn sm" draggable="false" aria-label="Remove ${names[k]} item ${i+1}" onclick="removeNWE('${k}',${i})">✕</button></span>`).join('<span aria-hidden="true">→</span>')+'</div>');
-  $('#free-list').innerHTML=(parts.length?'<div>Drag items to change their order, or focus an item and use Alt + ← / →.</div>':'')+parts.join('');
+  for(const k of ['N','W','E']){
+    const items=NWE_ORDER[k];
+    $('#selected-'+k).innerHTML=`<div class="selection-heading">Selected <span>${items.length}</span></div>`+
+      (items.length?`<div class="nwe-order" role="group" aria-label="${names[k]} order">`+items.map((item,i)=>
+      `<div class="nwe-chip" draggable="true" tabindex="0" data-nwe-key="${k}" data-nwe-index="${i}" title="Drag to reorder. Keyboard: Alt + Up / Down." ondragstart="startNWEDrag(event,'${k}',${i})" ondragend="endNWEDrag()" ondragover="overNWEDrag(event,'${k}')" ondragleave="this.classList.remove('drop-before','drop-after')" ondrop="dropNWE(event,'${k}',${i})" onkeydown="keyNWE(event,'${k}',${i})"><span class="nwe-grip" aria-hidden="true">⠿</span><span class="nwe-wording">${item.code?`<strong>${esc(item.code)}</strong>`:''}${esc(item.text||'')}</span><button type="button" class="btn sm" draggable="false" aria-label="Remove ${names[k]} item ${i+1}" onclick="removeNWE('${k}',${i})">✕</button></div>`).join('')+'</div><p class="muted reorder-hint">Drag to reorder · Alt + ↑ / ↓</p>':`<p class="muted selection-empty">No ${names[k].toLowerCase()} selected.</p>`);
+  }
 }
 
 // ---------- collect + build ----------
 function collect(){
   const j={
+    ...($('#f-formatting-profile').value==='john'?{formatting_profile:'john'}:{}),
     ...(activeSlug ? {slug:activeSlug} : {}),
     proposal:{
       for:$('#f-for').value, attention:$('#f-attention').value, address:$('#f-address').value,
@@ -1142,8 +1131,8 @@ function collect(){
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
     summary_text:$('#f-summary-text').value,
     options_title:$('#f-optionstitle').value,
-    gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine)})),
-    options:JOB.options.map(cleanOption),
+    gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine), ...(JOB.options.some(o=>o.locationId===g.id)?{options:JOB.options.filter(o=>o.locationId===g.id).map(cleanOption)}:{})})),
+    options:JOB.options.filter(o=>!JOB.gates.some(g=>g.id===o.locationId)).map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
   };
@@ -1199,7 +1188,6 @@ async function build(asPdf=false){
   const d=await r.json();
   $('#log').hidden=false; $('#log').textContent=[d.log,...(d.warnings||[])].filter(Boolean).join('\n');
   if(d.slug)activeSlug=d.slug;
-  $('#backup-status').textContent=d.backup?'Automatic backup saved: '+d.backup:(d.warnings||[]).join(' ');
   if(d.ok){
     const filename=d.pdf||d.docx;
     $('#status').textContent=(d.warnings||[]).length?d.warnings.join(' '):'Built '+filename;
@@ -1209,13 +1197,6 @@ async function build(asPdf=false){
     refreshJobs();
   } else { $('#status').textContent='Build failed — see details below.'; }
   }catch(e){$('#status').textContent='Build failed: '+e.message;}
-}
-
-async function showBackups(){
-  try{
-    const path=window.pywebview?await window.pywebview.api.open_backups():(await (await fetch('/api/backup-folder')).json()).path;
-    $('#backup-status').textContent='Backups: '+path;
-  }catch(e){$('#backup-status').textContent='Could not open backups: '+e.message;}
 }
 
 // ---------- saved jobs ----------
@@ -1239,6 +1220,7 @@ async function loadJob(){
   $('#status').textContent='Loaded '+slug;
 }
 function loadJobObject(j){
+  $('#f-formatting-profile').value=j.formatting_profile||'standard';
   activeSlug=j.slug||'';
   const p=j.proposal||{};
   $('#f-for').value=p.for||''; $('#f-attention').value=p.attention||''; $('#f-address').value=p.address||'';
@@ -1251,9 +1233,10 @@ function loadJobObject(j){
   $('#f-summary-text').value=j.summary_text||'';
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'', ...(g.format?{format:g.format}:{}),
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
-  JOB.options=(j.options||[]).map(o=>{
+  const allOptions=[...(j.options||[]).map(o=>({...o,locationId:undefined})),...(j.gates||[]).flatMap((g,i)=>(g.options||[]).map(o=>({...o,locationId:JOB.gates[i].id})))];
+  JOB.options=allOptions.map(o=>{
     if(o && o.lines && o.kind!=='block'){
-      return {id:'o'+(++gateSeq), title:o.title||'', amount:o.amount||'', deduct:!!o.deduct, note:o.note||'', ...(o.format?{format:o.format}:{}),
+      return {id:'o'+(++gateSeq), locationId:o.locationId, title:o.title||'', amount:o.amount||'', deduct:!!o.deduct, note:o.note||'', ...(o.format?{format:o.format}:{}),
         lines:(o.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)};
     }
     return o;
@@ -1290,7 +1273,7 @@ async function exportQuote(){
 async function importQuote(input){
   const file=input.files&&input.files[0]; if(!file)return;
   try{
-    if(!confirm('Import this quote? It will replace the current form. Export any unsaved work first. Saved quotes will be kept.'))return;
+    if(!confirm('Open this quote file? It will replace the current form. Use Save editable copy for unsaved work first. Saved quotes will be kept.'))return;
     await init();
     const fd=new FormData(); fd.append('file',file);
     const r=await fetch('/api/quote/import',{method:'POST',body:fd});
@@ -1299,8 +1282,7 @@ async function importQuote(input){
     loadJobObject({...d.job,slug:d.slug});
     $('#dl').hidden=true; $('#log').hidden=true;
     await refreshJobs(); $('#jobs').value=d.slug;
-    $('#status').textContent='Imported and saved as '+d.slug+' — edit, then Build Proposal.';
-    $('#backup-status').textContent=d.backup?'Automatic backup saved: '+d.backup:(d.warnings||[]).join(' ');
+    $('#status').textContent='Opened and saved as '+d.slug+' — edit, then Build Word.';
   }catch(e){$('#status').textContent='Import failed: '+e.message;}
   finally{input.value='';}
 }

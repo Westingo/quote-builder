@@ -26,7 +26,7 @@ import product_sync
 import word_preview
 import quote_transfer
 import quote_pdf
-import quote_backup
+import quote_docx
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -138,7 +138,7 @@ def api_build(job: dict = Body(...), pdf: bool = False):
         yaml.safe_dump(job, f, sort_keys=False, allow_unicode=True)
 
     buf = io.StringIO()
-    backup, warnings = backup_quote(job, slug)
+    backup, warnings = None, []
     ok, out = True, None
     try:
         with contextlib.redirect_stdout(buf):
@@ -178,18 +178,6 @@ def api_build(job: dict = Body(...), pdf: bool = False):
             "backup": backup, "warnings": warnings}
 
 
-def backup_quote(job, slug):
-    try:
-        return quote_backup.save(job, slug), []
-    except Exception as exc:
-        return None, [f"Quote saved locally, but automatic backup failed: {exc}"]
-
-
-@app.get("/api/backup-folder")
-def api_backup_folder():
-    return {"path": str(quote_backup.directory())}
-
-
 @app.post("/api/import")
 def api_import(file: UploadFile = File(...)):
     """Read a scanned sheet/quote/email with Claude vision -> draft job dict."""
@@ -217,9 +205,10 @@ def api_export_quote(job: dict = Body(...)):
 def api_import_quote(file: UploadFile = File(...)):
     try:
         is_pdf = (file.filename or "").lower().endswith(".pdf")
-        limit = quote_pdf.MAX_PDF_BYTES if is_pdf else quote_transfer.MAX_BYTES
+        is_docx = (file.filename or "").lower().endswith(".docx")
+        limit = quote_pdf.MAX_PDF_BYTES if is_pdf else quote_docx.MAX_BYTES if is_docx else quote_transfer.MAX_BYTES
         data = file.file.read(limit + 1)
-        job = quote_pdf.extract(data) if is_pdf else quote_transfer.import_quote(data)
+        job = quote_pdf.extract(data) if is_pdf else quote_docx.extract(data) if is_docx else quote_transfer.import_quote(data)
     except (ValueError, RecursionError) as exc:
         return JSONResponse({"error": str(exc)}, status_code=400)
     base = slugify(job["proposal"]["for"]) + "-imported"
@@ -234,7 +223,7 @@ def api_import_quote(file: UploadFile = File(...)):
             slug, suffix = f"{base}-{suffix}", suffix + 1
     with open(os.path.join(job_dir, "job.yaml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(job, f, sort_keys=False, allow_unicode=True)
-    backup, warnings = backup_quote(job, slug)
+    backup, warnings = None, []
     return {"ok": True, "job": job, "slug": slug, "backup": backup, "warnings": warnings}
 
 

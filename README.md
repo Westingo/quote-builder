@@ -39,10 +39,24 @@ do not reset local changes. Personal quotes and the local API key stay local.
 
 ## Use it
 
-The Code Picker reads products from the live [Copy Paste Google Sheet](https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit).
+### John's formatting sandbox
+
+The top-bar **Formatting** selector offers **Metro standard** (the default) and **John — test
+formatting**. John's profile starts with the current Metro layout. Future
+experiments go in `john_formatting.py`, which runs only for quotes explicitly
+assigned to John. It modifies the individual document, never shared renderer
+settings. Preview, Word and PDF all use the selected profile.
+
+The selection is saved with each quote and its transfers. Old quotes
+and new quotes use Metro standard. Receiving a John's-profile transfer requires
+this version; older installations request an update instead of losing the
+profile. Use a new quote for test work to keep an existing saved quote intact.
+
+Quote Builder reads products from the live [Copy Paste Google Sheet](https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit).
 It checks on startup and every minute while the app is open. Use **Refresh
 products** to check immediately; the status below it shows the last successful
-sync. Google's export may take a little time to reflect a just-saved edit.
+sync. **Refresh products**, **Open Copy Paste**, and **Formatting** are beside
+**Undo** in the top bar. Google's export may take a little time to reflect a just-saved edit.
 
 Add products to the existing tabs with a unique CODE and a DESCRIPTION, keeping
 the tab names and header columns. The 14 dictionary tabs are imported; calculator
@@ -62,16 +76,16 @@ In the window:
 1. Fill the **proposal header** (customer, address, date, job address, bid #, …).
 2. Add the **Install summary** lines (the centered list up top).
 3. Add **gate locations**; for each, add scope lines two ways:
-   - **+ code** — type a code (or pick from the **Code Picker** on the right);
+   - **+ code** — type a product code;
      it's looked up in the dictionary and expanded to the full Metro sentence.
    - **+ text** — type a line that isn't in the dictionary (verbatim).
    - Lines flagged with blanks (`_`) get a fill-in box (e.g. gate size/finish).
 4. Add **Options** (priced add/deduct lines, plus the Low-Voltage block).
 5. Tick **Notes / Warranties / Exclusions** (N / W / EX codes) or add free text.
-6. **Build Proposal** → opens the finished `.docx` (saved under `jobs/<slug>/`).
+6. **Build Word** → opens the finished `.docx` (saved under `jobs/<slug>/`).
 
 Quotes get revised, so the output is an **editable Word doc**, not a flat PDF.
-*Load saved…* re-opens a prior job to revise it.
+*Open local quote* re-opens a prior job to revise it.
 
 The **Live preview** on the right shows the actual proposal pages rendered by
 **Microsoft Word**, including the logo, borders, headers, footers, spacing,
@@ -92,6 +106,36 @@ customer header and footer still repeat on every page.
 
 ## Move an editable quote between computers
 
+### Keep options with their work location
+
+Use **+ option for this location** to add a detailed option beneath a location.
+Every option also has a **Belongs to** selector: choose a work location or
+**General options**. All option types can be assigned, including one-line,
+detailed, low-voltage and clean-up blocks. Drag handles reorder options.
+Attached options print immediately after their location's scope and move with
+the location when it is reordered. Removing a location returns its options to
+General options. Undo also restores these changes.
+
+Save, preview, Word/PDF transfer preserve these associations.
+Quotes with attached options require this version on the receiving computer;
+older versions will request an update instead of silently dropping the options.
+
+### Open a Word quote on another computer
+
+New **Build Word** documents include the editable quote inside the `.docx`.
+Send that file and choose **Open quote file…** on the other computer. Both
+computers need this version of Quote Builder. Import restores a separate local
+copy, including wording, quantities, options and formatting. It never needs
+the original computer's job folder.
+
+The embedded data describes the quote when it was built. Later changes made
+directly in Word do not update that data. Older Word documents have no embedded
+quote: open their saved job on the original computer and choose **Save editable
+copy**, or rebuild with this version. **Save editable copy** also saves current
+unsaved edits as a portable `.metroquote` file without building Word.
+
+Existing `.metroquote` backup files can still be opened through **Files → Open quote file…**.
+
 ### Adjust formatting before exporting
 
 Use **Format** beside a location item, note, or detailed-option item to edit
@@ -109,13 +153,13 @@ Use **Section format** on a location or detailed option to start a new page,
 keep the section together when it fits, or adjust item typography and spacing
 for the whole section. Individual line settings override section defaults.
 All these settings appear in the live preview and survive PDF transfers and
-backups. Headers, footers, and the opening band keep the standard Metro style.
+editable copies. Headers, footers, and the opening band keep the standard Metro style.
 
 ### Transfer a finished quote
 
 The easiest way is **Build PDF** in the transfer panel. It saves the Word
 proposal and creates a PDF with the editable `.metroquote` data attached inside
-it. Send that single PDF, then choose **Import PDF / quote…** on the other
+it. Send that single PDF, then choose **Files → Open quote file…** on the other
 computer. The visible PDF pages use the same Microsoft Word rendering as the
 preview. Desktop Microsoft Word must be installed and activated to build PDFs.
 
@@ -127,12 +171,12 @@ Older PDFs can still use **Start from a Scan** for a draft requiring review.
 
 You can also transfer the editable file separately:
 
-1. On Liv's computer, open the quote (use **Load saved…** for an older quote)
-   and click **Export quote**. Save the `.metroquote` file.
+1. On Liv's computer, open the quote (use **Open local quote** for an older quote)
+   and click **Files → Save editable copy**. Save the `.metroquote` file.
 2. Send that file by email, shared folder, or USB.
-3. On your computer, click **Import PDF / quote…** and choose the file. It is saved as
+3. On your computer, click **Files → Open quote file…** and choose the file. It is saved as
    a separate local copy and opens in the editor, ready for changes.
-4. Click **Build Proposal** after editing to save the changes and create Word output.
+4. Click **Build Word** after editing to save the changes and create Word output.
 
 Both computers need a version with these buttons. Export includes the current
 form, even before building: customer details, displayed product wording,
@@ -145,21 +189,12 @@ Send the `.metroquote` file for editing in Quote Builder. Edits made separately
 in Word or PDF are not included; make those changes in Quote Builder before
 exporting. Export any unsaved work before importing another quote.
 
-### Automatic backups
+### Saved quote recovery
 
-Every **Build Proposal**, **Build PDF**, and successful quote import saves a new
-dated `.metroquote` copy in **Metro Quote Backups** under your Windows user folder
-(outside the app folder). Click **Backup folder** to open it in the desktop app;
-the browser version displays its path. Import any backup to recover a separate
-editable copy. Earlier backups are retained, including when a later Word/PDF
-build fails. If a backup cannot be written, the app displays a warning while
-keeping the local saved quote.
-
-These are local recovery copies, not automatic cross-computer sync. To use an
-existing shared or synced folder, set `QUOTE_BACKUP_DIR` to that folder's full
-path before launching the app. Backup filenames use UTC timestamps and unique
-suffixes so saves from different computers can coexist. Unsaved typing is not
-backed up until you build or import a quote.
+Automatic local backup copies are disabled. Newly built Word and PDF files
+include the editable quote data; keep those files in your usual network storage
+and use **Files → Open quote file…** to reopen them. Existing `.metroquote`
+backup files remain usable through the same import action.
 
 ## Import from a scan (AI)
 

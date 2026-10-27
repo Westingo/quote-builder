@@ -84,16 +84,18 @@ def _build_header(section, h):
         p._element.getparent().remove(p._element)
 
     # full-height AMOUNT-column divider: a page-anchored line from the band
-    # (top of the body content area) down into the TOTAL box, drawn here so it
+    # (top of the body content area) to the body bottom, drawn here so it
     # repeats on every page. top_margin is sized to always exceed the header
     # height, so the band sits at top_margin and the line starts right at it.
     x = section.left_margin.pt + CONTENT_W.pt
     y_top = section.top_margin.pt + 1
-    # end at the body bottom (top of the DATE/TOTAL band); the band's own
-    # TOTAL-cell left border carries the divider down through the box, so the
-    # line never spills past the band into the fine print below.
+    # Share the same page coordinate for the divider end and footer rule.
+    # A paragraph border moves with footer content and can leave a gap here.
     y_bottom = section.page_height.pt - section.bottom_margin.pt
-    U.add_page_line(header, round(x, 1), round(y_top, 1), round(y_bottom, 1))
+    anchor = U.add_page_line(header, round(x, 1), round(y_top, 1), round(y_bottom, 1))
+    U.add_page_line(header, round(section.left_margin.pt, 1),
+                    round(y_bottom, 1), round(y_bottom, 1),
+                    x2_pt=round(section.page_width.pt - section.right_margin.pt, 1), paragraph=anchor)
 
     # --- title row: PROPOSAL | Pg X of Y | logo ---
     trow = header.add_table(rows=1, cols=3, width=PAGE_BODY_W)
@@ -168,18 +170,9 @@ def _build_header(section, h):
           value_bold=True, hang=Inches(1.15))
     field(grid.cell(3, 1), "Attention:", h.get("attention"))
 
-    # bottom rule under the info box
-    rule = header.add_paragraph()
-    U.no_space(rule, before=2, after=0)
-    pPr = rule._p.get_or_add_pPr()
-    from docx.oxml import OxmlElement
-    from docx.oxml.ns import qn
-    pbdr = OxmlElement("w:pBdr")
-    bottom = OxmlElement("w:bottom")
-    bottom.set(qn("w:val"), "single"); bottom.set(qn("w:sz"), "12")
-    bottom.set(qn("w:space"), "1"); bottom.set(qn("w:color"), "000000")
-    pbdr.append(bottom)
-    pPr.append(pbdr)
+    # Keep Word's required trailing header paragraph, without a second rule.
+    trailing = header.add_paragraph()
+    U.no_space(trailing, before=0, after=0)
 
 
 # ----------------------------------------------------------------------------
@@ -202,30 +195,9 @@ def _build_footer(section, h, total=None):
     for p in list(footer.paragraphs):
         p._element.getparent().remove(p._element)
 
-    # --- DATE INSTALLATION DESIRED | TOTAL band ---
-    band = footer.add_table(rows=1, cols=2, width=PAGE_BODY_W)
-    band.alignment = WD_TABLE_ALIGNMENT.CENTER
-    U.clear_table_borders(band)
-    U.set_col_widths(band, [CONTENT_W, AMOUNT_W])
-    for c in band.rows[0].cells:
-        U.set_cell_borders(c, edges=("top", "bottom"), sz="8")
-    lp = band.cell(0, 0).paragraphs[0]
-    U.no_space(lp, before=1, after=1)
-    _run(lp, "DATE INSTALLATION DESIRED", size=10)
-    rp = band.cell(0, 1).paragraphs[0]
-    rp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    U.no_space(rp, before=1, after=1)
-    _run(rp, "TOTAL", bold=True, size=10, smallcaps=True)
-    if total:
-        tp = band.cell(0, 1).add_paragraph()
-        tp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        U.no_space(tp, before=0, after=1)
-        amt = str(total)
-        _run(tp, amt if amt.startswith("$") else f"${amt}", bold=True, size=11)
-    U.set_cell_borders(band.cell(0, 1), edges=("top", "bottom", "left"), sz="8")
-
     # --- fine print + Metro logo in the bottom-right corner (like the original) ---
     fp = footer.add_paragraph()
+    # The footer separator is page-anchored with the amount divider above.
     U.no_space(fp, before=2, after=2, line=0.9)
     _run(fp, FINE_PRINT, size=6.5)
     ids = footer.add_paragraph()
@@ -378,7 +350,7 @@ def _amount_cell(cell, amount, deduct=False, before=0, after=0):
     rp = cell.paragraphs[0]
     U.no_space(rp, before=before, after=after, line=1.0)
     if amount not in (None, ""):
-        _run(rp, _format_amount_text(amount, deduct), size=10)
+        _run(rp, _format_amount_text(amount, deduct), bold=True, size=10)
     return rp
 
 
@@ -554,6 +526,8 @@ def render_body(body, doc):
     # per-gate scope — one 2-column table per gate (description | editable AMOUNT)
     for gate in doc.get("gates", []):
         _gate_block(body, gate)
+        if gate.get("options"):
+            render_options(body, gate["options"], doc.get("options_title", DEFAULT_OPTIONS_TITLE))
 
     # options — flow right after the gates; only spill to a new page if there
     # isn't room (no forced page break)
@@ -669,14 +643,6 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
     else:
         _para(body, before=10, after=0)   # just a gap before the options
 
-    def amount_para(cell, amount, deduct=False):
-        p = cell.paragraphs[0]
-        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        U.no_space(p, after=0)
-        if amount:
-            txt = f"<${amount}>" if deduct else f"${amount}"
-            _run(p, txt, size=10)
-
     for opt in options:
         # detailed option: a titled block of coded/free-text scope lines + an
         # amount (e.g. "Residential Elevator:" with a Brivo panel, a reader, ...)
@@ -726,7 +692,7 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
                 U.no_space(ap, after=0)
                 amt = str(sub.get("amount", "")).lstrip("$").strip()
                 if amt:                       # strip any leading $ so it isn't doubled
-                    _run(ap, f"${amt}", size=10)
+                    _run(ap, f"${amt}", bold=True, size=10)
         else:
             _run(lp, "•  ", size=10)
             _run(lp, opt.get("text", ""), size=10)
@@ -739,7 +705,7 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
                 _run(cg, note, bold=True, size=9)
                 # bottom-align the price so it lines up with the note (its last line)
                 t.cell(0, 1).vertical_alignment = WD_ALIGN_VERTICAL.BOTTOM
-            amount_para(t.cell(0, 1), opt.get("amount"), opt.get("deduct"))
+            _amount_cell(t.cell(0, 1), opt.get("amount"), opt.get("deduct"))
         # spacer
         sp = _para(body, after=4)
 
@@ -769,6 +735,8 @@ def render_nwe(body, doc):
 # entry point
 # ----------------------------------------------------------------------------
 def build_proposal(doc, out_path):
+    import formatting_profiles
+    profile = formatting_profiles.validate(doc.get("formatting_profile", "standard"))
     document = Document()
     # base style
     normal = document.styles["Normal"]
@@ -789,6 +757,8 @@ def build_proposal(doc, out_path):
     _build_header(section, doc["header"])
     _build_footer(section, doc["header"], total=doc.get("total"))
     render_body(document, doc)
+
+    formatting_profiles.apply(document, profile)
 
     document.save(out_path)
     return out_path
