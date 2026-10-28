@@ -76,8 +76,8 @@ def _para(container, *, align=None, before=0, after=2, line=1.0, reserve_amount=
 # ----------------------------------------------------------------------------
 # page header — the info box (repeats on every page)
 # ----------------------------------------------------------------------------
-def _build_header(section, h):
-    header = section.header
+def _build_header(section, h, *, first_page=False):
+    header = section.first_page_header if first_page else section.header
     header.is_linked_to_previous = False
     # clear the default empty paragraph
     for p in list(header.paragraphs):
@@ -96,6 +96,13 @@ def _build_header(section, h):
     U.add_page_line(header, round(section.left_margin.pt, 1),
                     round(y_bottom, 1), round(y_bottom, 1),
                     x2_pt=round(section.page_width.pt - section.right_margin.pt, 1), paragraph=anchor)
+
+    # Page one uses the opening band; continuation pages need a single rule.
+    if not first_page:
+        U.add_page_line(header, round(section.left_margin.pt, 1),
+                        round(y_top, 1), round(y_top, 1),
+                        x2_pt=round(section.page_width.pt - section.right_margin.pt, 1),
+                        paragraph=anchor)
 
     # --- title row: PROPOSAL | Pg X of Y | logo ---
     trow = header.add_table(rows=1, cols=3, width=PAGE_BODY_W)
@@ -189,8 +196,8 @@ FINE_PRINT = (
 )
 
 
-def _build_footer(section, h, total=None):
-    footer = section.footer
+def _build_footer(section, h, total=None, *, first_page=False):
+    footer = section.first_page_footer if first_page else section.footer
     footer.is_linked_to_previous = False
     for p in list(footer.paragraphs):
         p._element.getparent().remove(p._element)
@@ -754,8 +761,11 @@ def build_proposal(doc, out_path):
     section.footer_distance = Inches(0.3)
     U.set_page_border(section)
 
-    _build_header(section, doc["header"])
-    _build_footer(section, doc["header"], total=doc.get("total"))
+    section.different_first_page_header_footer = True
+    for first_page in (True, False):
+        _build_header(section, doc["header"], first_page=first_page)
+        _build_footer(section, doc["header"], total=doc.get("total"),
+                      first_page=first_page)
     render_body(document, doc)
 
     formatting_profiles.apply(document, profile)
