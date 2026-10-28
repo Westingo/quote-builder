@@ -1,0 +1,8 @@
+.pm-tabs{max-width:1800px;margin:auto;display:flex;gap:8px;padding:0 18px 12px}
+.pm-layout{display:grid;grid-template-columns:minmax(320px,1fr) minmax(400px,1fr);gap:24px;align-items:start}
+.pm-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.pm-wide{grid-column:1/-1}.pm-actions{display:flex;gap:8px}.pm-actions select{flex:1;min-width:0}
+.pm-preview{position:sticky;top:calc(var(--toolbar-height,120px) + 12px);max-height:calc(100vh - var(--toolbar-height,120px) - 90px);overflow:auto}
+#pm-image{width:100%;height:auto;background:white;box-shadow:0 2px 12px #0003}
+.pm-active #undo-btn,.pm-active #refresh-products,.pm-active .toolbar-profile,.pm-active #product-status,.pm-active .tb>a{display:none}
+@media(max-width:850px){.pm-layout{grid-template-columns:1fr}.pm-preview{position:static;max-height:none}.pm-fields{grid-template-columns:1fr}.pm-wide{grid-column:auto}}

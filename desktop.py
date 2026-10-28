@@ -40,6 +40,24 @@ class Api:
     proposal or its folder in the OS default app — the desktop equivalent of a
     browser download."""
 
+    def save_pm_pdf(self, data):
+        import webview
+        import pm_sheets
+        from app import slugify
+        content = pm_sheets.render(data)
+        paths = webview.windows[0].create_file_dialog(
+            webview.FileDialog.SAVE,
+            save_filename=slugify(data.get("customer")) + "-PM.pdf",
+            file_types=("PDF document (*.pdf)",))
+        if not paths:
+            return False
+        path = paths if isinstance(paths, str) else paths[0]
+        if not path.lower().endswith(".pdf"):
+            path += ".pdf"
+        with open(path, "wb") as stream:
+            stream.write(content)
+        return True
+
     def save_quote(self, job):
         import webview
         import quote_transfer

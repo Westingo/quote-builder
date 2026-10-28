@@ -27,6 +27,7 @@ import word_preview
 import quote_transfer
 import quote_pdf
 import quote_docx
+import pm_sheets
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATIC = os.path.join(HERE, "static")
@@ -36,6 +37,7 @@ CODES = os.path.join(HERE, "codes.yaml")
 DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 app = FastAPI(title="Metro Quote Builder")
+app.include_router(pm_sheets.router)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 

@@ -32,7 +32,7 @@ api_key.txt
 .product-cache.json
 .product-cache-*.tmp
 
-# Per-machine customer quotes stay local — only the template and Hoodland demo
+# Per-machine customer quotes stay local â€” only the template and Hoodland demo
 # ship in the repo. New job folders won't be committed on any machine.
 /jobs/*
 !/jobs/_template
@@ -40,3 +40,8 @@ api_key.txt
 
 # OpenAI scan key (local only)
 openai_api_key.txt
+
+# Local preventive maintenance contracts
+pm_sheets/
+tmp/
+pm-reference.png

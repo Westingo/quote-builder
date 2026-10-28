@@ -265,3 +265,23 @@ reference only — the tool never does pricing math.
 | `codes.yaml` / `build_codes.py` | the dictionary and its generator |
 | `static/index.html` | the single-page UI (vanilla JS) |
 | `jobs/<slug>/job.yaml` | per-job input; built `.docx` lands beside it |
+
+## PM sheets
+
+Use the **PM Sheets** tab to prepare a maintenance worksheet when a contract is awarded.
+Enter the account, zone, service months, customer/site, contact, scope, checklist,
+service price, and access notes. Choose a starting month and Quarterly, Semiannual, or Annual frequency. Scheduled
+visit months are calculated automatically, wrapping into the next year as needed.
+The live preview and PDF use the same one-page Letter layout. Technician completion
+fields remain blank for use on the service visit.
+
+**Save PM sheet** stores an editable contract locally in `pm_sheets/`; choose it in
+Saved PM sheets and click Open to revise it. **Duplicate** creates a separate contract
+on the next save. A recovery draft is kept in browser storage. **Build PDF** exports
+the current form; in the desktop app it opens a Save As dialog. Save the PM sheet as
+well if you want it in the saved list. PDFs include the source worksheet data as an
+attachment, but opening/importing that attachment is not yet part of the UI.
+
+Long content that cannot fit the worksheet is rejected with a message rather than
+clipped. Shorten the indicated content to keep the existing single-page format.
+No Publisher or Word installation is required for PM PDF generation.

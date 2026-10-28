@@ -220,6 +220,7 @@
 <script>/* Apply the personal theme before paint; keep its preference separate. */
 (function(){var t='moonlit';try{var saved=localStorage.getItem('quote-builder-theme');if(['moonlit','dark','light'].includes(saved))t=saved;}catch(e){}document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="stylesheet" href="/static/preview.css">
+<link rel="stylesheet" href="/static/pm.css">
 </head>
 <body>
 <header><div class="tb">
@@ -1335,5 +1336,6 @@ function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 </script>
 <script src="/static/history.js"></script>
 <script src="/static/preview.js"></script>
+<script src="/static/pm.js"></script>
 </body>
 </html>
