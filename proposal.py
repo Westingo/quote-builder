@@ -10,7 +10,7 @@ with everything already resolved to display text:
                  ccb, cc, job_footer},
       "tariff_notes": [str, ...],          # italic * bullets under the band
       "intro": str,                        # "Metro Access will provide ..."
-      "gate_summary": [str, ...],          # centered Install: list
+      "gate_summary": [str, ...],          # centered user-entered summary
       "gates": [ {title, lines:[{qty:int|None, text}]} ],
       "options": [ ... see render_options ... ],
       "notes": [str], "warranties": [str], "exclusions": [str],
@@ -517,10 +517,8 @@ def render_body(body, doc):
         p = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=6, after=2)
         _run(p, doc["intro"], bold=True, size=12)
 
-    # Install: gate summary (centered, underlined header)
+    # Centered summary: print only the wording entered by the user.
     if doc.get("gate_summary"):
-        p = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=2, after=1)
-        _run(p, "Install:", bold=True, underline=True, size=11)
         for g in doc["gate_summary"]:
             gp = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=0, after=0)
             _run(gp, g, bold=True, size=11)
