@@ -3,7 +3,7 @@
 let quoteHistory=[], quoteSnapshot=null, quoteTypingTarget=null;
 function snapshotQuote(){
   const fields={};
-  document.querySelectorAll('#quote-editor [id^="f-"], #f-formatting-profile').forEach(el=>fields[el.id]=el.value);
+  document.querySelectorAll('#quote-editor [id^="f-"], #f-formatting-profile').forEach(el=>fields[el.id]=el.type==='checkbox'?el.checked:el.value);
   return JSON.stringify({job:JOB,nwe:NWE_ORDER,fields,gateSeq});
 }
 function resetQuoteHistory(){
@@ -26,7 +26,10 @@ function undoQuote(){
   if(!quoteHistory.length)return;
   const state=JSON.parse(quoteHistory.pop());
   JOB=state.job; NWE_ORDER=state.nwe; gateSeq=state.gateSeq;
-  for(const [id,value] of Object.entries(state.fields))document.getElementById(id).value=value;
+  for(const [id,value] of Object.entries(state.fields)){
+    const el=document.getElementById(id);
+    if(el.type==='checkbox')el.checked=value;else el.value=value;
+  }
   // Rebuild checkmarks without replacing the saved wording or order.
   document.querySelectorAll('.checklist input').forEach(cb=>cb.checked=false);
   for(const key of ['N','W','E']){

@@ -236,6 +236,7 @@ def build_doc(job, data, index):
 
     doc = {
         "header": {
+            "cmi": p.get("cmi") is True,
             "for": p.get("for", ""),
             "address": p.get("address", ""),
             "phone": p.get("phone", ""),
@@ -255,6 +256,7 @@ def build_doc(job, data, index):
         "intro": intro,
         "gate_summary": job.get("gate_summary", []),
         "summary_text": job.get("summary_text", ""),
+        "summary_text_format": quote_format.validate(job.get("summary_text_format", {})),
         "gates": gates,
         "options_title": job.get("options_title", proposal.DEFAULT_OPTIONS_TITLE),
         "options": process_options(index, job.get("options")),

@@ -35,3 +35,8 @@ for(const name of ['addOption','addDetailOption','addLowVoltage','addCleanup']){
   options[name]();assert.equal(revealed,name==='addDetailOption'?1:0);
 }
 console.log('Passed undo additions, removal with empty rows, cached wording, typing grouping, notes, quote reset, history limit and all option insertion targets.');
+
+field.type='checkbox';field.checked=false;ctx.resetQuoteHistory();
+field.checked=true;ctx.recordQuoteChange();ctx.undoQuote();
+assert.equal(field.checked,false);
+console.log('Passed checkbox undo.');

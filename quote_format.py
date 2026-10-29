@@ -7,7 +7,7 @@ ENUMS = {
 }
 NUMBERS = {"font_size": (8, 14), "space_before": (0, 36),
            "space_after": (0, 24), "line_spacing": (1, 1.5)}
-FLAGS = {"bold", "underline", "keep_next", "keep_together", "page_break"}
+FLAGS = {"bold", "italic", "underline", "keep_next", "keep_together", "page_break"}
 
 
 def validate(value):

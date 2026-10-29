@@ -12,7 +12,7 @@ const context=vm.createContext({
   NWE_ORDER:{N:[],W:[],E:[]},renderFree(){},buildChecklists(){},
   $:selector=>({querySelectorAll:()=>boxes[selector.slice(-1)]})
 });
-for(const name of ['selectNWE','collectNWE','removeNWE','applyNWE','moveNWE','dropNWE'])vm.runInContext(extract(name),context);
+for(const name of ['selectNWE','collectNWE','removeNWE','applyNWE','moveNWE','dropNWE','warrantyYearParts','updateWarrantyYears'])vm.runInContext(extract(name),context);
 for(const key of ['N','W','E']){
   for(const n of [2,1,6]){const cb=boxes[key].find(c=>c.value.endsWith(n));cb.checked=true;context.selectNWE(key,cb);}
   assert.deepEqual(Array.from(context.collectNWE(key),x=>x.code),[2,1,6].map(n=>(key==='E'?'EX':key)+n));
@@ -51,3 +51,23 @@ context.NWE_DRAG={key:'W',index:2};dropEvent.clientY=25;
 context.dropNWE(dropEvent,'W',0); // Left half inserts before the target.
 assert.deepEqual(Array.from(context.collectNWE('W'),x=>x.code||x.text),['second','custom','first']);
 console.log('Passed: selection/import order, reorder both directions, drop placement, section boundaries, custom text, saved round-trip.');
+
+// Warranty 1's entered years must survive save/reload and later edits.
+boxes.W[0].dataset.description='LiftMaster Elite series opener – years parts, no warranty on battery';
+context.NWE_ORDER.W=[];
+context.applyNWE('W',['W1']);
+context.updateWarrantyYears(0,{value:'5',validity:{valid:true}});
+const warrantySaved=context.collectNWE('W');
+assert.equal(warrantySaved[0].text,'LiftMaster Elite series opener – 5 years parts, no warranty on battery');
+context.NWE_ORDER.W=[];
+context.applyNWE('W',warrantySaved);
+assert.equal(context.NWE_ORDER.W[0].code,'W1');
+assert.equal(context.warrantyYearParts(context.NWE_ORDER.W[0])[2],'5');
+context.updateWarrantyYears(0,{value:'3',validity:{valid:true}});
+assert.equal(context.warrantyYearParts(context.NWE_ORDER.W[0])[2],'3');
+context.updateWarrantyYears(0,{value:'-1',validity:{valid:false}});
+assert.equal(context.warrantyYearParts(context.NWE_ORDER.W[0])[2],'3');
+context.updateWarrantyYears(0,{value:'',validity:{valid:true}});
+assert.equal(context.NWE_ORDER.W[0].text,boxes.W[0].dataset.description);
+assert.equal(context.warrantyYearParts({code:'W6',text:boxes.W[0].dataset.description}),null);
+console.log('Passed: editable warranty years, saved round-trip, subsequent edits, invalid input, and clearing.');

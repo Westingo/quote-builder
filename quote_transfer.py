@@ -38,7 +38,9 @@ def validate_job(job):
     formatting_profiles.validate(job.get("formatting_profile", "standard"))
     check(job.get("proposal"), dict, "proposal")
     for key, value in job["proposal"].items():
-        if key == "tariff_notes":
+        if key == "cmi":
+            check(value, bool, "proposal.cmi")
+        elif key == "tariff_notes":
             if value is not None:
                 strings(value, "proposal.tariff_notes")
         else:
@@ -46,6 +48,8 @@ def validate_job(job):
     if not job["proposal"].get("for", "").strip():
         raise ValueError("Customer (For:) is required.")
     strings(job.get("gate_summary", []), "gate_summary")
+    if "summary_text_format" in job:
+        quote_format.validate(job["summary_text_format"])
     if "summary_text" in job:
         check(job["summary_text"], str, "summary_text")
     for key in ("gates", "options", "notes", "warranties", "exclusions"):

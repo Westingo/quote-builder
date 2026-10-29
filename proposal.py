@@ -104,6 +104,22 @@ def _build_header(section, h, *, first_page=False):
                         x2_pt=round(section.page_width.pt - section.right_margin.pt, 1),
                         paragraph=anchor)
 
+    if h.get("cmi") is True:
+        # Page-anchored badge beside the logo, without changing header height.
+        from docx.oxml import parse_xml
+        anchor.add_run()._r.append(parse_xml(
+            '<w:pict xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+            'xmlns:v="urn:schemas-microsoft-com:vml">'
+            '<v:rect id="CMIBadge" style="position:absolute;left:440pt;top:27pt;'
+            'width:36pt;height:17pt;mso-position-horizontal-relative:page;'
+            'mso-position-vertical-relative:page" strokecolor="black" strokeweight="0.5pt" fillcolor="white">'
+            '<v:textbox inset="0,0,0,0"><w:txbxContent><w:p><w:pPr>'
+            '<w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/>'
+            '</w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman"/>'
+            '<w:sz w:val="20"/></w:rPr><w:t>CMI</w:t></w:r></w:p></w:txbxContent></v:textbox>'
+            '</v:rect></w:pict>'
+        ))
+
     # --- title row: PROPOSAL | Pg X of Y | logo ---
     trow = header.add_table(rows=1, cols=3, width=PAGE_BODY_W)
     trow.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -461,6 +477,10 @@ def _format_row(row, line, section):
         pos = {"left": 0, "quantity": QTY_TAB, "description": DESC_TAB}[start]
         pf.left_indent = pos
         pf.first_line_indent = 0
+    # A Supply label starts a separate group, with one blank line above it.
+    # Apply to both scope and option rows; explicit row spacing still wins.
+    if p.text.lstrip().lower().startswith("supply:"):
+        fmt.setdefault("space_before", 12)
     if fmt.get("wrap") in ("start", "description"):
         first = (pf.left_indent or 0) + (pf.first_line_indent or 0)
         if start == "auto":
@@ -488,6 +508,8 @@ def _format_row(row, line, section):
     for run in p.runs:
         if "bold" in fmt:
             run.bold = fmt["bold"]
+        if "italic" in fmt:
+            run.italic = fmt["italic"]
         if "underline" in fmt:
             run.underline = fmt["underline"]
     row.cells[1].vertical_alignment = {"top": WD_ALIGN_VERTICAL.TOP,
@@ -527,6 +549,30 @@ def render_body(body, doc):
     if (doc.get("summary_text") or "").strip():
         p = _para(body, before=6, after=4)
         _run(p, doc["summary_text"], size=10)
+        fmt = quote_format.validate(doc.get("summary_text_format", {}))
+        pf = p.paragraph_format
+        start = fmt.get("start", "auto")
+        origin = {"auto": 0, "left": 0, "quantity": QTY_TAB, "description": DESC_TAB}[start]
+        target = DESC_TAB if fmt.get("wrap") == "description" else origin
+        pf.left_indent = target
+        pf.first_line_indent = origin - target
+        if "align" in fmt:
+            pf.alignment = {"left": WD_ALIGN_PARAGRAPH.LEFT,
+                            "center": WD_ALIGN_PARAGRAPH.CENTER,
+                            "right": WD_ALIGN_PARAGRAPH.RIGHT}[fmt["align"]]
+        for key in ("space_before", "space_after"):
+            if key in fmt:
+                setattr(pf, key, Pt(fmt[key]))
+        if "line_spacing" in fmt:
+            pf.line_spacing = fmt["line_spacing"]
+        if "keep_next" in fmt:
+            pf.keep_with_next = fmt["keep_next"]
+        for run in p.runs:
+            if "font_size" in fmt:
+                run.font.size = Pt(fmt["font_size"])
+            for key in ("bold", "italic", "underline"):
+                if key in fmt:
+                    setattr(run, key, fmt[key])
 
     # per-gate scope — one 2-column table per gate (description | editable AMOUNT)
     for gate in doc.get("gates", []):

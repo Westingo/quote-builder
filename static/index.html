@@ -139,6 +139,7 @@
   .nwe-order{display:flex;flex-direction:column;align-items:stretch;gap:7px}
   .nwe-chip{display:flex;align-items:flex-start;padding:8px;gap:6px;font-size:12px;line-height:1.45;cursor:grab}
   .nwe-wording{flex:1;min-width:0;overflow-wrap:anywhere}
+  .nwe-years{width:64px;display:inline-block;padding:3px 5px;font:inherit}
   .nwe-wording strong{display:block;margin-bottom:3px;color:var(--accent)}
   .nwe-chip .btn{padding:2px 5px;flex:none}
   .nwe-grip{color:var(--muted);flex:none}
@@ -258,6 +259,7 @@
 
     <!-- HEADER FIELDS -->
     <section class="sheet"><h2>Proposal Header</h2><div class="pad">
+      <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><input type="checkbox" id="f-cmi" style="width:auto"> CMI</label>
       <div class="row">
         <div><label>For (customer) *</label><input type="text" id="f-for"></div>
         <div><label>Attention</label><input type="text" id="f-attention"></div>
@@ -292,6 +294,7 @@
     <section class="sheet"><h2>Text Below Install Summary</h2><div class="pad">
       <label for="f-summary-text">Optional text — printed below the install summary, before work locations</label>
       <textarea id="f-summary-text" rows="3" placeholder="Add project details or a note here…"></textarea>
+      <button type="button" class="btn sm" onclick="openFormatting('summary',0)">Format</button>
     </div></section>
     <section class="sheet"><h2>Work Locations <button class="btn sm" onclick="addGate(true)">+ location</button></h2>
       <div class="pad" id="gates"></div></section>
@@ -662,9 +665,10 @@ function renderLineList(id, lines, ul, withLineAmount){
 }
 let formatTarget=null;
 function openFormatting(id,index=null){
-  const group=findLines(id);
-  const target=index===null?group:group.lines[index];
-  formatTarget={target,index};
+  const summary=id==='summary';
+  const group=summary?null:findLines(id);
+  const target=summary?{text:$('#f-summary-text').value,format:JOB.summary_text_format}:index===null?group:group.lines[index];
+  formatTarget={target,index,summary};
   const f=target.format||{};
   const dialog=$('#format-dialog');
   const select=(key,label,choices)=>`<label>${label}<select name="${key}"><option value="">Use default</option>${choices.map(([v,t])=>`<option value="${v}"${f[key]===v?' selected':''}>${t}</option>`).join('')}</select></label>`;
@@ -672,15 +676,15 @@ function openFormatting(id,index=null){
   const flag=(key,label)=>`<label><input style="width:auto" name="${key}" type="checkbox" ${f[key]?'checked':''}> ${label}</label>`;
   const row=index!==null;
   const text=row?(target.amount_note??target.text??applyFills(target)):'';
-  dialog.innerHTML=`<form id="format-form"><h2>${row?'Line formatting':'Section formatting'}</h2>
+  dialog.innerHTML=`<form id="format-form"><h2>${summary?'Summary text formatting':row?'Line formatting':'Section formatting'}</h2>
     <p class="muted">Changes appear in the live preview and are saved with the quote. Blank fields use the existing layout.</p>
     ${row?`<label>Text — press Enter for a line break<textarea name="wording" rows="4"></textarea></label>
-      ${select('start','Text position',[['auto','Keep label / quantity / note style'],['left','Text only: left edge'],['quantity','Text only: quantity column'],['description','Text only: description column']])}
-      <p class="muted">Text-only positions hide the label and quantity on this line. Choose the default position to show them again.</p>
+      ${select('start','Text position',[['auto',summary?'Left edge (default)':'Keep label / quantity / note style'],['left','Text only: left edge'],['quantity','Text only: quantity column'],['description','Text only: description column']])}
+      ${summary?'':'<p class="muted">Text-only positions hide the label and quantity on this line. Choose the default position to show them again.</p>'}
       ${select('wrap','Wrapped lines start at',[['auto','Original layout'],['start','Same column as the text'],['description','Description column']])}
       ${select('align','Text alignment',[['left','Left'],['center','Center'],['right','Right']])}
-      ${select('amount_align','Price alignment beside this text',[['top','Top — beside first line'],['center','Middle'],['bottom','Bottom — beside last line']])}
-      ${flag('bold','Bold text')}${flag('underline','Underline text')}${flag('keep_next','Keep with the next line')}`:
+      ${summary?'':select('amount_align','Price alignment beside this text',[['top','Top — beside first line'],['center','Middle'],['bottom','Bottom — beside last line']])}
+      ${flag('bold','Bold text')}${flag('italic','Italic text')}${flag('underline','Underline text')}${flag('keep_next','Keep with the next line')}`:
       `${flag('page_break','Start this section on a new page')}${flag('keep_together','Keep this section on one page when it fits')}`}
     <div class="row">${number('font_size',row?'Font size (pt)':'Item font size (pt)',8,14,0.5)}${number('line_spacing','Line spacing',1,1.5,0.05)}</div>
     <div class="row">${number('space_before',row?'Space above line (pt)':'Space above heading (pt)',0,36)}${number('space_after',row?'Space below line (pt)':'Space between items (pt)',0,24)}</div>
@@ -691,7 +695,7 @@ function openFormatting(id,index=null){
   dialog.showModal();
 }
 function saveFormatting(form){
-  const {target,index}=formatTarget, f={};
+  const {target,index,summary}=formatTarget, f={};
   for(const el of form.elements){
     if(!el.name||el.name==='wording')continue;
     if(el.type==='checkbox'){if(el.checked)f[el.name]=true;}
@@ -702,10 +706,15 @@ function saveFormatting(form){
     const key=target.amount_note!==undefined?'amount_note':'text';
     target[key]=form.elements.wording.value;
   }
+  if(summary){
+    JOB.summary_text_format=target.format||{};
+    $('#f-summary-text').value=target.text;
+  }
   $('#format-dialog').close();redraw();schedulePreview();
 }
 function resetFormatting(){
   delete formatTarget.target.format;
+  if(formatTarget.summary)delete JOB.summary_text_format;
   $('#format-dialog').close();redraw();schedulePreview();
 }
 function changeNoteType(id,i,type){
@@ -1114,13 +1123,28 @@ function addFreeNWE(key){
   if(typeof recordQuoteChange==='function')recordQuoteChange();
   input.focus();
 }
+function warrantyYearParts(item){
+  if(item.code && item.code!=='W1')return null;
+  return (item.text||'').match(/^(LiftMaster Elite series opener\s*[–—-]\s*)(\d*)(\s*years parts, no warranty on battery)$/i);
+}
+function nweWording(key,item,index){
+  const parts=key==='W'?warrantyYearParts(item):null;
+  if(!parts)return esc(item.text||'');
+  return `${esc(parts[1])}<input class="nwe-years" type="number" min="0" step="1" inputmode="numeric" placeholder="Years" aria-label="Warranty 1 parts warranty years" value="${escAttr(parts[2])}" draggable="false" ondragstart="event.stopPropagation();event.preventDefault()" oninput="updateWarrantyYears(${index},this)"> ${esc(parts[3].trimStart())}`;
+}
+function updateWarrantyYears(index,input){
+  const item=NWE_ORDER.W[index],parts=item&&warrantyYearParts(item);
+  if(!parts||!input.validity.valid||!/^\d*$/.test(input.value))return;
+  item.text=parts[1]+(input.value?input.value+' ':'')+parts[3].trimStart();
+  if(typeof recordQuoteChange==='function')recordQuoteChange();
+}
 function renderFree(){
   const names={N:'Notes',W:'Warranties',E:'Exclusions'};
   for(const k of ['N','W','E']){
     const items=NWE_ORDER[k];
     $('#selected-'+k).innerHTML=`<div class="selection-heading">Selected <span>${items.length}</span></div>`+
       (items.length?`<div class="nwe-order" role="group" aria-label="${names[k]} order">`+items.map((item,i)=>
-      `<div class="nwe-chip" draggable="true" tabindex="0" data-nwe-key="${k}" data-nwe-index="${i}" title="Drag to reorder. Keyboard: Alt + Up / Down." ondragstart="startNWEDrag(event,'${k}',${i})" ondragend="endNWEDrag()" ondragover="overNWEDrag(event,'${k}')" ondragleave="this.classList.remove('drop-before','drop-after')" ondrop="dropNWE(event,'${k}',${i})" onkeydown="keyNWE(event,'${k}',${i})"><span class="nwe-grip" aria-hidden="true">⠿</span><span class="nwe-wording">${item.code?`<strong>${esc(item.code)}</strong>`:''}${esc(item.text||'')}</span><button type="button" class="btn sm" draggable="false" aria-label="Remove ${names[k]} item ${i+1}" onclick="removeNWE('${k}',${i})">✕</button></div>`).join('')+'</div><p class="muted reorder-hint">Drag to reorder · Alt + ↑ / ↓</p>':`<p class="muted selection-empty">No ${names[k].toLowerCase()} selected.</p>`);
+      `<div class="nwe-chip" draggable="true" tabindex="0" data-nwe-key="${k}" data-nwe-index="${i}" title="Drag to reorder. Keyboard: Alt + Up / Down." ondragstart="startNWEDrag(event,'${k}',${i})" ondragend="endNWEDrag()" ondragover="overNWEDrag(event,'${k}')" ondragleave="this.classList.remove('drop-before','drop-after')" ondrop="dropNWE(event,'${k}',${i})" onkeydown="keyNWE(event,'${k}',${i})"><span class="nwe-grip" aria-hidden="true">⠿</span><span class="nwe-wording">${item.code?`<strong>${esc(item.code)}</strong>`:''}${nweWording(k,item,i)}</span><button type="button" class="btn sm" draggable="false" aria-label="Remove ${names[k]} item ${i+1}" onclick="removeNWE('${k}',${i})">✕</button></div>`).join('')+'</div><p class="muted reorder-hint">Drag to reorder · Alt + ↑ / ↓</p>':`<p class="muted selection-empty">No ${names[k].toLowerCase()} selected.</p>`);
   }
 }
 
@@ -1130,6 +1154,7 @@ function collect(){
     ...($('#f-formatting-profile').value==='john'?{formatting_profile:'john'}:{}),
     ...(activeSlug ? {slug:activeSlug} : {}),
     proposal:{
+      ...($('#f-cmi').checked?{cmi:true}:{}),
       for:$('#f-for').value, attention:$('#f-attention').value, address:$('#f-address').value,
       phone:$('#f-phone').value, email:$('#f-email').value, date:$('#f-date').value,
       terms:$('#f-terms').value, job_address:$('#f-jobaddr').value, bid_number:$('#f-bid').value,
@@ -1137,6 +1162,7 @@ function collect(){
       job_footer:$('#f-jobfooter').value },
     gate_summary:JOB.gate_summary.filter(x=>x.trim()),
     summary_text:$('#f-summary-text').value,
+    ...(Object.keys(JOB.summary_text_format||{}).length?{summary_text_format:{...JOB.summary_text_format}}:{}),
     options_title:$('#f-optionstitle').value,
     gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine), ...(JOB.options.some(o=>o.locationId===g.id)?{options:JOB.options.filter(o=>o.locationId===g.id).map(cleanOption)}:{})})),
     options:JOB.options.filter(o=>!JOB.gates.some(g=>g.id===o.locationId)).map(cleanOption),
@@ -1230,6 +1256,7 @@ function loadJobObject(j){
   $('#f-formatting-profile').value=j.formatting_profile||'standard';
   activeSlug=j.slug||'';
   const p=j.proposal||{};
+  $('#f-cmi').checked=p.cmi===true;
   $('#f-for').value=p.for||''; $('#f-attention').value=p.attention||''; $('#f-address').value=p.address||'';
   $('#f-phone').value=p.phone||''; $('#f-email').value=p.email||''; $('#f-date').value=p.date||'';
   $('#f-terms').value=p.terms||''; $('#f-jobaddr').value=p.job_address||''; $('#f-bid').value=p.bid_number||'';
@@ -1238,6 +1265,7 @@ function loadJobObject(j){
   $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   $('#f-summary-text').value=j.summary_text||'';
+  JOB.summary_text_format={...(j.summary_text_format||{})};
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'', ...(g.format?{format:g.format}:{}),
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
   const allOptions=[...(j.options||[]).map(o=>({...o,locationId:undefined})),...(j.gates||[]).flatMap((g,i)=>(g.options||[]).map(o=>({...o,locationId:JOB.gates[i].id})))];
@@ -1320,9 +1348,9 @@ function applyNWE(key,arr){
     if(v===null||v===undefined)return;
     const code=typeof v==='object'?v.code:String(v);
     const cb=[...$('#'+map[key]).querySelectorAll('input')].find(i=>i.value===String(code));
-    if(cb && (typeof v!=='object'||v.text===undefined||cb.dataset.description===v.text)){
+    if(cb && (typeof v!=='object'||v.text===undefined||cb.dataset.description===v.text||(key==='W'&&code==='W1'&&warrantyYearParts(v)))){
       cb.checked=true;
-      NWE_ORDER[key].push({code:cb.value,text:cb.dataset.description});
+      NWE_ORDER[key].push({code:cb.value,text:typeof v==='object'&&v.text!==undefined?v.text:cb.dataset.description});
     }else{
       // Preserve saved/imported wording and its position, even for retired codes.
       NWE_ORDER[key].push({text:String(typeof v==='object'?(v.text??v.code??''):v)});
