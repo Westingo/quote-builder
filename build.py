@@ -22,6 +22,7 @@ import yaml
 import proposal
 import product_sync
 import quote_format
+import pm_quotes
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CODES = os.path.join(HERE, "codes.yaml")
@@ -214,19 +215,23 @@ def process_options(index, options):
 
 def build_doc(job, data, index):
     p = job.get("proposal", {})
+    pm = pm_quotes.validate(job.get("pm_quote", {})) if job.get("quote_type") == "pm" else None
+
+    if pm is not None:
+        job = {**job, "gates": [], "options": [], "notes": [], "warranties": [], "exclusions": []}
 
     def desc(code, sheet=None):
         return lookup(index, code, sheet)[0].get("description", "")
 
     # tariff notes default to N38/N39 unless the job overrides
-    tariff = p.get("tariff_notes")
+    tariff = [] if pm is not None else p.get("tariff_notes")
     if tariff is None:
         tariff = [desc("N38", "N"), desc("N39", "N")]
 
-    intro = p.get("intro") or desc("INTRO1", "Other")
+    intro = "" if pm is not None else p.get("intro") or desc("INTRO1", "Other")
 
     gates = []
-    for g in job.get("gates", []):
+    for g in ([] if pm is not None else job.get("gates", [])):
         gates.append({
             "title": g["title"],
             "format": quote_format.validate(g.get("format", {})),
@@ -265,6 +270,9 @@ def build_doc(job, data, index):
         "exclusions": resolve_codes(index, job.get("exclusions"), "exclusion"),
         "total": job.get("total"),
     }
+    if pm is not None:
+        doc["pm_quote"] = pm
+        doc["total"] = None
     import formatting_profiles
     doc["formatting_profile"] = formatting_profiles.validate(job.get("formatting_profile", "standard"))
     return doc

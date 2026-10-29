@@ -38,6 +38,7 @@ function undoQuote(){
       if(item){cb.checked=true; cb.dataset.description=item.text;}
     });
   }
+  if(typeof syncQuoteTemplate==='function')syncQuoteTemplate();
   renderSummary(); redraw(); renderFree();
   quoteTypingTarget=null; quoteSnapshot=snapshotQuote();
   document.getElementById('undo-btn').disabled=!quoteHistory.length;

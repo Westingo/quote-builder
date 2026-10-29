@@ -2,6 +2,7 @@
 import json
 import quote_format
 import formatting_profiles
+import pm_quotes
 
 FORMAT = "metro-quote-builder"
 MAX_BYTES = 5 * 1024 * 1024
@@ -35,6 +36,10 @@ def validate_job(job):
             check(value, str, path)
 
     check(job, dict, "job")
+    if job.get("quote_type", "standard") not in ("standard", "pm"):
+        raise ValueError("Invalid quote type.")
+    if "pm_quote" in job or job.get("quote_type") == "pm":
+        pm_quotes.validate(job.get("pm_quote", {}))
     formatting_profiles.validate(job.get("formatting_profile", "standard"))
     check(job.get("proposal"), dict, "proposal")
     for key, value in job["proposal"].items():
@@ -102,6 +107,8 @@ def export_quote(job):
     version = 2 if any(g.get("options") for g in job.get("gates", [])) else 1
     if job.get("formatting_profile", "standard") != "standard":
         version = 3
+    if job.get("quote_type") == "pm":
+        version = 4
     payload = {"format": FORMAT, "version": version, "job": job}
     data = json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False).encode("utf-8")
     if len(data) > MAX_BYTES:
@@ -118,7 +125,7 @@ def import_quote(data):
         raise ValueError("Choose a .metroquote file created with Export quote.") from exc
     if not isinstance(payload, dict) or payload.get("format") != FORMAT:
         raise ValueError("Choose a .metroquote file created with Export quote.")
-    if type(payload.get("version")) is not int or payload["version"] not in (1, 2, 3):
+    if type(payload.get("version")) is not int or payload["version"] not in (1, 2, 3, 4):
         raise ValueError("This quote uses a newer format. Update Quote Builder and try again.")
     job = validate_job(payload.get("job"))
     # Also reject non-finite numbers accepted by Python's JSON reader.

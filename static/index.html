@@ -285,6 +285,21 @@
       </div>
     </div></section>
 
+    <section class="sheet"><h2>Quote template</h2><div class="pad">
+      <label for="f-quote-type">Template</label>
+      <select id="f-quote-type" onchange="syncQuoteTemplate()"><option value="standard">Standard quote</option><option value="pm">Preventative maintenance quote</option></select>
+      <div id="pm-quote-fields" hidden>
+        <p class="muted">The maintenance items and Notes from your PM template stay fixed. Enter the equipment, service frequency, and annual price below.</p>
+        <div class="row">
+          <div><label for="f-pm-frequency">Service frequency</label><select id="f-pm-frequency" onchange="syncQuoteTemplate()"><option>Monthly</option><option selected>Quarterly</option><option>Semiannual</option><option>Annual</option></select></div>
+          <div><label for="f-pm-price">Annual price ($)</label><input type="text" id="f-pm-price" placeholder="1,440.00"></div>
+        </div>
+        <p class="muted" id="pm-quote-visits">4 visits per year</p>
+        <label for="f-pm-equipment">Equipment (one item per line, including quantity)</label>
+        <textarea id="f-pm-equipment" rows="4" placeholder="2) Slide Gates with 2 LiftMaster Model SL3000 AC Slide Gate Operators"></textarea>
+      </div>
+    </div></section>
+    <div id="standard-quote-fields">
     <!-- INSTALL SUMMARY -->
     <section class="sheet"><h2>Install Summary <button class="btn sm" onclick="addSummary()">+ line</button></h2>
       <div class="pad"><div class="muted">Your wording, centered at the top with no added heading, e.g. <i>(1) 24' x 8' Vertical Pivot Gate</i></div>
@@ -331,6 +346,7 @@
       </div>
       <input type="hidden" id="f-total">
       </div></section>
+    </div>
   </div>
 
 </div>
@@ -355,6 +371,7 @@
 
 <div class="buildbar">
   <button class="btn" onclick="newQuote()">Start new quote</button>
+  <button class="btn" onclick="newQuote('pm')">New PM quote</button>
   <button class="btn" onclick="loadJob()">Open local quote</button>
   <select id="jobs" style="width:auto"></select>
   <span class="sp"></span>
@@ -1149,6 +1166,13 @@ function renderFree(){
 }
 
 // ---------- collect + build ----------
+function syncQuoteTemplate(){
+  const pm=$('#f-quote-type').value==='pm';
+  $('#pm-quote-fields').hidden=!pm;
+  $('#standard-quote-fields').hidden=pm;
+  const visits={Monthly:12,Quarterly:4,Semiannual:2,Annual:1}[$('#f-pm-frequency').value];
+  $('#pm-quote-visits').textContent=visits+' visit'+(visits===1?'':'s')+' per year · price is the annual total';
+}
 function collect(){
   const j={
     ...($('#f-formatting-profile').value==='john'?{formatting_profile:'john'}:{}),
@@ -1169,6 +1193,10 @@ function collect(){
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
   };
+  if($('#f-quote-type').value==='pm'){
+    j.quote_type='pm';
+    j.pm_quote={frequency:$('#f-pm-frequency').value,equipment:$('#f-pm-equipment').value,price:$('#f-pm-price').value};
+  }
   return j;
 }
 function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty||l.leftnote) && !String(l.text||'').trim()));}
@@ -1238,12 +1266,12 @@ async function refreshJobs(){
   const sel=$('#jobs'); sel.innerHTML='';
   list.forEach(j=>{const o=document.createElement('option');o.value=j.slug;o.textContent=j.slug;sel.appendChild(o);});
 }
-function newQuote(){
-  const hasWork = JOB.gates.length || JOB.options.length || $('#f-for').value.trim();
+function newQuote(type='standard'){
+  const hasWork = JOB.gates.length || JOB.options.length || $('#f-for').value.trim() || $('#f-pm-equipment').value.trim() || $('#f-pm-price').value.trim();
   if(hasWork && !confirm('Start a new quote? This clears the current form.')) return;
-  loadJobObject({});                 // empty job resets every field + list
+  loadJobObject(type==='pm'?{quote_type:'pm',proposal:{date:new Date().toLocaleDateString('en-US')}}:{});
   $('#jobs').value=''; $('#dl').hidden=true; $('#log').hidden=true;
-  $('#status').innerHTML='<span class="muted">New quote — form cleared.</span>';
+  $('#status').textContent=type==='pm'?'New PM quote — enter customer, frequency, equipment, and annual price.':'New quote — form cleared.';
   window.scrollTo(0,0);
 }
 async function loadJob(){
@@ -1253,6 +1281,11 @@ async function loadJob(){
   $('#status').textContent='Loaded '+slug;
 }
 function loadJobObject(j){
+  $('#f-quote-type').value=j.quote_type||'standard';
+  $('#f-pm-frequency').value=j.pm_quote?.frequency||'Quarterly';
+  $('#f-pm-equipment').value=j.pm_quote?.equipment||'';
+  $('#f-pm-price').value=j.pm_quote?.price||'';
+  syncQuoteTemplate();
   $('#f-formatting-profile').value=j.formatting_profile||'standard';
   activeSlug=j.slug||'';
   const p=j.proposal||{};

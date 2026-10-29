@@ -267,7 +267,7 @@ def _build_footer(section, h, total=None, *, first_page=False):
 # ----------------------------------------------------------------------------
 # body content
 # ----------------------------------------------------------------------------
-def _band(body):
+def _band(body, title="WE PROPOSE TO FURNISH THE FOLLOWING"):
     """Opening band, rendered once in the body, never as a repeating header."""
     t = body.add_table(rows=1, cols=2)
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -279,7 +279,7 @@ def _band(body):
     lp = t.cell(0, 0).paragraphs[0]
     lp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     U.no_space(lp, before=1, after=1)
-    _run(lp, "WE PROPOSE TO FURNISH THE FOLLOWING", bold=True, size=11, smallcaps=True)
+    _run(lp, title, bold=True, size=11, smallcaps=True)
     rp = t.cell(0, 1).paragraphs[0]
     rp.alignment = WD_ALIGN_PARAGRAPH.CENTER
     U.no_space(rp, before=1, after=1)
@@ -523,6 +523,10 @@ def _page_break(body):
 
 
 def render_body(body, doc):
+    if "pm_quote" in doc:
+        import pm_quotes
+        pm_quotes.render(body, doc["pm_quote"])
+        return
     # Keep the opening band outside the repeating page header and scope tables.
     _band(body)
 

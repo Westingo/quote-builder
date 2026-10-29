@@ -16,7 +16,7 @@ const context=vm.createContext({
   collectNWE:key=>context.NWE_ORDER[key],
   applyFills:line=>line._desc,
 });
-for(const name of ['titleFor','collect','dropEmptySubs','cleanLine','cleanOption','loadJobObject']){
+for(const name of ['syncQuoteTemplate','titleFor','collect','dropEmptySubs','cleanLine','cleanOption','loadJobObject']){
   let code=extract(name);
   // loadJobObject is followed by async transfer handlers; isolate its closing brace.
   if(name==='loadJobObject')code=code.slice(0,code.indexOf('\nasync function'));
@@ -68,3 +68,16 @@ context.removeGate(context.JOB.gates[1].id);
 assert.equal(context.collect().options.length,2);
 assert.deepEqual(JSON.parse(JSON.stringify(context.collect().options[1])),job.options[0]);
 console.log('Passed: option association follows location reorder, survives reload, and returns to general when location is removed.');
+const pmJob={quote_type:'pm',proposal:{for:'PM test'},pm_quote:{frequency:'Annual',equipment:'1) Gate operator',price:'825.00'}};
+context.loadJobObject(pmJob);
+let pmExport=JSON.parse(JSON.stringify(context.collect()));
+assert.equal(pmExport.quote_type,'pm');
+assert.deepEqual(pmExport.pm_quote,pmJob.pm_quote);
+assert.equal(fields['#standard-quote-fields'].hidden,true);
+assert.equal(fields['#pm-quote-fields'].hidden,false);
+assert.match(fields['#pm-quote-visits'].textContent,/1 visit per year/);
+context.loadJobObject({});
+assert.equal(context.collect().quote_type,undefined);
+assert.equal(fields['#standard-quote-fields'].hidden,false);
+assert.equal(fields['#pm-quote-fields'].hidden,true);
+console.log('Passed: PM template round-trip, annual visits and standard quote reset.');

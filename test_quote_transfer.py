@@ -68,7 +68,7 @@ class TransferTests(unittest.TestCase):
         bad_shape["job"]["gates"][0]["lines"] = [None]
         bad_block = copy.deepcopy(valid)
         del bad_block["job"]["options"][1]["priced"]
-        for data in (b"not json", b"{}", b"%PDF-1.7", json.dumps(dict(valid, version=4)).encode(),
+        for data in (b"not json", b"{}", b"%PDF-1.7", json.dumps(dict(valid, version=5)).encode(),
                      json.dumps(bad_shape).encode(), json.dumps(bad_block).encode(), b"x" * (transfer.MAX_BYTES + 1)):
             with self.subTest(data=data[:80]):
                 self.assertEqual(self.upload(data).status_code, 400)
