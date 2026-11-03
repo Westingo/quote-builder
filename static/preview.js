@@ -63,7 +63,7 @@ document.getElementById('preview-dialog').addEventListener('close',()=>{
   document.getElementById('preview-home').append(document.getElementById('preview-panel'));
   document.getElementById('preview-expand').hidden=false;
   document.getElementById('preview-close').hidden=true;
-  document.body.style.overflow='';document.getElementById('preview-expand').focus();
+  document.body.style.overflow='';document.getElementById(window.matchMedia('(max-width:760px)').matches?'mobile-preview':'preview-expand').focus();
 });
 const previewEditor=document.getElementById('quote-editor');
 for(const event of ['input','change','click','keydown'])previewEditor.addEventListener(event,schedulePreview);

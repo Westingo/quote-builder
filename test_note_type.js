@@ -4,15 +4,16 @@ function extract(name){const a=html.indexOf('function '+name+'(');return html.sl
 let lines;
 const ctx=vm.createContext({findLines:()=>({lines}),redraw(){},applyFills:ln=>ln._desc.replace('_',ln.fills[0])});
 for(const name of ['changeNoteType','cleanLine'])vm.runInContext(extract(name),ctx);
-for(const from of ['item','sub','atqty','leftnote','priced'])for(const to of ['item','sub','atqty','leftnote','priced']){
+for(const from of ['item','header','sub','atqty','leftnote','priced'])for(const to of ['item','header','sub','atqty','leftnote','priced']){
   const note=from==='priced'?{amount_note:'Keep exact wording'}:{text:'Keep exact wording',...(from==='item'?{qty:1}:{[from]:true})};
   note.amount='15%';lines=[{text:'Before'},note,{text:'After'}];
   ctx.changeNoteType('gate',1,to);
   assert.equal(lines[1],note);assert.equal(note.amount,'15%');
   assert.equal(to==='priced'?note.amount_note:note.text,'Keep exact wording');
-  for(const flag of ['sub','atqty','leftnote'])assert.equal(note[flag],flag===to?true:undefined);
+  for(const flag of ['header','sub','atqty','leftnote'])assert.equal(note[flag],flag===to?true:undefined);
   assert.equal(note.amount_note,to==='priced'?'Keep exact wording':undefined);
   const exported=ctx.cleanLine(note);
+  assert.equal(exported.header,to==='header'?true:undefined);
   assert.equal(exported.amount,'15%');assert.equal(to==='priced'?exported.amount_note:exported.text,'Keep exact wording');
   assert.equal(lines[0].text,'Before');assert.equal(lines[2].text,'After');
 }
@@ -29,4 +30,4 @@ assert.equal(ctx.cleanLine(lines[0]).sub,true);
 ctx.changeNoteType('gate',0,'item');
 assert.equal(lines[0].code,'CODE');assert.equal(lines[0].qty,1);
 assert.equal(lines[0].text,'Surface mounted outside');assert.equal(lines[0].amount,'25');
-console.log('Passed all 25 item/note conversions, resolved code wording, formatting, amounts, export, empty notes and invalid type.');
+console.log('Passed all 36 item/note conversions, resolved code wording, formatting, amounts, export, empty notes and invalid type.');

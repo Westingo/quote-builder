@@ -285,3 +285,21 @@ attachment, but opening/importing that attachment is not yet part of the UI.
 Long content that cannot fit the worksheet is rejected with a message rather than
 clipped. Shorten the indicated content to keep the existing single-page format.
 No Publisher or Word installation is required for PM PDF generation.
+
+
+### Phone layout
+
+At widths up to 760 pixels, QB uses stacked fields and larger touch controls.
+Tools expands the header actions; Preview opens the proposal full screen.
+Files contains new/open quote actions, the saved-quote selector, PDF generation,
+and editable-copy export. Build Word stays on the bottom bar. Resizing preserves
+current form values. Quotes and PM Sheets use the same existing backend.
+
+QB includes a PWA manifest, home-screen icons, an install action where supported,
+and an offline connection notice. The public address is
+https://quotebuilder.westin-co.com, protected by Cloudflare Access sign-in.
+The protected route is published; authorized workflow and phone checks are still
+pending. See [MOBILE.md](MOBILE.md) for the exact
+host, tunnel, authentication, and phone installation setup. The default desktop
+server remains loopback-only. Word and saved quotes stay on the Windows host;
+this is an online PWA, not an offline quote editor.

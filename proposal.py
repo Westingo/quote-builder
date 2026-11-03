@@ -425,7 +425,7 @@ def _gate_block(body, gate):
             _format_scope_para(lp, None, ln.get("text", ""),
                                reserve_amount=False, atqty=True)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
-        elif ln.get("leftnote"):           # note starting at the far-left label column
+        elif ln.get("leftnote") or ln.get("header"):           # note starting at the far-left label column
             _format_scope_para(lp, None, ln.get("text", ""),
                                reserve_amount=False, leftnote=True)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
@@ -466,6 +466,8 @@ def _format_row(row, line, section):
     # Section typography supplies defaults; per-line choices take precedence.
     fmt = {k: v for k, v in section.items()
            if k in ("font_size", "space_after", "line_spacing")}
+    if line.get("header"):
+        fmt.update(bold=True, underline=True, space_before=6, keep_next=True)
     fmt.update(quote_format.validate(line.get("format", {})))
     p = row.cells[0].paragraphs[0]
     pf = p.paragraph_format
@@ -484,7 +486,7 @@ def _format_row(row, line, section):
     if fmt.get("wrap") in ("start", "description"):
         first = (pf.left_indent or 0) + (pf.first_line_indent or 0)
         if start == "auto":
-            first = (0 if line.get("leftnote") or "amount_note" in line else
+            first = (0 if line.get("header") or line.get("leftnote") or "amount_note" in line else
                      Inches(1.5) if line.get("sub") else QTY_TAB if line.get("atqty") else DESC_TAB)
         target = DESC_TAB if fmt["wrap"] == "description" else first
         origin = (pf.left_indent or 0) + (pf.first_line_indent or 0)
@@ -644,7 +646,7 @@ def _detail_option(body, opt):
             _format_scope_para(lp, None, ln.get("text", ""),
                                reserve_amount=False, atqty=True)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
-        elif ln.get("leftnote"):           # note starting at the far-left label column
+        elif ln.get("leftnote") or ln.get("header"):           # note starting at the far-left label column
             _format_scope_para(lp, None, ln.get("text", ""),
                                reserve_amount=False, leftnote=True)
             _amount_cell(t.cell(i, 1), ln.get("amount"), ln.get("deduct"))
@@ -766,10 +768,17 @@ def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
 
 
 def render_nwe(body, doc):
-    def section(label, items, bullet="✱"):
+    breaks = doc.get("nwe_page_breaks", [])
+    start_group = "group" in breaks
+    def section(key, label, bullet="✱"):
+        nonlocal start_group
+        items = doc.get(key, [])
         if not items:
             return
         h = _para(body, before=10, after=2)
+        if start_group or key in breaks:
+            h.paragraph_format.page_break_before = True
+        start_group = False
         h.paragraph_format.keep_with_next = True   # don't orphan the header
         _run(h, label, bold=True, underline=True, size=10.5)
         for it in items:
@@ -781,9 +790,9 @@ def render_nwe(body, doc):
             _run(p, f"{bullet}  ", size=9.5)
             _run(p, it, size=9.5)
 
-    section("Notes:", doc.get("notes", []))
-    section("Warranties:", doc.get("warranties", []))
-    section("Exclusions:", doc.get("exclusions", []))
+    section("notes", "Notes:")
+    section("warranties", "Warranties:")
+    section("exclusions", "Exclusions:")
 
 
 # ----------------------------------------------------------------------------

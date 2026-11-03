@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quote Builder — Metro Access Control</title>
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/static/icons/qb-192.png">
+<meta name="theme-color" content="#1b1722">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="QB">
 <style>
   :root{
     /* light theme */
@@ -104,6 +109,7 @@
   .ghead input[type=text]{width:auto}
   .gate .ghead>input{font-weight:600}
   .lines{list-style:none;margin:0;padding:8px 10px}
+  .location-lines:empty::before{content:"Drop an item here";display:block;padding:8px;color:var(--muted);font-size:13px}
   .lines li{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
   .lines li:last-child{border-bottom:none}
   .lines li .qty{width:54px;flex:none}
@@ -121,6 +127,8 @@
   /* nwe checklists */
   .nwe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
   @media(max-width:900px){.nwe{grid-template-columns:1fr}}
+  .page-start{display:inline-flex;align-items:center;gap:5px;margin:4px 8px 8px 0;font-size:12px}
+  .page-start input{width:auto}
   .nwe .col h3{font-size:12.5px;font-weight:700;letter-spacing:0;margin:0 0 8px;color:var(--text)}
   .checklist{max-height:240px;overflow:auto;border:1px solid var(--border);background:var(--surface);padding:5px;border-radius:var(--r-sm)}
   .checklist label{display:flex;gap:7px;text-transform:none;letter-spacing:0;font-weight:400;
@@ -222,11 +230,13 @@
 (function(){var t='moonlit';try{var saved=localStorage.getItem('quote-builder-theme');if(['moonlit','dark','light'].includes(saved))t=saved;}catch(e){}document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="stylesheet" href="/static/preview.css">
 <link rel="stylesheet" href="/static/pm.css">
+<link rel="stylesheet" href="/static/mobile.css">
 </head>
 <body>
 <header><div class="tb">
   <div class="brand"><span>METRO</span> ACCESS CONTROL</div>
   <div class="role">Quote Builder</div>
+  <button type="button" class="btn sm mobile-only" id="mobile-tools" aria-expanded="false">Tools</button>
   <button class="btn sm" id="undo-btn" onclick="undoQuote()" disabled title="Undo the last quote edit">↶ Undo</button>
   <button id="refresh-products" class="btn sm" onclick="refreshProducts(true)">Refresh products</button>
   <a class="btn sm" href="https://docs.google.com/spreadsheets/d/1_JJQ8S-ZwqUzmRewfjesz84QV0dEf6P52bHjd_BLdOo/edit" target="_blank" rel="noopener">Open Copy Paste</a>
@@ -239,6 +249,7 @@
   <button class="btn sm" id="themebtn" title="Change color theme" onclick="toggleTheme()">☾ Moonlit</button>
 </div><div id="product-status" class="muted toolbar-status" role="status">Loading products…</div></header>
 
+<p id="connection-status" role="status" hidden style="padding:12px;margin:0;background:var(--bad-soft);color:var(--text)">You’re offline. Keep this window open; reconnect before saving or building your quote.</p>
 <main>
 <div class="workspace">
 <div id="quote-editor"><div class="grid2">
@@ -327,18 +338,21 @@
 
     <!-- NOTES / WARRANTIES / EXCLUSIONS -->
     <section class="sheet"><h2>Notes · Warranties · Exclusions</h2>
-      <div class="pad"><div class="nwe">
+      <div class="pad"><label class="page-start"><input type="checkbox" id="f-break-group"> Start Notes / Warranties / Exclusions on a new page</label><div class="nwe">
         <div class="col"><h3>Notes (N)</h3>
+          <label class="page-start"><input type="checkbox" id="f-break-notes"> Start notes on a new page</label>
           <input type="text" id="codes-N" placeholder="paste codes e.g. 34 36 39, Enter" onkeydown="if(event.key==='Enter')addNWECodes('N')">
           <div class="checklist" id="cl-N"></div>
           <div class="nwe-add"><input type="text" id="free-N" aria-label="Custom note" placeholder="Custom note…"><button type="button" class="btn sm" onclick="addFreeNWE('N')" aria-label="Add custom note">Add</button></div>
           <div id="selected-N" class="nwe-selected"></div></div>
         <div class="col"><h3>Warranties (W)</h3>
+          <label class="page-start"><input type="checkbox" id="f-break-warranties"> Start warranties on a new page</label>
           <input type="text" id="codes-W" placeholder="paste codes e.g. 2 3 15, Enter" onkeydown="if(event.key==='Enter')addNWECodes('W')">
           <div class="checklist" id="cl-W"></div>
           <div class="nwe-add"><input type="text" id="free-W" aria-label="Custom warranty" placeholder="Custom warranty…"><button type="button" class="btn sm" onclick="addFreeNWE('W')" aria-label="Add custom warranty">Add</button></div>
           <div id="selected-W" class="nwe-selected"></div></div>
         <div class="col"><h3>Exclusions (E)</h3>
+          <label class="page-start"><input type="checkbox" id="f-break-exclusions"> Start exclusions on a new page</label>
           <input type="text" id="codes-E" placeholder="paste codes e.g. 4a 6 8c, Enter" onkeydown="if(event.key==='Enter')addNWECodes('E')">
           <div class="checklist" id="cl-E"></div>
           <div class="nwe-add"><input type="text" id="free-E" aria-label="Custom exclusion" placeholder="Custom exclusion…"><button type="button" class="btn sm" onclick="addFreeNWE('E')" aria-label="Add custom exclusion">Add</button></div>
@@ -369,16 +383,18 @@
 <dialog id="format-dialog" style="max-width:680px;width:90%;max-height:85vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:20px" aria-label="Quote formatting"></dialog>
 <dialog id="preview-dialog" aria-labelledby="preview-title"></dialog>
 
-<div class="buildbar">
+<div class="buildbar" id="quote-buildbar">
+  <button type="button" class="btn mobile-only" id="mobile-preview" onclick="openPreview()">Preview</button>
   <button class="btn" onclick="newQuote()">Start new quote</button>
   <button class="btn" onclick="newQuote('pm')">New PM quote</button>
   <button class="btn" onclick="loadJob()">Open local quote</button>
-  <select id="jobs" style="width:auto"></select>
+  <select id="jobs" aria-label="Saved quotes" style="width:auto"></select>
   <span class="sp"></span>
   <span id="status" class="muted"></span>
   <details class="file-actions" id="file-actions">
     <summary class="btn">Files</summary>
     <div class="file-menu">
+      <button type="button" class="btn" id="install-qb" hidden>Install QB</button>
       <button class="btn" onclick="$('#quote-file').click()">Open quote file…</button>
       <button class="btn" onclick="$('#file-actions').open=false;build(true)">Build PDF</button>
       <button class="btn" onclick="$('#file-actions').open=false;exportQuote()">Save editable copy</button>
@@ -390,6 +406,7 @@
 </div>
 <div id="log" hidden></div>
 
+<script src="/static/mobile.js" defer></script>
 <script>
 const $ = s => document.querySelector(s);
 let activeSlug = '';
@@ -571,6 +588,12 @@ function addLeftNote(id){
   findLines(id).lines.push({text:t, leftnote:true});   // text starts at the far-left label column
   inp.value=''; redraw();
 }
+function addHeader(id){
+  const input=$('#hdr-'+id), text=input.value.trim();
+  if(!text)return;
+  findLines(id).lines.push({text,header:true});
+  input.value='';redraw();
+}
 function addSubBelow(id,i){
   // insert a blank sub-note right after this item and any sub-notes it already
   // has, so multiple sub-notes stack in order under the item
@@ -592,6 +615,11 @@ function addRowHTML(id, withPriced){
     <input class="ftext" id="ft-${id}" placeholder="…or free-text line" onkeydown="if(event.key==='Enter')addFreeLine('${id}')">
     <input class="qty" type="number" id="fq-${id}" placeholder="qty" style="width:60px">
     <button class="btn sm" onclick="addFreeLine('${id}')">+ text</button>
+  </div>
+  <div class="addrow" style="border-top:none;padding-top:0">
+    <span class="muted" style="align-self:center;white-space:nowrap">header →</span>
+    <input class="ftext" id="hdr-${id}" aria-label="Header text" placeholder="Section heading, e.g. Access Control" onkeydown="if(event.key==='Enter')addHeader('${id}')">
+    <button class="btn sm" onclick="addHeader('${id}')">+ header</button>
   </div>
   <div class="addrow" style="border-top:none;padding-top:0">
     <span class="muted" style="align-self:center;white-space:nowrap">sub-note →</span>
@@ -626,15 +654,15 @@ function addPricedNote(id){
 }
 function renderLineList(id, lines, ul, withLineAmount){
   ul.innerHTML='';
-  const firstCountedIdx=lines.findIndex(l=>l.amount_note===undefined
+  const firstCountedIdx=lines.findIndex(l=>!l.header && l.amount_note===undefined
         && l.qty!=null && l.qty!=='' && Number(l.qty)!==0);
   lines.forEach((ln,i)=>{
     const li=document.createElement('li');
     bindReorder(li,'lines:'+id,i);
     const mv=dragHandle('lines:'+id,i,'line item');
-    const noteType=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':null;
+    const noteType=ln.amount_note!==undefined?'priced':ln.header?'header':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':null;
     const typeSelect=`<select aria-label="Line type" title="Change item or note type without retyping" style="width:125px;flex:none" onchange="changeNoteType('${id}',${i},this.value)">`+
-      [['item','Item'],['sub','Sub-note'],['atqty','Note'],['leftnote','Left note'],['priced','Priced note']].map(([value,label])=>
+      [['item','Item'],['header','Header'],['sub','Sub-note'],['atqty','Note'],['leftnote','Left note'],['priced','Priced note']].map(([value,label])=>
         `<option value="${value}"${value===(noteType||'item')?' selected':''}>${label}</option>`).join('')+'</select>';
     if(noteType){
       const text=noteType==='priced'?ln.amount_note:ln.text;
@@ -643,7 +671,7 @@ function renderLineList(id, lines, ul, withLineAmount){
              title="Amount shown in the AMOUNT column" style="width:96px;flex:none"
              oninput="setLineAmount('${id}',${i},this.value)">` : '';
       li.innerHTML=`${mv}${typeSelect}
-        <input type="text" value="${escAttr(text||'')}" aria-label="Note text" style="flex:1"
+        <input type="text" value="${escAttr(text||'')}" aria-label="${noteType==='header'?'Header':'Note'} text" style="flex:1;${noteType==='header'?'font-weight:bold;text-decoration:'+(ln.format?.underline===false?'none':'underline'):''}"
           oninput="${noteType==='priced'?'setNoteLabel':'setSubText'}('${id}',${i},this.value)">
         ${amount}<button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
@@ -690,7 +718,7 @@ function openFormatting(id,index=null){
   const dialog=$('#format-dialog');
   const select=(key,label,choices)=>`<label>${label}<select name="${key}"><option value="">Use default</option>${choices.map(([v,t])=>`<option value="${v}"${f[key]===v?' selected':''}>${t}</option>`).join('')}</select></label>`;
   const number=(key,label,min,max,step=1)=>`<label>${label}<input name="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${f[key]??''}" placeholder="Default"></label>`;
-  const flag=(key,label)=>`<label><input style="width:auto" name="${key}" type="checkbox" ${f[key]?'checked':''}> ${label}</label>`;
+  const flag=(key,label)=>`<label><input style="width:auto" name="${key}" type="checkbox" ${(f[key]??(target.header && key==='underline'))?'checked':''}> ${label}</label>`;
   const row=index!==null;
   const text=row?(target.amount_note??target.text??applyFills(target)):'';
   dialog.innerHTML=`<form id="format-form"><h2>${summary?'Summary text formatting':row?'Line formatting':'Section formatting'}</h2>
@@ -715,7 +743,7 @@ function saveFormatting(form){
   const {target,index,summary}=formatTarget, f={};
   for(const el of form.elements){
     if(!el.name||el.name==='wording')continue;
-    if(el.type==='checkbox'){if(el.checked)f[el.name]=true;}
+    if(el.type==='checkbox'){if(el.checked)f[el.name]=true;else if(target.header && el.name==='underline')f.underline=false;}
     else if(el.value!=='')f[el.name]=el.type==='number'?Number(el.value):el.value;
   }
   if(Object.keys(f).length)target.format=f;else delete target.format;
@@ -735,13 +763,13 @@ function resetFormatting(){
   $('#format-dialog').close();redraw();schedulePreview();
 }
 function changeNoteType(id,i,type){
-  if(!['item','sub','atqty','leftnote','priced'].includes(type))return;
+  if(!['item','header','sub','atqty','leftnote','priced'].includes(type))return;
   const ln=findLines(id).lines[i];
-  const current=ln.amount_note!==undefined?'priced':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':'item';
+  const current=ln.amount_note!==undefined?'priced':ln.header?'header':ln.sub?'sub':ln.atqty?'atqty':ln.leftnote?'leftnote':'item';
   if(current===type)return;
   const text=ln.amount_note!==undefined?ln.amount_note:
     (ln.text!==undefined&&ln.text!==''?ln.text:ln.code!==undefined?applyFills(ln):(ln.text||''));
-  for(const key of ['sub','atqty','leftnote','amount_note','text'])delete ln[key];
+  for(const key of ['header','sub','atqty','leftnote','amount_note','text'])delete ln[key];
   if(type==='priced')ln.amount_note=text;
   else{ln.text=text;if(type!=='item')ln[type]=true;}
   // The selected type controls indentation; keep typography and price settings.
@@ -794,9 +822,13 @@ function renderGates(){
                placeholder="Location title — e.g. Work to be Done at 24' Gate Location:  ·  Head End  ·  Pool Equipment"
                oninput="setGateTitle('${g.id}',this.value)">
         <button class="btn x sm" style="margin-left:auto" onclick="removeGate('${g.id}')">remove location</button></div>
-      <button class="btn sm" onclick="openFormatting('${g.id}')">Section format</button><ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}<button class="btn sm" style="margin-top:12px" onclick="addLocationOption('${g.id}')">+ option for this location</button><div class="location-options" id="options-${g.id}"></div>`;
+      <button class="btn sm" onclick="openFormatting('${g.id}')">Section format</button>
+      <label class="page-start"><input type="checkbox" ${g.format?.page_break?'checked':''} onchange="setLocationPageBreak('${g.id}',this.checked)"> Start location on a new page</label><ul class="lines" id="ls-${g.id}"></ul>${addRowHTML(g.id, true)}<button class="btn sm" style="margin-top:12px" onclick="addLocationOption('${g.id}')">+ option for this location</button><div class="location-options" id="options-${g.id}"></div>`;
     box.appendChild(el);
-    renderLineList(g.id, g.lines, el.querySelector('#ls-'+g.id), true);
+    const list=el.querySelector('#ls-'+g.id);
+    list.classList.add('location-lines');
+    renderLineList(g.id,g.lines,list,true);
+    if(!g.lines.length)bindReorder(list,'lines:'+g.id,0,true);
   });
   renderOptions();
 }
@@ -810,12 +842,17 @@ function reorderList(group){
   if(group==='options')return JOB.options;
   if(group.startsWith('lines:'))return findLines(group.slice(6))?.lines;
 }
-function reorderAt(group,from,slot){
-  const items=reorderList(group);
-  if(!items||!Number.isInteger(from)||!Number.isInteger(slot)||from<0||from>=items.length||slot<0||slot>items.length)return;
-  const to=slot>from?slot-1:slot;
-  if(to===from)return;
-  const [item]=items.splice(from,1);items.splice(to,0,item);
+function compatibleRowGroups(source,target){
+  if(source===target)return true;
+  return [source,target].every(group=>group.startsWith('lines:')&&JOB.gates.some(g=>'lines:'+g.id===group));
+}
+function reorderAt(group,from,slot,targetGroup=group){
+  if(!compatibleRowGroups(group,targetGroup))return;
+  const items=reorderList(group),target=reorderList(targetGroup);
+  if(!items||!target||!Number.isInteger(from)||!Number.isInteger(slot)||from<0||from>=items.length||slot<0||slot>target.length)return;
+  const to=items===target&&slot>from?slot-1:slot;
+  if(items===target&&to===from)return;
+  const [item]=items.splice(from,1);target.splice(to,0,item);
   redraw();
   if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
@@ -838,23 +875,23 @@ function endRowDrag(){
   rowDrag=null;clearRowMarkers();
   document.querySelectorAll('.reorder-source').forEach(el=>el.classList.remove('reorder-source'));
 }
-function bindReorder(el,group,index){
+function bindReorder(el,group,index,empty=false){
   el.dataset.reorderGroup=group;el.dataset.reorderIndex=index;
   el.ondragover=event=>{
-    if(!rowDrag||rowDrag.group!==group)return;
+    if(!rowDrag||!compatibleRowGroups(rowDrag.group,group))return;
     event.preventDefault();event.stopPropagation();event.dataTransfer.dropEffect='move';
     clearRowMarkers();
     const rect=el.getBoundingClientRect();
-    el.classList.add(event.clientY<rect.top+rect.height/2?'reorder-before':'reorder-after');
+    el.classList.add(empty||event.clientY<rect.top+rect.height/2?'reorder-before':'reorder-after');
   };
   el.ondragleave=event=>{
     if(!el.contains(event.relatedTarget))el.classList.remove('reorder-before','reorder-after');
   };
   el.ondrop=event=>{
-    if(!rowDrag||rowDrag.group!==group)return;
+    if(!rowDrag||!compatibleRowGroups(rowDrag.group,group))return;
     event.preventDefault();event.stopPropagation();
-    const rect=el.getBoundingClientRect(),slot=index+(event.clientY<rect.top+rect.height/2?0:1);
-    const from=rowDrag.index;endRowDrag();reorderAt(group,from,slot);
+    const rect=el.getBoundingClientRect(),slot=index+(empty||event.clientY<rect.top+rect.height/2?0:1);
+    const source=rowDrag;endRowDrag();reorderAt(source.group,source.index,slot,group);
   };
 }
 function keyRowDrag(event,group,index){
@@ -877,6 +914,12 @@ function moveLine(id,i,dir){
   if(j<0||j>=lines.length) return;
   const [ln]=lines.splice(i,1); lines.splice(j,0,ln);
   redraw();
+}
+function setLocationPageBreak(id,enabled){
+  const gate=findLines(id);
+  gate.format={...gate.format};
+  if(enabled)gate.format.page_break=true;else delete gate.format.page_break;
+  if(!Object.keys(gate.format).length)delete gate.format;
 }
 function setGateTitle(id,v){const g=JOB.gates.find(g=>g.id===id);g.title=v;renderOptions();}
 
@@ -1193,13 +1236,15 @@ function collect(){
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
     total:$('#f-total').value||null,
   };
+  const breaks=['group','notes','warranties','exclusions'].filter(key=>$('#f-break-'+key).checked);
+  if(breaks.length)j.nwe_page_breaks=breaks;
   if($('#f-quote-type').value==='pm'){
     j.quote_type='pm';
     j.pm_quote={frequency:$('#f-pm-frequency').value,equipment:$('#f-pm-equipment').value,price:$('#f-pm-price').value};
   }
   return j;
 }
-function dropEmptySubs(lines){return lines.filter(l=>!((l.sub||l.atqty||l.leftnote) && !String(l.text||'').trim()));}
+function dropEmptySubs(lines){return lines.filter(l=>!((l.header||l.sub||l.atqty||l.leftnote) && !String(l.text||'').trim()));}
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
@@ -1211,8 +1256,8 @@ function cleanLine(ln){
   if(ln.atqty){
     const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
   }
-  if(ln.leftnote){
-    const o={text:ln.text, leftnote:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
+  if(ln.header||ln.leftnote){
+    const o={text:ln.text, [ln.header?'header':'leftnote']:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
   }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
@@ -1298,6 +1343,9 @@ function loadJobObject(j){
   $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   $('#f-summary-text').value=j.summary_text||'';
+  for(const key of ['group','notes','warranties','exclusions']){
+    $('#f-break-'+key).checked=(j.nwe_page_breaks||[]).includes(key);
+  }
   JOB.summary_text_format={...(j.summary_text_format||{})};
   gateSeq=0; JOB.gates=(j.gates||[]).map(g=>({id:'g'+(++gateSeq), title:g.title||'', ...(g.format?{format:g.format}:{}),
     lines:(g.lines||[]).map(l=>l.code!==undefined?{...l,_desc:descOf(l.code,l.sheet),_blanks:(descOf(l.code,l.sheet)||'').includes('_')}:l)}));
@@ -1398,5 +1446,6 @@ function escAttr(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 <script src="/static/history.js"></script>
 <script src="/static/preview.js"></script>
 <script src="/static/pm.js"></script>
+<script src="/static/pwa.js"></script>
 </body>
 </html>

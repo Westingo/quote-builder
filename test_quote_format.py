@@ -52,6 +52,23 @@ class FormatTests(unittest.TestCase):
         self.assertTrue(doc.tables[2].cell(0, 0).paragraphs[0].paragraph_format.keep_with_next)
         self.assertEqual(doc.tables[3].cell(1, 1).vertical_alignment, WD_ALIGN_VERTICAL.TOP)
 
+    def test_mid_location_header(self):
+        job = fixture()
+        job["gates"][0]["lines"].insert(1, {"header": True, "text": "Access Control"})
+        job = quote_transfer.import_quote(quote_transfer.export_quote(job))
+        lines = build.resolve_lines({}, job["gates"][0]["lines"])
+        doc = Document()
+        proposal._gate_block(doc, {"title": "Gate", "lines": lines})
+        proposal._detail_option(doc, {"title": "Option", "lines": lines})
+        for table in doc.tables:
+            heading = table.cell(2, 0).paragraphs[0]
+            self.assertEqual(heading.text, "Access Control")
+            self.assertTrue(all(run.bold and run.underline for run in heading.runs))
+            self.assertEqual(heading.paragraph_format.left_indent, 0)
+            self.assertTrue(heading.paragraph_format.keep_with_next)
+            self.assertIn("First description", table.cell(1, 0).text)
+            self.assertIn("Text starts", table.cell(3, 0).text)
+
     def test_supply_group_spacing(self):
         lines = [
             {"qty": 1, "text": "Installed opener", "label": "Install:"},

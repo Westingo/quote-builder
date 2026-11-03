@@ -1,0 +1,51 @@
+/* Phone editor: the same quote and actions, arranged for touch. */
+.mobile-only{display:none}
+@media(max-width:760px){
+  .mobile-only{display:inline-flex;align-items:center;justify-content:center}
+  header{position:static}
+  .tb{gap:8px;padding:10px 12px}
+  .tb .brand{flex:1;font-size:14px}
+  .tb .role{display:none}
+  header:not(.mobile-tools-open) .tb>:not(.brand):not(#mobile-tools):not(#undo-btn){display:none}
+  header:not(.mobile-tools-open) .toolbar-status{display:none}
+  .tb .toolbar-profile{flex-wrap:wrap;white-space:normal}
+  .tb .toolbar-profile select{max-width:100%}
+  .pm-tabs{padding:0 12px 10px}
+  main{padding:12px 10px;margin-bottom:calc(var(--mobile-bar-height,90px) + 24px)}
+  .workspace{display:block}
+  #preview-home{display:none}
+  #preview-dialog #preview-panel{min-height:0}
+  .preview-toolbar{flex-wrap:wrap}
+  .pad{padding:12px}
+  .row{flex-direction:column;gap:4px}
+  .row>*{min-width:0;max-width:100%;flex:auto}
+  .row3{grid-template-columns:minmax(0,1fr)}
+  input[type=text],input[type=date],input[type=search],input[type=number],select,textarea,
+  .lines li .txt .itemtext,.lines li .txt .fills,.lines li .txt input.code{font-size:16px;min-height:44px}
+  .btn,.btn.sm,.btn.x,.ord .btn.sm,.nwe-chip .btn{min-height:44px;min-width:44px;padding:8px 10px}
+  .checklist label{min-height:44px;padding:10px 5px;font-size:14px}
+  input[type=checkbox]{width:20px;height:20px;flex:none}
+  .sheet>h2{gap:8px}
+  .sheet>h2 button{margin-left:0}
+  .ghead>input[type=text]{flex:1 1 100%;min-width:0}
+  .lines{padding:8px}
+  .lines li{gap:8px;padding:12px 0}
+  .lines li .txt{flex:1 1 100%;min-width:0}
+  .lines li .txt .itemtext{flex:1 1 100%;min-width:0}
+  .lines li .txt .fills{width:100%}
+  .addrow input.ftext{min-width:0;flex:1 1 100%}
+  .opt .amt{width:100%}
+  .nwe-chip{flex-wrap:wrap}
+  .nwe-wording{flex-basis:calc(100% - 30px)}
+  .buildbar{flex-wrap:wrap;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));align-items:center}
+  .buildbar .sp{display:none}
+  .buildbar #status,.buildbar #pm-status{width:100%;overflow-wrap:anywhere}
+  .buildbar #status:empty,.buildbar #pm-status:empty{display:none}
+  .buildbar #dl{max-width:100%;overflow-wrap:anywhere}
+  .buildbar .file-actions{margin-left:auto}
+  .file-menu{width:300px;max-width:calc(100vw - 20px);max-height:65dvh}
+  .buildbar .file-menu #jobs{width:100%!important;flex:none}
+  .pm-actions{flex-wrap:wrap}
+  .pm-layout{grid-template-columns:minmax(0,1fr)}
+  #format-dialog{padding:12px!important;width:calc(100% - 20px)!important;max-height:90dvh!important}
+}

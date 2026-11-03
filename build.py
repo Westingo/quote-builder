@@ -103,6 +103,8 @@ def resolve_line(index, line):
     res = {"qty": qty, "text": _terminate(text)}
     if "format" in line:
         res["format"] = quote_format.validate(line["format"])
+    if line.get("header"):
+        res.update(header=True, text=text, qty=None)
     if line.get("sub"):                        # indented "— text" sub-note
         res["sub"] = True
     if line.get("atqty"):                      # note starting at the qty/number column
@@ -265,6 +267,7 @@ def build_doc(job, data, index):
         "gates": gates,
         "options_title": job.get("options_title", proposal.DEFAULT_OPTIONS_TITLE),
         "options": process_options(index, job.get("options")),
+        "nwe_page_breaks": job.get("nwe_page_breaks", []),
         "notes": resolve_codes(index, job.get("notes"), "note"),
         "warranties": resolve_codes(index, job.get("warranties"), "warranty"),
         "exclusions": resolve_codes(index, job.get("exclusions"), "exclusion"),

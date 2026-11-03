@@ -64,6 +64,12 @@ def index():
                         headers={"Cache-Control": "no-store"})
 
 
+@app.get("/sw.js")
+def service_worker():
+    return FileResponse(os.path.join(STATIC, "sw.js"), media_type="application/javascript",
+                        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"})
+
+
 @app.get("/api/codes")
 def api_codes(refresh: bool = False, local: bool = False):
     """The dictionary, grouped sheet -> category -> items, for the picker UI."""

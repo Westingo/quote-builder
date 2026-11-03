@@ -23,7 +23,7 @@ def validate_job(job):
             elif key == "qty":
                 if val is not None:
                     check(val, (str, int, float), path + "." + key)
-            elif key in ("sub", "atqty", "leftnote", "deduct", "cost_per_gate"):
+            elif key in ("header", "sub", "atqty", "leftnote", "deduct", "cost_per_gate"):
                 check(val, bool, path + "." + key)
             elif key == "fills":
                 strings(val, path + ".fills")
@@ -52,6 +52,10 @@ def validate_job(job):
             check(value, str, "proposal field")
     if not job["proposal"].get("for", "").strip():
         raise ValueError("Customer (For:) is required.")
+    breaks = job.get("nwe_page_breaks", [])
+    strings(breaks, "nwe_page_breaks")
+    if any(key not in ("group", "notes", "warranties", "exclusions") for key in breaks):
+        raise ValueError("Invalid quote: unknown page break section.")
     strings(job.get("gate_summary", []), "gate_summary")
     if "summary_text_format" in job:
         quote_format.validate(job["summary_text_format"])

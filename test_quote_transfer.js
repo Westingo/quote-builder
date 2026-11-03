@@ -29,6 +29,7 @@ const job={slug:'liv-imported-2',proposal:{cmi:true,for:'Liv customer',ccb:'CUST
   options:[{kind:'block',title:'Option',bullets:['First','Second'],priced:[{label:'Single',amount:'50'}]}],
   notes:[{text:'Custom note'}],warranties:[],exclusions:[],total:'123'};
 job.gates[0].format={page_break:true,font_size:9};
+job.nwe_page_breaks=['group','exclusions'];
 job.summary_text='Project detail\nSecond line';
 job.summary_text_format={italic:true,align:'center',space_before:12};
 job.gates[0].lines[0].format={amount_align:'top',bold:true};
@@ -37,6 +38,7 @@ job.options.push({title:'Detailed',format:{keep_together:true},lines:[{text:'Mul
 context.loadJobObject(job);
 const exported=JSON.parse(JSON.stringify(context.collect()));
 assert.equal(exported.proposal.cmi,true);
+assert.deepEqual(exported.nwe_page_breaks,job.nwe_page_breaks);
 assert.equal(exported.summary_text,job.summary_text);
 assert.deepEqual(exported.summary_text_format,job.summary_text_format);
 assert.equal(exported.slug,job.slug);
@@ -46,6 +48,7 @@ for(const key of ['gates','gate_summary','options','notes','warranties','exclusi
 context.loadJobObject({});
 assert.equal(context.activeSlug,'');
 assert.equal(context.collect().summary_text_format,undefined);
+assert.equal(context.collect().nwe_page_breaks,undefined);
 assert.equal(fields['#f-cmi'].checked,false);
 assert.equal(context.collect().proposal.cmi,undefined);
 assert.equal(context.collect().summary_text,'');
@@ -54,7 +57,7 @@ console.log('Passed: imported save identity, editor round-trip, custom wording, 
 
 // Attach to an identity, reorder locations, save/reload, then remove the parent.
 context.redraw=()=>{};context.renderOptions=()=>{};context.scrollToOption=()=>{};
-for(const name of ['assignOption','removeGate','reorderList','reorderAt'])vm.runInContext(extract(name),context);
+for(const name of ['assignOption','removeGate','reorderList','compatibleRowGroups','reorderAt'])vm.runInContext(extract(name),context);
 context.loadJobObject({...job,gates:[...job.gates,{title:'Gate B',lines:[]}]});
 context.assignOption(0,context.JOB.gates[0].id);
 context.reorderAt('gates',0,2);
