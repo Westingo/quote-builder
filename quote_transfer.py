@@ -101,6 +101,8 @@ def validate_job(job):
                 row(value, key)
     if "options_title" in job:
         check(job["options_title"], str, "options_title")
+    if "band_title" in job:
+        check(job["band_title"], str, "band_title")
     if job.get("total") is not None:
         check(job["total"], (str, int, float), "total")
     return {k: v for k, v in job.items() if k != "slug"}

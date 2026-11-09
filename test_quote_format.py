@@ -24,6 +24,28 @@ def fixture():
 
 
 class FormatTests(unittest.TestCase):
+    def test_quote_suffix_in_page_box(self):
+        cases = {
+            "G20260365-R1": "R1",
+            "G20260341 CO1 R1": "CO1 R1",
+            "G20260341-CO2-R12": "CO2 R12",
+            "G20260341 co1": "CO1",
+            "G20260365": "",
+            "ORDER1": "",
+            "G20260365-R1 pending": "",
+        }
+        for bid, suffix in cases.items():
+            with self.subTest(bid=bid), tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "quote.docx"
+                proposal.build_proposal({"header": {"bid_number": bid}}, str(path))
+                doc = Document(path)
+                for header in (doc.sections[0].header, doc.sections[0].first_page_header):
+                    box = header.tables[0].cell(0, 1).tables[0].cell(0, 0)
+                    expected = "Pg. 1 of 1" + (" — " + suffix if suffix else "")
+                    self.assertEqual(box.text, expected)
+                    self.assertIn("NUMPAGES", box._tc.xml)
+                self.assertIn(bid, doc.sections[0].footer._element.xml)
+
     def test_transfer_and_docx_formatting(self):
         job = fixture()
         self.assertEqual(quote_transfer.import_quote(quote_transfer.export_quote(job)), job)

@@ -75,14 +75,6 @@ def _fill_blanks(text, fills):
     return re.sub(r"_+", repl, text)
 
 
-def _terminate(text):
-    """Code-derived lines get a closing period like the sample proposal."""
-    t = text.rstrip()
-    if t and t[-1] not in ".!?:":
-        t += "."
-    return t
-
-
 def _norm_label(v):
     """Normalize a row label (Install/Supply/Other) to print with a trailing colon."""
     v = str(v or "").strip()
@@ -99,8 +91,8 @@ def resolve_line(index, line):
         text = item.get("description", "")
         text = _fill_blanks(text, line.get("fills"))
     if line.get("note"):
-        text = _terminate(text) + " — " + str(line["note"])
-    res = {"qty": qty, "text": _terminate(text)}
+        text = text.rstrip() + " — " + str(line["note"])
+    res = {"qty": qty, "text": text.rstrip()}
     if "format" in line:
         res["format"] = quote_format.validate(line["format"])
     if line.get("header"):
@@ -266,6 +258,7 @@ def build_doc(job, data, index):
         "summary_text_format": quote_format.validate(job.get("summary_text_format", {})),
         "gates": gates,
         "options_title": job.get("options_title", proposal.DEFAULT_OPTIONS_TITLE),
+        "band_title": job.get("band_title", proposal.DEFAULT_BAND_TITLE),
         "options": process_options(index, job.get("options")),
         "nwe_page_breaks": job.get("nwe_page_breaks", []),
         "notes": resolve_codes(index, job.get("notes"), "note"),

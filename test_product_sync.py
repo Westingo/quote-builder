@@ -89,9 +89,9 @@ class ProductSyncTests(unittest.TestCase):
             sync.get_products()
         _, index = build.load_codes()
         self.assertEqual(build.resolve_line(index, {'code': 'NEW1', 'sheet': 'Brivo'})['text'],
-                         'Fresh product.')
+                         'Fresh product')
         self.assertEqual(build.resolve_line(index, {'code': 'REMOVED', 'text': 'Saved wording'})['text'],
-                         'Saved wording.')
+                         'Saved wording')
         self.assertEqual(build.resolve_codes(index, [{'code': 'OLD', 'text': 'Saved note'}], 'note'),
                          ['Saved note'])
 

@@ -38,8 +38,8 @@ class PreviewTests(unittest.TestCase):
             "options": [{"text": "Deduct", "amount": "25", "deduct": True}],
             "notes": ["N38"], "total": "200"})
         doc = result["doc"]
-        self.assertEqual(doc["gates"][0]["lines"][0]["text"], "Gate 24 feet wide.")
-        self.assertEqual(doc["gates"][0]["lines"][1]["text"], "Custom description.")
+        self.assertEqual(doc["gates"][0]["lines"][0]["text"], "Gate 24 feet wide")
+        self.assertEqual(doc["gates"][0]["lines"][1]["text"], "Custom description")
         self.assertEqual(doc["gates"][0]["lines"][1]["amount"], "50%")
         self.assertTrue(doc["options"][0]["deduct"])
         self.assertEqual(doc["notes"], ["Tariff one"])

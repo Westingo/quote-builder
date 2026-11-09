@@ -23,6 +23,7 @@ Word page header & footer so they repeat on every page automatically. The
 between, with page breaks at section boundaries.
 """
 import os
+import re
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_BREAK
@@ -41,6 +42,15 @@ AMOUNT_W = Inches(1.0)       # right AMOUNT gutter
 PAGE_BODY_W = CONTENT_W + AMOUNT_W
 TEXT_GAP = Inches(0.28)      # keep body text clear of the AMOUNT divider line
 RIGHT_INDENT = AMOUNT_W + TEXT_GAP   # right indent for full-width body paragraphs
+
+
+def _quote_suffix(bid_number):
+    """Read trailing revision/change-order tags without altering the quote ID."""
+    match = re.search(r"(?:[\s-]+(?:CO|R)\d+)+\s*$",
+                      str(bid_number or ""), re.IGNORECASE)
+    if not match:
+        return ""
+    return " ".join(re.findall(r"(?:CO|R)\d+", match.group(), re.IGNORECASE)).upper()
 
 
 # ----------------------------------------------------------------------------
@@ -144,6 +154,9 @@ def _build_header(section, h, *, first_page=False):
     U.add_field(c1, "PAGE", "1")
     _run(c1, " of ", size=11)
     U.add_field(c1, "NUMPAGES", "1")
+    suffix = _quote_suffix(h.get("bid_number"))
+    if suffix:
+        _run(c1, " — " + suffix, size=11)
 
     c2 = trow.cell(0, 2).paragraphs[0]
     c2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -180,7 +193,9 @@ def _build_header(section, h, *, first_page=False):
     field(grid.cell(0, 0), "For:", h.get("for"))
     field(grid.cell(0, 1), "Phone:", h.get("phone"))
     field(grid.cell(1, 0), "Address:", h.get("address"))
-    field(grid.cell(1, 1), "", "")
+    # Let Email start directly below Phone instead of leaving an empty row.
+    email_cell = grid.cell(1, 1).merge(grid.cell(2, 1))
+    field(email_cell, "Email:", h.get("email"))
     # Date + Terms share a line
     p = grid.cell(2, 0).paragraphs[0]
     U.no_space(p, before=3, after=3)
@@ -188,7 +203,6 @@ def _build_header(section, h, *, first_page=False):
     _run(p, f"{h.get('date','')}      ", size=10)
     _run(p, "Terms: ", bold=True, size=10)
     _run(p, h.get("terms", "") or "", size=10)
-    field(grid.cell(2, 1), "Email:", h.get("email"))
     field(grid.cell(3, 0), "Job Address:", h.get("job_address"),
           value_bold=True, hang=Inches(1.15))
     field(grid.cell(3, 1), "Attention:", h.get("attention"))
@@ -267,7 +281,10 @@ def _build_footer(section, h, total=None, *, first_page=False):
 # ----------------------------------------------------------------------------
 # body content
 # ----------------------------------------------------------------------------
-def _band(body, title="WE PROPOSE TO FURNISH THE FOLLOWING"):
+DEFAULT_BAND_TITLE = "WE PROPOSE TO FURNISH THE FOLLOWING"
+
+
+def _band(body, title=DEFAULT_BAND_TITLE):
     """Opening band, rendered once in the body, never as a repeating header."""
     t = body.add_table(rows=1, cols=2)
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -530,7 +547,7 @@ def render_body(body, doc):
         pm_quotes.render(body, doc["pm_quote"])
         return
     # Keep the opening band outside the repeating page header and scope tables.
-    _band(body)
+    _band(body, doc.get("band_title", DEFAULT_BAND_TITLE))
 
     # tariff notes (italic, * bullet)
     for n in doc.get("tariff_notes", []):
@@ -693,21 +710,28 @@ DEFAULT_OPTIONS_TITLE = "OPTIONS – Circle options chosen to be added to totals
 
 
 def render_options(body, options, title=DEFAULT_OPTIONS_TITLE):
+    first_break = bool(options and quote_format.validate(options[0].get("format", {})).get("page_break"))
     if title:
         head = _para(body, align=WD_ALIGN_PARAGRAPH.CENTER, before=14, after=6)
         head.paragraph_format.keep_with_next = True
         _run(head, title, bold=True, underline=True, size=10.5)
     else:
-        _para(body, before=10, after=0)   # just a gap before the options
+        head = _para(body, before=10, after=0)   # just a gap before the options
+    if first_break:
+        head.paragraph_format.page_break_before = True
 
-    for opt in options:
+    for index, opt in enumerate(options):
         # detailed option: a titled block of coded/free-text scope lines + an
         # amount (e.g. "Residential Elevator:" with a Brivo panel, a reader, ...)
         if isinstance(opt, dict) and opt.get("lines") is not None and "kind" not in opt:
+            if index == 0 and first_break:
+                opt = {**opt, "format": {**opt.get("format", {}), "page_break": False}}
             _detail_option(body, opt)
             continue
 
         # each option is a 2-col table row: text | amount
+        if index > 0 and quote_format.validate(opt.get("format", {})).get("page_break"):
+            _page_break(body)
         t = body.add_table(rows=1, cols=2)
         t.alignment = WD_TABLE_ALIGNMENT.CENTER
         U.clear_table_borders(t)

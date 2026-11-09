@@ -277,14 +277,16 @@
       </div>
       <div class="row">
         <div><label>Address</label><input type="text" id="f-address"></div>
-        <div><label>Phone</label><input type="text" id="f-phone"></div>
+        <div><label for="f-phone">Phone</label><textarea id="f-phone" rows="2"></textarea></div>
       </div>
       <div class="row">
-        <div><label>Email</label><input type="text" id="f-email"></div>
+        <div><label for="f-email">Email</label><textarea id="f-email" rows="2"></textarea></div>
         <div><label>Date</label><input type="text" id="f-date" placeholder="06/26/2026"></div>
         <div><label>Terms</label><input type="text" id="f-terms"></div>
       </div>
       <label>Job Address (two lines ok)</label><textarea id="f-jobaddr"></textarea>
+      <label for="f-band-title">Proposal heading line</label>
+      <input type="text" id="f-band-title" value="WE PROPOSE TO FURNISH THE FOLLOWING">
       <div class="row3">
         <div><label>Bid / Quote #</label><input type="text" id="f-bid"></div>
         <div><label>Submitted By</label><input type="text" id="f-subby"></div>
@@ -677,11 +679,15 @@ function renderLineList(id, lines, ul, withLineAmount){
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
+    const labelChoices=['','Install','Supply','Automate','Other'];
+    const customLabel=ln._customLabel || !labelChoices.includes(effLabel);
     const labelSel=`<select class="lblsel" title="row label" style="width:94px;flex:none"
-        oninput="setLabel('${id}',${i},this.value)">`+
-      ['','Install','Supply','Automate','Other'].map(o=>
-        `<option value="${o}"${o===effLabel?' selected':''}>${o||'—'}</option>`).join('')+
-      `</select>`;
+        onchange="chooseRowLabel('${id}',${i},this)">`+
+      labelChoices.map(o=>
+        `<option value="${o}"${!customLabel && o===effLabel?' selected':''}>${o||'—'}</option>`).join('')+
+      `<option value="__custom__"${customLabel?' selected':''}>Custom…</option></select>`+
+      `<input type="text" aria-label="Custom row label" placeholder="Custom label" style="width:140px;flex:none" ${customLabel?'':'hidden'}
+        value="${escAttr(customLabel?effLabel:'')}" oninput="setLabel('${id}',${i},this.value)">`;
     const marker=`<input class="qty" type="number" value="${ln.qty??''}" placeholder="—"
                    oninput="setQty('${id}',${i},this.value)">`;
     let body;
@@ -803,6 +809,14 @@ function replaceLineCode(id,i,input){
   redraw();
 }
 function setLabel(id,i,v){findLines(id).lines[i].label=v;}  // '' = no label
+function chooseRowLabel(id,i,select){
+  const line=findLines(id).lines[i], input=select.nextElementSibling;
+  const custom=select.value==='__custom__';
+  line._customLabel=custom;
+  input.hidden=!custom;
+  setLabel(id,i,custom?input.value:select.value);
+  if(custom)input.focus();
+}
 function setSubText(id,i,v){findLines(id).lines[i].text=v;}
 // edit an item's wording after it's added; on a code line this overrides the
 // code's dictionary text at build time (build.py prefers `text` over `code`)
@@ -997,7 +1011,14 @@ function addLocationOption(locationId){
   if(typeof recordQuoteChange==='function')recordQuoteChange();
 }
 function optionPlacement(o,i){
-  return `<label style="display:block;margin:8px 0">Belongs to<select aria-label="Option work location" onchange="assignOption(${i},this.value)"><option value="">General options</option>${JOB.gates.map(g=>`<option value="${g.id}" ${o.locationId===g.id?'selected':''}>${esc(titleFor(g)||'(untitled location)')}</option>`).join('')}</select></label>`;
+  return `<label style="display:block;margin:8px 0">Belongs to<select aria-label="Option work location" onchange="assignOption(${i},this.value)"><option value="">General options</option>${JOB.gates.map(g=>`<option value="${g.id}" ${o.locationId===g.id?'selected':''}>${esc(titleFor(g)||'(untitled location)')}</option>`).join('')}</select></label>
+    <label class="page-start"><input type="checkbox" ${o.format?.page_break?'checked':''} onchange="setOptionPageBreak(${i},this.checked)"> Start option on a new page</label>`;
+}
+function setOptionPageBreak(i,enabled){
+  const option=JOB.options[i];
+  option.format={...option.format};
+  if(enabled)option.format.page_break=true;else delete option.format.page_break;
+  if(!Object.keys(option.format).length)delete option.format;
 }
 function renderOptions(){
   const general=$('#options');general.innerHTML='<div class="muted">General options apply to the whole quote. Use Belongs to to place an option under a work location.</div>';
@@ -1231,6 +1252,7 @@ function collect(){
     summary_text:$('#f-summary-text').value,
     ...(Object.keys(JOB.summary_text_format||{}).length?{summary_text_format:{...JOB.summary_text_format}}:{}),
     options_title:$('#f-optionstitle').value,
+    band_title:$('#f-band-title').value,
     gates:JOB.gates.map(g=>({title:titleFor(g), ...(g.format?{format:g.format}:{}), lines:dropEmptySubs(g.lines).map(cleanLine), ...(JOB.options.some(o=>o.locationId===g.id)?{options:JOB.options.filter(o=>o.locationId===g.id).map(cleanOption)}:{})})),
     options:JOB.options.filter(o=>!JOB.gates.some(g=>g.id===o.locationId)).map(cleanOption),
     notes:collectNWE('N'), warranties:collectNWE('W'), exclusions:collectNWE('E'),
@@ -1274,7 +1296,7 @@ function cleanLine(ln){
   return {...o,...(ln.format?{format:ln.format}:{})};
 }
 function cleanOption(o){
-  if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced};
+  if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced,...(o.format?{format:o.format}:{})};
   if(o.lines){   // detailed option
     const r={title:o.title, lines:dropEmptySubs(o.lines).map(cleanLine)};
     if(o.amount)r.amount=o.amount; if(o.deduct)r.deduct=true;
@@ -1341,6 +1363,7 @@ function loadJobObject(j){
   $('#f-subby').value=p.submitted_by||''; $('#f-jobfooter').value=p.job_footer||''; $('#f-total').value=j.total||'';
   $('#f-ccb').value=p.ccb??'46091'; $('#f-cc').value=p.cc??'METROOD121MJ';
   $('#f-optionstitle').value=(j.options_title!==undefined)?j.options_title:'OPTIONS – Circle options chosen to be added to totals:';
+  $('#f-band-title').value=j.band_title??'WE PROPOSE TO FURNISH THE FOLLOWING';
   JOB.gate_summary=(j.gate_summary||[]).slice();
   $('#f-summary-text').value=j.summary_text||'';
   for(const key of ['group','notes','warranties','exclusions']){
