@@ -330,7 +330,7 @@ def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False,
     With sub=True, render an indented '— text' sub-note that hangs under the item
     above it (e.g. '— With drive rail, 208/230 1PH.'). With atqty=True, the text
     starts at the qty/number column (lining up with the '1)' markers) and wraps at
-    the description column. With leftnote=True, the text starts at the far-left
+    that same column. With leftnote=True, the text starts at the far-left
     label column (level with 'Install:') and wraps across the full width."""
     U.no_space(p, before=0, after=0, line=1.0)
     pf = p.paragraph_format
@@ -349,9 +349,9 @@ def _format_scope_para(p, qty, text, label="", reserve_amount=True, sub=False,
         return p
     if atqty:
         # dash at the label column (aligns with Install:/Supply:), text at the qty
-        # column (aligns with the '1)' markers), wrapping at the description column
-        pf.left_indent = DESC_TAB
-        pf.first_line_indent = -DESC_TAB
+        # column (aligns with the '1)' markers), with wrapped text aligned there.
+        pf.left_indent = QTY_TAB
+        pf.first_line_indent = -QTY_TAB
         pf.right_indent = RIGHT_INDENT if reserve_amount else TEXT_GAP
         pf.tab_stops.add_tab_stop(QTY_TAB)
         _run(p, "—\t", size=10)

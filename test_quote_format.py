@@ -24,6 +24,19 @@ def fixture():
 
 
 class FormatTests(unittest.TestCase):
+    def test_note_wrap_aligns_with_note_text(self):
+        note = {"text": "Long note that wraps onto another line. " * 12, "atqty": True}
+        for render in (proposal._gate_block, proposal._detail_option):
+            with self.subTest(render=render.__name__):
+                doc = Document()
+                render(doc, {"title": "Scope", "lines": [note]})
+                paragraph = next(p for row in doc.tables[0].rows
+                                 for p in row.cells[0].paragraphs if note["text"] in p.text)
+                self.assertTrue(paragraph.text.startswith("—\t"))
+                self.assertEqual(paragraph.paragraph_format.left_indent.twips, proposal.QTY_TAB.twips)
+                self.assertEqual(paragraph.paragraph_format.first_line_indent.twips, -proposal.QTY_TAB.twips)
+                self.assertEqual(paragraph.paragraph_format.tab_stops[0].position.twips, proposal.QTY_TAB.twips)
+
     def test_quote_suffix_in_page_box(self):
         cases = {
             "G20260365-R1": "R1",
