@@ -20,6 +20,8 @@ def validate_job(job):
         for key, val in value.items():
             if key == "format":
                 quote_format.validate(val)
+            elif key == "price_format":
+                quote_format.validate_price(val)
             elif key == "qty":
                 if val is not None:
                     check(val, (str, int, float), path + "." + key)

@@ -95,6 +95,8 @@ def resolve_line(index, line):
     res = {"qty": qty, "text": text.rstrip()}
     if "format" in line:
         res["format"] = quote_format.validate(line["format"])
+    if "price_format" in line:
+        res["price_format"] = quote_format.validate_price(line["price_format"])
     if line.get("header"):
         res.update(header=True, text=text, qty=None)
     if line.get("sub"):                        # indented "— text" sub-note
@@ -119,6 +121,7 @@ def resolve_lines(index, lines):
     for ln in lines or []:
         if isinstance(ln, dict) and ln.get("amount_note") is not None:
             out.append({"amount_note": ln["amount_note"],
+                        "price_format": quote_format.validate_price(ln.get("price_format", {})),
                         "format": quote_format.validate(ln.get("format", {})),
                         "amount": ln.get("amount"), "deduct": ln.get("deduct")})
         else:

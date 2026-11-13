@@ -24,3 +24,10 @@ def validate(value):
             continue
         raise ValueError(f"Invalid formatting setting: {key}")
     return value
+
+
+def validate_price(value):
+    validate(value)
+    if set(value) - {"font_size", "bold", "italic", "underline", "align", "amount_align"}:
+        raise ValueError("Invalid price formatting setting.")
+    return value

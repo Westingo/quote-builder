@@ -675,7 +675,7 @@ function renderLineList(id, lines, ul, withLineAmount){
       li.innerHTML=`${mv}${typeSelect}
         <input type="text" value="${escAttr(text||'')}" aria-label="${noteType==='header'?'Header':'Note'} text" style="flex:1;${noteType==='header'?'font-weight:bold;text-decoration:'+(ln.format?.underline===false?'none':'underline'):''}"
           oninput="${noteType==='priced'?'setNoteLabel':'setSubText'}('${id}',${i},this.value)">
-        ${amount}<button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
+        ${amount}${amount?`<button class="btn sm" onclick="openFormatting('${id}',${i},true)">Price format</button>`:''}<button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
       ul.appendChild(li); return;
     }
     const effLabel=(ln.label!==undefined)?ln.label:(i===firstCountedIdx?'Install':'');
@@ -708,23 +708,37 @@ function renderLineList(id, lines, ul, withLineAmount){
            title="price or note shown in the AMOUNT column for this item"
            style="width:96px;flex:none" oninput="setLineAmount('${id}',${i},this.value)">`
       : '';
-    li.innerHTML=`${mv}${typeSelect}${labelSel}${marker}<div class="txt">${body}</div>${amt}
+    li.innerHTML=`${mv}${typeSelect}${labelSel}${marker}<div class="txt">${body}</div>${amt}${amt?`<button class="btn sm" onclick="openFormatting('${id}',${i},true)">Price format</button>`:''}
       <button class="btn sm" onclick="openFormatting('${id}',${i})">Format</button><button class="btn sm" title="add a sub-note under this item" onclick="addSubBelow('${id}',${i})">+sub</button>
       <button class="btn x sm" onclick="rmLine('${id}',${i})">✕</button>`;
     ul.appendChild(li);
   });
 }
 let formatTarget=null;
-function openFormatting(id,index=null){
+function openFormatting(id,index=null,price=false){
   const summary=id==='summary';
   const group=summary?null:findLines(id);
   const target=summary?{text:$('#f-summary-text').value,format:JOB.summary_text_format}:index===null?group:group.lines[index];
-  formatTarget={target,index,summary};
-  const f=target.format||{};
+  formatTarget={target,index,summary,price};
+  const f=(price?target.price_format:target.format)||{};
   const dialog=$('#format-dialog');
   const select=(key,label,choices)=>`<label>${label}<select name="${key}"><option value="">Use default</option>${choices.map(([v,t])=>`<option value="${v}"${f[key]===v?' selected':''}>${t}</option>`).join('')}</select></label>`;
   const number=(key,label,min,max,step=1)=>`<label>${label}<input name="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${f[key]??''}" placeholder="Default"></label>`;
   const flag=(key,label)=>`<label><input style="width:auto" name="${key}" type="checkbox" ${(f[key]??(target.header && key==='underline'))?'checked':''}> ${label}</label>`;
+  if(price){
+    dialog.innerHTML=`<form><h2>Price formatting</h2>
+      <p class="muted">Styles only the amount on this line. Blank fields use the existing price style.</p>
+      ${number('font_size','Price font size (pt)',8,14,0.5)}
+      ${select('bold','Bold',[['true','On'],['false','Off']])}
+      ${select('italic','Italic',[['true','On'],['false','Off']])}
+      ${select('underline','Underline',[['true','On'],['false','Off']])}
+      ${select('align','Price text alignment',[['left','Left'],['center','Center'],['right','Right']])}
+      ${select('amount_align','Position beside the text',[['top','Top'],['center','Middle'],['bottom','Bottom']])}
+      <p><button class="btn primary" type="submit">Apply</button> <button class="btn" type="button" onclick="resetFormatting()">Reset price formatting</button> <button class="btn" type="button" onclick="$('#format-dialog').close()">Cancel</button></p></form>`;
+    for(const key of ['bold','italic','underline'])dialog.querySelector(`[name="${key}"]`).value=f[key]===undefined?'':String(f[key]);
+    dialog.querySelector('form').onsubmit=event=>{event.preventDefault();saveFormatting(event.currentTarget);};
+    dialog.showModal();return;
+  }
   const row=index!==null;
   const text=row?(target.amount_note??target.text??applyFills(target)):'';
   dialog.innerHTML=`<form id="format-form"><h2>${summary?'Summary text formatting':row?'Line formatting':'Section formatting'}</h2>
@@ -746,14 +760,15 @@ function openFormatting(id,index=null){
   dialog.showModal();
 }
 function saveFormatting(form){
-  const {target,index,summary}=formatTarget, f={};
+  const {target,index,summary,price}=formatTarget, f={};
   for(const el of form.elements){
     if(!el.name||el.name==='wording')continue;
     if(el.type==='checkbox'){if(el.checked)f[el.name]=true;else if(target.header && el.name==='underline')f.underline=false;}
-    else if(el.value!=='')f[el.name]=el.type==='number'?Number(el.value):el.value;
+    else if(el.value!=='')f[el.name]=price && ['bold','italic','underline'].includes(el.name)?el.value==='true':el.type==='number'?Number(el.value):el.value;
   }
-  if(Object.keys(f).length)target.format=f;else delete target.format;
-  if(index!==null){
+  const formatKey=price?'price_format':'format';
+  if(Object.keys(f).length)target[formatKey]=f;else delete target[formatKey];
+  if(index!==null && !price){
     const key=target.amount_note!==undefined?'amount_note':'text';
     target[key]=form.elements.wording.value;
   }
@@ -764,7 +779,7 @@ function saveFormatting(form){
   $('#format-dialog').close();redraw();schedulePreview();
 }
 function resetFormatting(){
-  delete formatTarget.target.format;
+  delete formatTarget.target[formatTarget.price?'price_format':'format'];
   if(formatTarget.summary)delete JOB.summary_text_format;
   $('#format-dialog').close();redraw();schedulePreview();
 }
@@ -1270,16 +1285,16 @@ function dropEmptySubs(lines){return lines.filter(l=>!((l.header||l.sub||l.atqty
 function cleanLine(ln){
   if(ln.amount_note!==undefined){
     const r={amount_note:ln.amount_note}; if(ln.amount)r.amount=ln.amount;
-    if(ln.deduct)r.deduct=true; return {...r,...(ln.format?{format:ln.format}:{})};
+    if(ln.deduct)r.deduct=true; return {...r,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
   }
   if(ln.sub){
-    const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
+    const o={text:ln.text, sub:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
   }
   if(ln.atqty){
-    const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
+    const o={text:ln.text, atqty:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
   }
   if(ln.header||ln.leftnote){
-    const o={text:ln.text, [ln.header?'header':'leftnote']:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{})};
+    const o={text:ln.text, [ln.header?'header':'leftnote']:true}; if(ln.amount)o.amount=ln.amount; return {...o,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
   }
   if(ln.code!==undefined){
     const o={code:ln.code, sheet:ln.sheet, qty:ln.qty};
@@ -1288,12 +1303,12 @@ function cleanLine(ln){
     else o.text=applyFills(ln);  // snapshot the displayed wording before later sheet changes
     if(ln.label!==undefined) o.label=ln.label;
     if(ln.amount) o.amount=ln.amount;
-    return {...o,...(ln.format?{format:ln.format}:{})};
+    return {...o,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
   }
   const o={text:ln.text, qty:ln.qty};
   if(ln.label!==undefined) o.label=ln.label;
   if(ln.amount) o.amount=ln.amount;
-  return {...o,...(ln.format?{format:ln.format}:{})};
+  return {...o,...(ln.format?{format:ln.format}:{}),...(ln.price_format?{price_format:ln.price_format}:{})};
 }
 function cleanOption(o){
   if(o.kind==='block') return {kind:'block',title:o.title,bullets:o.bullets,priced:o.priced,...(o.format?{format:o.format}:{})};

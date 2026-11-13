@@ -24,6 +24,31 @@ def fixture():
 
 
 class FormatTests(unittest.TestCase):
+    def test_independent_price_format_survives_transfer_and_rendering(self):
+        price = {"font_size": 14, "bold": False, "italic": True,
+                 "underline": True, "align": "left", "amount_align": "top"}
+        for kind in ({"text": "Item", "qty": 1}, {"amount_note": "Note"},
+                     {"text": "Header", "header": True}, {"text": "Sub", "sub": True}):
+            line = {**kind, "amount": "123", "format": {"font_size": 9, "bold": True},
+                    "price_format": price}
+            job = {"proposal": {"for": "Test"}, "gates": [{"lines": [line]}]}
+            restored = quote_transfer.import_quote(quote_transfer.export_quote(job))
+            lines = build.resolve_lines({}, restored["gates"][0]["lines"])
+            self.assertEqual(lines[0]["price_format"], price)
+            for render in (proposal._gate_block, proposal._detail_option):
+                doc = Document()
+                render(doc, {"title": "Test", "lines": lines})
+                row = doc.tables[0].rows[1]
+                self.assertEqual(row.cells[0].paragraphs[0].runs[-1].font.size.pt, 9)
+                self.assertTrue(row.cells[0].paragraphs[0].runs[-1].bold)
+                run = row.cells[1].paragraphs[0].runs[-1]
+                self.assertEqual(run.font.size.pt, 14)
+                self.assertFalse(run.bold)
+                self.assertTrue(run.italic)
+                self.assertTrue(run.underline)
+                self.assertEqual(row.cells[1].vertical_alignment, WD_ALIGN_VERTICAL.TOP)
+                self.assertEqual(row.cells[1].paragraphs[0].alignment, 0)
+
     def test_note_wrap_aligns_with_note_text(self):
         note = {"text": "Long note that wraps onto another line. " * 12, "atqty": True}
         for render in (proposal._gate_block, proposal._detail_option):

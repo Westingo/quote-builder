@@ -534,6 +534,22 @@ def _format_row(row, line, section):
     row.cells[1].vertical_alignment = {"top": WD_ALIGN_VERTICAL.TOP,
         "center": WD_ALIGN_VERTICAL.CENTER, "bottom": WD_ALIGN_VERTICAL.BOTTOM}[fmt.get("amount_align", "bottom")]
 
+    price = quote_format.validate_price(line.get("price_format", {}))
+    cell = row.cells[1]
+    if "amount_align" in price:
+        cell.vertical_alignment = {"top": WD_ALIGN_VERTICAL.TOP,
+            "center": WD_ALIGN_VERTICAL.CENTER, "bottom": WD_ALIGN_VERTICAL.BOTTOM}[price["amount_align"]]
+    for para in cell.paragraphs:
+        if "align" in price:
+            para.alignment = {"left": WD_ALIGN_PARAGRAPH.LEFT,
+                "center": WD_ALIGN_PARAGRAPH.CENTER, "right": WD_ALIGN_PARAGRAPH.RIGHT}[price["align"]]
+        for run in para.runs:
+            if "font_size" in price:
+                run.font.size = Pt(price["font_size"])
+            for key in ("bold", "italic", "underline"):
+                if key in price:
+                    setattr(run, key, price[key])
+
 
 def _page_break(body):
     p = body.add_paragraph()
